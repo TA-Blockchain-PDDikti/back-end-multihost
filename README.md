@@ -2,4 +2,15 @@
 ---
 
 
+## Requirements
+
+- Git
+- cURL
+- Docker
+- Docker Compose
+- Golang
+- Node
+- npm
+<!-- - Python -->
+
 
