@@ -138,8 +138,26 @@ if [ $res -ne 0 ]; then
 
   set -x
 
-  sudo apt-get install git
-  git --version
+  pushd $HOME
+
+  VERSION="1.20.2"  # go version
+  ARCH="amd64"      # go archicture
+  curl -O -L "https://golang.org/dl/go${VERSION}.linux-${ARCH}.tar.gz"
+
+  curl -sL https://golang.org/dl/ | grep -A 5 -w "go${VERSION}.linux-${ARCH}.tar.gz"curl -sL https://golang.org/dl/ | grep -A 5 -w "go${VERSION}.linux-${ARCH}.tar.gz"
+
+  tar -xf "go${VERSION}.linux-${ARCH}.tar.gz"
+
+  sudo chown -R root:root ./go
+  sudo mv -v go /usr/local
+
+  echo "# Set up Go path #" >> ~/.bashrc
+  echo "export GOPATH=$HOME/go" >> ~/.bashrc
+  echo "export PATH=$PATH:/usr/local/go/bin:$GOPATH/bin" >> ~/.bashrc
+
+  popd
+
+  go version
 
   set +x
 fi
