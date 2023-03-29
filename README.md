@@ -39,7 +39,7 @@
    ```
    
 ## Client API
-See the documentation [here](https://documenter.getpostman.com/view/15252427/2s93RRwtez){:target="_blank" rel="noopener"}
+See the documentation [here](https://documenter.getpostman.com/view/15252427/2s93RRwtez)
 
 
 
