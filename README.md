@@ -37,6 +37,9 @@
    ```
    ./scripts/install-fabric.sh
    ```
+   
+## API Documentation
+See the documentation [here](https://documenter.getpostman.com/view/15252427/2s93RRwtez)
 
 
 
