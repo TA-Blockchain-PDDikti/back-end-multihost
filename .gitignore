@@ -1,3 +1,6 @@
 # Fabric binaries
 fabric/
 fabric/bin/
+
+#node modules
+/node_modules/
