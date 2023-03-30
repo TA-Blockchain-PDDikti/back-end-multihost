@@ -38,8 +38,20 @@
    ./scripts/install-fabric.sh
    ```
    
-## Client API
-See the documentation [here](https://documenter.getpostman.com/view/15252427/2s93RRwtez)
+## Fabric Application
+See the API documentation [here](https://documenter.getpostman.com/view/15252427/2s93RRwtez)
+
+Step to run the application:
+
+1. Install dependencies
+  ```
+   npm i
+  ```
+
+2. Run app
+  ```
+   node app.js
+  ```
 
 
 
