@@ -1,3 +1,8 @@
 # Fabric binaries
 fabric/
 fabric/bin/
+
+#Artifact
+organizations/peerOrganizations
+organizations/ordererOrganizations
+channel-artifacts/
