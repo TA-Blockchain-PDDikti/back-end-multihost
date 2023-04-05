@@ -1,0 +1,55 @@
+version: '3.7'
+
+volumes:
+  orderer.example.com:
+
+networks:
+  academic_network:
+    name: academic_network
+
+services:
+
+  # ca.orderer:
+  #   container_name: ca.example.com
+  #   extends:
+  #     file: docker-compose-base.yaml
+  #     service: ca-base
+  #   environment:
+  #     - FABRIC_CA_SERVER_CA_NAME=ca.example.com
+  #     - FABRIC_CA_SERVER_PORT=9054
+  #     - FABRIC_CA_SERVER_OPERATIONS_LISTENADDRESS=0.0.0.0:19054
+  #     - FABRIC_CA_SERVER_CA_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.example.com-cert.pem
+  #     - FABRIC_CA_SERVER_TLS_CERTFILE=/etc/hyperledger/fabric-ca-server-tls/tlsca.example.com-cert.pem
+  #   ports:
+  #     - "9054:9054"
+  #     - "19054:19054"
+  #   command: sh -c 'fabric-ca-server start -b admin:adminpw -d'
+  #   volumes:
+  #     - ../organizations/fabric-ca/ordererOrg:/etc/hyperledger/fabric-ca-server
+  #     - ../organizations/ordererOrganizations/example.com/ca/:/etc/hyperledger/fabric-ca-server-config
+  #     - ../organizations/ordererOrganizations/example.com/tlsca/:/etc/hyperledger/fabric-ca-server-tls
+  #   networks:
+  #     - academic_network
+
+  orderer:
+    container_name: orderer.example.com
+    extends:
+      file: docker-compose-base.yaml
+      service: orderer-base
+    environment:
+      - ORDERER_GENERAL_LISTENPORT=7050
+      - ORDERER_ADMIN_LISTENADDRESS=0.0.0.0:7053
+      - ORDERER_OPERATIONS_LISTENADDRESS=orderer.example.com:9443
+    working_dir: /root
+    command: orderer
+    volumes:
+        - ../channel-artifacts/genesis.block:/var/hyperledger/orderer/orderer.genesis.block
+        - ../organizations/ordererOrganizations/example.com/orderers/orderer.example.com/msp:/etc/hyperledger/orderer/msp
+        - ../organizations/ordererOrganizations/example.com/orderers/orderer.example.com/tls/:/etc/hyperledger/orderer/tls
+        - orderer.example.com:/var/hyperledger/production/orderer
+    ports:
+      - 7050:7050
+      - 7053:7053
+      - 9443:9443
+    networks:
+      - academic_network
