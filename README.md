@@ -43,12 +43,17 @@ See the API documentation [here](https://documenter.getpostman.com/view/15252427
 
 Step to run the application:
 
-1. Install dependencies
+1. Go to directory
+   ```
+   cd server-app/api
+   ```
+
+2. Install dependencies
   ```
    npm i
   ```
 
-2. Run app
+3. Run app
   ```
    node app.js
   ```
