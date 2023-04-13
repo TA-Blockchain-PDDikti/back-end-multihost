@@ -3,4 +3,4 @@ fabric/
 fabric/bin/
 
 #node modules
-fabricApp/api/node_modules/
+server-app/api/node_modules/
