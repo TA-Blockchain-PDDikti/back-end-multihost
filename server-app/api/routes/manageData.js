@@ -22,14 +22,24 @@ dataRouter.delete('/dosen/:id', dataController.deleteDosen)
 //mahasiswa
 dataRouter.post('/mahasiswa', dataController.createMahasiswa)
 dataRouter.get('/mahasiswa', dataController.getAllMahasiswa)
+dataRouter.get('/mahasiswa/:id', dataController.getMahasiswaById)
+dataRouter.get('/mahasiswa/kelas/:idKelas', dataController.getMahasiswaByKelas)
 dataRouter.put('/mahasiswa/:id', dataController.updateMahasiswa)
 dataRouter.delete('/mahasiswa/:id', dataController.deleteMahasiswa)
+
+//matakuliah
+dataRouter.post('/matkul', dataController.createMataKuliah)
+dataRouter.get('/matkul', dataController.getAllMataKuliah)
+dataRouter.put('/matkul/:id', dataController.updateMataKuliah)
+dataRouter.delete('/matkul/:id', dataController.deleteMataKuliah)
 
 //kelas
 dataRouter.post('/kelas', dataController.createKelas)
 dataRouter.get('/kelas', dataController.getAllKelas)
 dataRouter.put('/kelas/:id', dataController.updateKelas)
 dataRouter.delete('/kelas/:id', dataController.deleteKelas)
+dataRouter.post('/kelas/dosen', dataController.assignDosen)
+dataRouter.post('/kelas/mahasiswa', dataController.assignMahasiswa)
 
 //verifier
 dataRouter.post('/verifier', dataController.createVerifier)
