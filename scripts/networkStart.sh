@@ -294,7 +294,7 @@ function generateGenesisBlock() {
 
   infoln "Generating orderer genesis block"
   set -x
-  configtxgen -profile OrdererGenesis -outputBlock ./channel-artifacts/${CHANNEL_NAME}.block -channelID $CHANNEL_NAME
+  configtxgen -profile OrdererGenesis -outputBlock ./channel-artifacts/genesis.block -channelID $CHANNEL_NAME
   res=$?
   set +x
   if [ $res -ne 0 ]; then
@@ -302,7 +302,7 @@ function generateGenesisBlock() {
     println ""
     exit 1
   fi
-  BLOCKFILE="./channel-artifacts/${CHANNEL_NAME}.block"
+  BLOCKFILE="./channel-artifacts/genesis.block"
 
   println ""
 }
@@ -310,9 +310,9 @@ function generateGenesisBlock() {
 function generateChannelConfigTx() {
   # Generating channel configuration transaction: channel.tx
 
-  infoln "Generating channel configuration transaction: ${CHANNEL_NAME}.tx"
+  infoln "Generating channel configuration transaction: channel.tx"
   set -x
-  configtxgen -profile AcademicChannel -outputCreateChannelTx ./channel-artifacts/${CHANNEL_NAME}.tx -channelID $CHANNEL_NAME
+  configtxgen -profile AcademicChannel -outputCreateChannelTx ./channel-artifacts/channel.tx -channelID $CHANNEL_NAME
   res=$?
   set +x
   if [ $res -ne 0 ]; then
