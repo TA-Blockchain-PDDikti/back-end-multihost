@@ -10,18 +10,21 @@ dataRouter.delete('/pendidikan-tinggi/:id', dataController.deletePT)
 //prodi
 dataRouter.post('/prodi', dataController.createProdi)
 dataRouter.get('/prodi', dataController.getAllProdi)
+dataRouter.get('/prodi/pt/:id', dataController.getProdiByPT)
 dataRouter.put('/prodi/:id', dataController.updateProdi)
 dataRouter.delete('/prodi/:id', dataController.deleteProdi)
 
 //dosen
 dataRouter.post('/dosen', dataController.createDosen)
 dataRouter.get('/dosen', dataController.getAllDosen)
+dataRouter.get('/dosen/pt/:id', dataController.getDosenByPT)
 dataRouter.put('/dosen/:id', dataController.updateDosen)
 dataRouter.delete('/dosen/:id', dataController.deleteDosen)
 
 //mahasiswa
 dataRouter.post('/mahasiswa', dataController.createMahasiswa)
 dataRouter.get('/mahasiswa', dataController.getAllMahasiswa)
+dataRouter.get('/mahasiswa/pt/:id', dataController.getMahasiswaByPT)
 dataRouter.get('/mahasiswa/:id', dataController.getMahasiswaById)
 dataRouter.get('/mahasiswa/kelas/:idKelas', dataController.getMahasiswaByKelas)
 dataRouter.put('/mahasiswa/:id', dataController.updateMahasiswa)

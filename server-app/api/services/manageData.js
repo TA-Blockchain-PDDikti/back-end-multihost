@@ -45,11 +45,22 @@ exports.getAllProdi = async(user) => {
     result = [
         { 
             "id": "123",
-            "idPT": "123",
-            "nama": "Univ ABC",
+            "PT": "UI",
+            "nama": "Ilkom",
             "jenjangPendidikan": "user123"  
         }
     ]
+    return result
+}
+
+exports.getProdiByPT = async(user) => {
+    result = { 
+        "PT": "UI",
+        "listProdi": [{ 
+            "id": "123",
+            "nama": "Ilkom",
+            "jenjangPendidikan": "user123"  
+        }] }
     return result
 }
 
@@ -79,6 +90,24 @@ exports.getAllDosen = async(user) => {
         "sign":"hash",
         "signJab":"hash" 
     }]
+    return result
+}
+
+exports.getDosenByPT = async(user) => {
+    result = {
+        "PT":"UI",
+        "listDosen":[
+        { 
+        "id": "123",
+        "Prodi":"Ilmu Komputer",
+        "nidn": "12344",
+        "nama": "Petrus Mursanto",
+        "nomorST":"234",
+        "jabatan":"dekan",
+        "nomorSK":"1334",
+        "sign":"hash",
+        "signJab":"hash" 
+    }]}
     return result
 }
 
@@ -125,6 +154,24 @@ exports.getMahasiswaById = async(user) => {
         "totalSks": 140,
         "ipk": 3.7
     }
+    return result
+}
+
+exports.getMahasiswaByPT = async(user) => {
+    result = {
+        "PT":"UI",
+        "listMahasiswa":[{ 
+        "id": 123,
+        "npm": "14567889",
+        "Prodi":"Ilmu Komputer",
+        "nama": "Farzana", 
+        "jenjangPendidikan": "S1",
+        "status": "Lulus",
+        "nomorIjazah": "N123",
+        "totalMutu":120,
+        "totalSks": 140,
+        "ipk": 3.7
+    }]}
     return result
 }
 

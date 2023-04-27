@@ -101,7 +101,10 @@ exports.getAllProdi = async(req, res) => {
     res.status(200).send({data});
 }
 
-
+exports.getProdiByPT = async(req, res) => {
+    data = await dataService.getProdiByPT(1) 
+    res.status(200).send({data});
+}
 
 // Dosen
 exports.createDosen = async(req, res) => {
@@ -154,6 +157,11 @@ exports.getAllDosen = async(req, res) => {
     res.status(200).send({data});
 }
 
+exports.getDosenByPT = async(req, res) => {
+    data = await dataService.getDosenByPT(1) 
+    res.status(200).send({data});
+}
+
 //Mahasiswa
 
 exports.createMahasiswa = async(req, res) => {
@@ -203,6 +211,11 @@ exports.deleteMahasiswa = async(req, res) => {
 
 exports.getAllMahasiswa = async(req, res) => {
     data = await dataService.getAllMahasiswa(1) 
+    res.status(200).send({data});
+}
+
+exports.getMahasiswaByPT = async(req, res) => {
+    data = await dataService.getMahasiswaByPT(1) 
     res.status(200).send({data});
 }
 

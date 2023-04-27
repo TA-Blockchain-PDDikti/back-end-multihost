@@ -1,4 +1,3 @@
-const exp = require('constants');
 const dataService = require('../services/academicRecord.js')
 
 exports.createAcademicRecord = async(req, res) => {
