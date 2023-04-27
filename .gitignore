@@ -4,3 +4,8 @@ fabric/bin/
 
 #node modules
 server-app/api/node_modules/
+
+#Artifact
+organizations/peerOrganizations
+organizations/ordererOrganizations
+channel-artifacts/
