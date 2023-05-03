@@ -6,7 +6,7 @@ const academicRecordRouter = require('./academicRecord.js')
 
 router.use('/data', dataRouter);
 router.use('/academicRecords', academicRecordRouter)
-router.use('/certificates', certificateRouter )
+router.use('/certificates', certificateRouter)
 router.use('/auth', userRouter)
 
 module.exports = router;
