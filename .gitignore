@@ -4,3 +4,13 @@ fabric/bin/
 
 #node modules
 server-app/api/node_modules/
+#Artifact
+channel-artifacts/
+organizations/fabric-ca/*/IssuerPublicKey
+organizations/fabric-ca/*/IssuerRevocationPublicKey
+organizations/fabric-ca/*/ca-cert.pem
+organizations/fabric-ca/*/fabric-ca-server.db
+organizations/fabric-ca/*/msp/
+organizations/fabric-ca/*/tls-cert.pem
+organizations/peerOrganizations
+organizations/ordererOrganizations
