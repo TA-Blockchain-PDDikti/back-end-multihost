@@ -176,16 +176,18 @@ exports.getMahasiswaByPT = async(user) => {
 }
 
 exports.getMahasiswaByKelas = async(user) => {
-    result = [{ 
+    result = {
+        "kelas":"basdat A",
+        "mahasiswa":[{ 
         "id": 123,
         "npm": "14567889",
-        "PT":"UI",
-        "Prodi":"Ilmu Komputer",
+        "pt":"UI",
+        "prodi":"Ilmu Komputer",
         "nama": "Farzana", 
         "totalMutu":120,
         "totalSks": 140,
         "ipk": 3.7
-    }]
+    }]}
     return result
 }
 
