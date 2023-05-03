@@ -4,6 +4,7 @@ fabric/bin/
 
 #node modules
 server-app/api/node_modules/
+
 #Artifact
 channel-artifacts/
 organizations/fabric-ca/*/IssuerPublicKey
