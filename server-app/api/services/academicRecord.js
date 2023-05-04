@@ -1,15 +1,21 @@
 const { Gateway, Wallets } = require('fabric-network');
 
 exports.createAcademicRecord = async(user, nama) => {
-    return true;
+    const network = await fabric.connectToNetwork("he1.gradechain.com", "he-channel", "he", user)
+    const result = await fabric.interactWithChaincode(true, network, "CreateNmhs", "args" )
+    return result;
 }
 
 exports.updateAcademicRecord = async(user, nama) => {
-    return true;
+    const network = await fabric.connectToNetwork("he1.gradechain.com", "he-channel", "he", user)
+    const result = await fabric.interactWithChaincode(true, network, "UpdateNmhs", "args" )
+    return result;
 }
 
 exports.deleteAcademicRecord = async(user) => {
-    return true
+    const network = await fabric.connectToNetwork("he1.gradechain.com", "he-channel", "he", user)
+    const result = await fabric.interactWithChaincode(true, network, "DeleteNmhs", "args" )
+    return result;
 }
 
 exports.getAcademicRecordById = async(user) => {

@@ -1,15 +1,21 @@
 const { Gateway, Wallets } = require('fabric-network');
 
 exports.createIjazah = async(user, nama) => {
-    return true;
+    const network = await fabric.connectToNetwork("he1.gradechain.com", "he-channel", "he", user)
+    const result = await fabric.interactWithChaincode(true, network, "CreateIjz", "args" )
+    return result;
 }
 
 exports.updateIjazah = async(user, nama) => {
-    return true;
+    const network = await fabric.connectToNetwork("he1.gradechain.com", "he-channel", "he", user)
+    const result = await fabric.interactWithChaincode(true, network, "UpdateIjz", "args" )
+    return result;
 }
 
 exports.signIjazah = async(user, nama) => {
-    return true;
+    const network = await fabric.connectToNetwork("he1.gradechain.com", "he-channel", "he", user)
+    const result = await fabric.interactWithChaincode(true, network, "DeleteIjz", "args" )
+    return result;
 }
 
 exports.getIdentifier = async(user, nama) => {

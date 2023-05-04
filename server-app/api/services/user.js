@@ -1,25 +1,18 @@
 'use strict';
 
 const FabricCAServices = require('fabric-ca-client');
-const { Wallets } = require('fabric-network');
-const fs = require('fs');
-const path = require('path');
+const fabric = require("../utils/fabric.js")
 
 const registerUser = async(userId, userSecret, organizationName) =>  {
     try {
     
-        // load the network configuration
-        const ccpPath = path.resolve(__dirname, '..', '..', '..', 'organizations', 'peerOrganizations', `${organizationName}.example.com`, `connection-${organizationName}.json`);
-        const ccp = JSON.parse(fs.readFileSync(ccpPath, 'utf8'));
+        const ccp = await fabric.getCcp(organizationName)
 
         // Create a new CA client for interacting with the CA.
         const caURL = ccp.certificateAuthorities[`ca.${organizationName}.example.com`].url;
         const ca = new FabricCAServices(caURL);
 
-        // Create a new file system based wallet for managing identities.
-        const walletPath = path.join(process.cwd(), 'wallet');
-        const wallet = await Wallets.newFileSystemWallet(walletPath);
-        console.log(`Wallet path: ${walletPath}`);
+        const wallet = await fabric.getWallet()
 
         // Check to see if we've already enrolled the user.
         const userIdentity = await wallet.get(userId);
@@ -75,19 +68,14 @@ const registerUser = async(userId, userSecret, organizationName) =>  {
 
 const enrollAdmin = async(adminId, adminSecret, organizationName) => {
     try {
-        // load the network configuration
-        const ccpPath = path.resolve(__dirname, '..', '..', '..', 'organizations', 'peerOrganizations', `${organizationName}.example.com`, `connection-${organizationName}.json`);
-        const ccp = JSON.parse(fs.readFileSync(ccpPath, 'utf8'));
+        const ccp = await fabric.getCcp(organizationName)
 
         // Create a new CA client for interacting with the CA.
         const caInfo = ccp.certificateAuthorities[`ca.${organizationName}.example.com`];
         const caTLSCACerts = caInfo.tlsCACerts.pem;
         const ca = new FabricCAServices(caInfo.url, { trustedRoots: caTLSCACerts, verify: false }, caInfo.caName);
 
-        // Create a new file system based wallet for managing identities.
-        const walletPath = path.join(process.cwd(), 'wallet');
-        const wallet = await Wallets.newFileSystemWallet(walletPath);
-        console.log(`Wallet path: ${walletPath}`);
+        const wallet = await fabric.getWallet()
 
         // Check to see if we've already enrolled the admin user.
         const identity = await wallet.get(adminId);
@@ -108,7 +96,6 @@ const enrollAdmin = async(adminId, adminSecret, organizationName) => {
         };
         await wallet.put(adminId, x509Identity);
         console.log(x509Identity)
-        console.log('Successfully enrolled admin user "admin" and imported it into the wallet');
 
         const response = {
             "success":true,

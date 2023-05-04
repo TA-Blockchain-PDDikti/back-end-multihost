@@ -1,18 +1,26 @@
-const { Gateway, Wallets } = require('fabric-network');
 
-exports.createPT = async(user, nama) => {
-    return true;
+const fabric = require("../utils/fabric.js")
+
+exports.createPT = async(user, args) => {
+    const network = await fabric.connectToNetwork("he1.gradechain.com", "he-channel", "he", user)
+    const result = await fabric.interactWithChaincode(true, network, "CreateSp", "args" )
+    return result;
 }
 
-exports.updatePT = async(user, nama) => {
-    return true;
+exports.updatePT = async(user, args) => {
+    const network = await fabric.connectToNetwork("he1.gradechain.com", "he-channel", "he", user)
+    const result = await fabric.interactWithChaincode(true, network, "UpdateSp", "args" )
+    return result;
 }
 
 exports.deletePT = async(user) => {
-    return true
+    const network = await fabric.connectToNetwork("he1.gradechain.com", "he-channel", "he", user)
+    const result = await fabric.interactWithChaincode(true, network, "DeleteSp", "args" )
+    return result;
 }
 
 exports.getAllPT = async(user) => {
+
     result = [
         { 
             "id": 123,
@@ -30,19 +38,26 @@ exports.getAllPT = async(user) => {
 
 //Prodi
 exports.createProdi = async(user, nama) => {
-    return true;
+    const network = await fabric.connectToNetwork("he1.gradechain.com", "he-channel", "he", user)
+    const result = await fabric.interactWithChaincode(true, network, "CreateSms", "args" )
+    return result;
 }
 
 exports.updateProdi = async(user, nama) => {
-    return true;
+    const network = await fabric.connectToNetwork("he1.gradechain.com", "he-channel", "he", user)
+    const result = await fabric.interactWithChaincode(true, network, "CreateSms", "args" )
+    return result;
 }
 
 exports.deleteProdi = async(user) => {
-    return true
-}
+    const network = await fabric.connectToNetwork("he1.gradechain.com", "he-channel", "he", user)
+    const result = await fabric.interactWithChaincode(true, network, "CreateSms", "args" )
+    return result;}
 
 exports.getAllProdi = async(user) => {
-    result = [
+    const network = await fabric.connectToNetwork("he1.gradechain.com", "he-channel", "he", user)
+    const result = await fabric.interactWithChaincode(true, network, "GetAllSms", "args" )
+    response = [
         { 
             "id": "123",
             "PT": "UI",
@@ -50,7 +65,7 @@ exports.getAllProdi = async(user) => {
             "jenjangPendidikan": "user123"  
         }
     ]
-    return result
+    return response
 }
 
 exports.getProdiByPT = async(user) => {
@@ -66,18 +81,25 @@ exports.getProdiByPT = async(user) => {
 
 //dosen
 exports.createDosen = async(user, nama) => {
-    return true;
+    const network = await fabric.connectToNetwork("he1.gradechain.com", "he-channel", "he", user)
+    const result = await fabric.interactWithChaincode(true, network, "CreatePtk", "args" )
+    return result;
 }
 
 exports.updateDosen = async(user, nama) => {
-    return true;
+    const network = await fabric.connectToNetwork("he1.gradechain.com", "he-channel", "he", user)
+    const result = await fabric.interactWithChaincode(true, network, "UpdatePtk", "args" )
+    return result;
 }
 
 exports.deleteDosen = async(user) => {
-    return true
-}
+    const network = await fabric.connectToNetwork("he1.gradechain.com", "he-channel", "he", user)
+    const result = await fabric.interactWithChaincode(true, network, "DeletePtk", "args" )
+    return result;}
 
 exports.getAllDosen = async(user) => {
+    const network = await fabric.connectToNetwork("he1.gradechain.com", "he-channel", "he", user)
+    const result = await fabric.interactWithChaincode(true, network, "DeleteSp", "args" )
     result = [{ 
         "id": "123",
         "PT":"UI",
@@ -113,16 +135,21 @@ exports.getDosenByPT = async(user) => {
 
 //mahasiswa
 exports.createMahasiswa = async(user, nama) => {
-    return true;
+    const network = await fabric.connectToNetwork("he1.gradechain.com", "he-channel", "he", user)
+    const result = await fabric.interactWithChaincode(true, network, "CreatePd", "args" )
+    return result;
 }
 
 exports.updateMahasiswa = async(user, nama) => {
-    return true;
+    const network = await fabric.connectToNetwork("he1.gradechain.com", "he-channel", "he", user)
+    const result = await fabric.interactWithChaincode(true, network, "UpdatePd", "args" )
+    return result;
 }
 
 exports.deleteMahasiswa = async(user) => {
-    return true
-}
+    const network = await fabric.connectToNetwork("he1.gradechain.com", "he-channel", "he", user)
+    const result = await fabric.interactWithChaincode(true, network, "DeletePd", "args" )
+    return result;}
 
 exports.getAllMahasiswa = async(user) => {
     result = [
@@ -193,16 +220,21 @@ exports.getMahasiswaByKelas = async(user) => {
 
 //mata kuliah
 exports.createMataKuliah = async(user, nama) => {
-    return true;
+    const network = await fabric.connectToNetwork("he1.gradechain.com", "he-channel", "he", user)
+    const result = await fabric.interactWithChaincode(true, network, "CreateMk", "args" )
+    return result;
 }
 
 exports.updateMataKuliah = async(user, nama) => {
-    return true;
+    const network = await fabric.connectToNetwork("he1.gradechain.com", "he-channel", "he", user)
+    const result = await fabric.interactWithChaincode(true, network, "UpdateMk", "args" )
+    return result;
 }
 
 exports.deleteMataKuliah = async(user) => {
-    return true
-}
+    const network = await fabric.connectToNetwork("he1.gradechain.com", "he-channel", "he", user)
+    const result = await fabric.interactWithChaincode(true, network, "DeleteMk", "args" )
+    return result;}
 
 exports.getAllMataKuliah = async(user) => {
     result = [{ 
@@ -218,16 +250,21 @@ exports.getAllMataKuliah = async(user) => {
 
 //kelas
 exports.createKelas = async(user, nama) => {
-    return true; 
+    const network = await fabric.connectToNetwork("he1.gradechain.com", "he-channel", "he", user)
+    const result = await fabric.interactWithChaincode(true, network, "CreateKls", "args" )
+    return result; 
 }
 
 exports.updateKelas = async(user, nama) => {
-    return true;
+    const network = await fabric.connectToNetwork("he1.gradechain.com", "he-channel", "he", user)
+    const result = await fabric.interactWithChaincode(true, network, "UpdateKls", "args" )
+    return result;
 }
 
 exports.deleteKelas = async(user) => {
-    return true
-}
+    const network = await fabric.connectToNetwork("he1.gradechain.com", "he-channel", "he", user)
+    const result = await fabric.interactWithChaincode(true, network, "DeleteKls", "args" )
+    return result;}
 
 exports.assignDosen = async(user, idDosen) => {
     var listDosen = [];
@@ -266,7 +303,7 @@ exports.updateVerifier = async(user, nama) => {
 }
 
 exports.deleteVerifier = async(user) => {
-    return true
+    return true;
 }
 
 exports.getAllVerifier = async(user) => {
