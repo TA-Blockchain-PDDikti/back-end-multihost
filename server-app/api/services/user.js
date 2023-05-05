@@ -3,7 +3,7 @@
 const FabricCAServices = require('fabric-ca-client');
 const fabric = require("../utils/fabric.js")
 
-const registerUser = async(userId, userSecret, organizationName) =>  {
+const registerUser = async(userId, organizationName) =>  {
     try {
     
         const ccp = await fabric.getCcp(organizationName)
@@ -31,14 +31,17 @@ const registerUser = async(userId, userSecret, organizationName) =>  {
         const adminUser = await provider.getUserContext(adminIdentity, 'admin');
 
         // Register the user, enroll the user, and import the new identity into the wallet.
+        console.log('register')
         const secret = await ca.register({
-            affiliation: 'org1.department1',
+            affiliation: 'he1.department1',
             enrollmentID: userId,
             role: 'client'
         }, adminUser);
+
+        console.log('enroll', secret)
         const enrollment = await ca.enroll({
             enrollmentID: userId,
-            enrollmentSecret: userSecret
+            enrollmentSecret: secret
         });
         const x509Identity = {
             credentials: {
