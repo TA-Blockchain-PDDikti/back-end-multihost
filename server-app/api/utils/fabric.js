@@ -25,7 +25,7 @@ const connectToNetwork = async(organizationName, channelName, chaincodeName, use
         // Check to see if we've already enrolled the user.
         const identity = await wallet.get(user);
             if (!identity) {
-                throw 'An identity for the user "appUser" does not exist in the wallet'
+                throw `An identity for the user ${user} does not exist in the wallet`
             }
 
         // Create a new gateway for connecting to our peer node.
@@ -46,16 +46,5 @@ const connectToNetwork = async(organizationName, channelName, chaincodeName, use
 
 }
 
-const interactWithChaincode = async(isQuery, networkObj, functionName, args) => {
-    if (isQuery) {
-        const result = await networkObj.contract.evaluateTransaction(functionName, ...args);
-    }
-    else {
-        await networkObj.contract.submitTransaction(functionName, ...args)
-    }
 
-    networkObj.gateway.disconnect()
-
-}
-
-module.exports = {getCcp, getWallet, connectToNetwork, interactWithChaincode}
+module.exports = {getCcp, getWallet, connectToNetwork}

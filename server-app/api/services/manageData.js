@@ -1,26 +1,33 @@
 
 const fabric = require("../utils/fabric.js")
+const { randomUUID } = require('crypto');
 
-exports.createPT = async(user, args) => {
+exports.createPT = async(user, namaPT, adminPT) => {
     const network = await fabric.connectToNetwork("he1.gradechain.com", "he-channel", "he", user)
-    const result = await fabric.interactWithChaincode(true, network, "CreateSp", "args" )
+    const idPT = randomUUID()
+    const result = await network.contract.submitTransaction("CreateSp", idPT, 'HE1MSP', namaPT, adminPT)
+    network.gateway.disconnect()
     return result;
 }
 
-exports.updatePT = async(user, args) => {
+exports.updatePT = async(user, idPT, namaPT, adminPT) => {
     const network = await fabric.connectToNetwork("he1.gradechain.com", "he-channel", "he", user)
-    const result = await fabric.interactWithChaincode(true, network, "UpdateSp", "args" )
+    const result = await network.contract.submitTransaction("UpdateSp", idPT, 'HE1MSP', namaPT, adminPT)
+    network.gateway.disconnect()
     return result;
 }
 
-exports.deletePT = async(user) => {
+exports.deletePT = async(user, idPT) => {
     const network = await fabric.connectToNetwork("he1.gradechain.com", "he-channel", "he", user)
-    const result = await fabric.interactWithChaincode(true, network, "DeleteSp", "args" )
+    const result = await network.contract.submitTransaction("DeleteSp", idPT)
+    network.gateway.disconnect()
     return result;
 }
 
 exports.getAllPT = async(user) => {
-
+    const network = await fabric.connectToNetwork("he1.gradechain.com", "he-channel", "he", user)
+    const result = await network.contract.evaluateTransaction("GetAllSp")
+    network.gateway.disconnect()
     result = [
         { 
             "id": 123,
@@ -37,26 +44,31 @@ exports.getAllPT = async(user) => {
 }
 
 //Prodi
-exports.createProdi = async(user, nama) => {
+exports.createProdi = async(user, idPT, nama, jenjangPendidikan) => {
     const network = await fabric.connectToNetwork("he1.gradechain.com", "he-channel", "he", user)
-    const result = await fabric.interactWithChaincode(true, network, "CreateSms", "args" )
+    const prodiId = randomUUID()
+    const result = await network.contract.submitTransaction("CreateSms", prodiId, idPT, nama, jenjangPendidikan)
+    network.gateway.disconnect()
     return result;
 }
 
-exports.updateProdi = async(user, nama) => {
+exports.updateProdi = async(user, idProdi, idPT, nama, jenjangPendidikan) => {
     const network = await fabric.connectToNetwork("he1.gradechain.com", "he-channel", "he", user)
-    const result = await fabric.interactWithChaincode(true, network, "CreateSms", "args" )
+    const result = await network.contract.submitTransaction("UpdateSms", idProdi, idPT, nama, jenjangPendidikan)
+    network.gateway.disconnect()
     return result;
 }
 
-exports.deleteProdi = async(user) => {
+exports.deleteProdi = async(user, idProdi) => {
     const network = await fabric.connectToNetwork("he1.gradechain.com", "he-channel", "he", user)
-    const result = await fabric.interactWithChaincode(true, network, "CreateSms", "args" )
+    const result = await network.contract.submitTransaction("DeleteSms", idProdi)
+    network.gateway.disconnect()
     return result;}
 
 exports.getAllProdi = async(user) => {
     const network = await fabric.connectToNetwork("he1.gradechain.com", "he-channel", "he", user)
-    const result = await fabric.interactWithChaincode(true, network, "GetAllSms", "args" )
+    const result = await network.contract.evaluateTransaction("GetAllSms")
+    network.gateway.disconnect()
     response = [
         { 
             "id": "123",
@@ -68,7 +80,12 @@ exports.getAllProdi = async(user) => {
     return response
 }
 
-exports.getProdiByPT = async(user) => {
+exports.getProdiByPT = async(user, idPT) => {
+    const network = await fabric.connectToNetwork("he1.gradechain.com", "he-channel", "he", user)
+    const resultAll = await network.contract.evaluateTransaction("GetAllSms")
+    network.gateway.disconnect()
+
+    //TODO: Filter by  PT 
     result = { 
         "PT": "UI",
         "listProdi": [{ 
@@ -80,26 +97,31 @@ exports.getProdiByPT = async(user) => {
 }
 
 //dosen
-exports.createDosen = async(user, nama) => {
+exports.createDosen = async(user,idPT,idProdi,nama,nomorST) => {
     const network = await fabric.connectToNetwork("he1.gradechain.com", "he-channel", "he", user)
-    const result = await fabric.interactWithChaincode(true, network, "CreatePtk", "args" )
+    const idDosen = randomUUID()
+    const result = await network.contract.submitTransaction("CreatePtk", idDosen, idPT, idProdi,nama,nomorST)
+    network.gateway.disconnect()
     return result;
 }
 
-exports.updateDosen = async(user, nama) => {
+exports.updateDosen = async(user,idDosen, idPT,idProdi,nama,nomorST) => {
     const network = await fabric.connectToNetwork("he1.gradechain.com", "he-channel", "he", user)
-    const result = await fabric.interactWithChaincode(true, network, "UpdatePtk", "args" )
+    const result = await network.contract.submitTransaction("UpdatePtk",idDosen, idPT,idProdi,nama,nomorST )
+    network.gateway.disconnect()
     return result;
 }
 
-exports.deleteDosen = async(user) => {
+exports.deleteDosen = async(user, idDosen) => {
     const network = await fabric.connectToNetwork("he1.gradechain.com", "he-channel", "he", user)
-    const result = await fabric.interactWithChaincode(true, network, "DeletePtk", "args" )
+    const result = await network.contract.submitTransaction("DeletePtk", idDosen)
+    network.gateway.disconnect()
     return result;}
 
 exports.getAllDosen = async(user) => {
     const network = await fabric.connectToNetwork("he1.gradechain.com", "he-channel", "he", user)
-    const result = await fabric.interactWithChaincode(true, network, "DeleteSp", "args" )
+    const result = await network.contract.evaluateTransaction("GetAllPtk")
+    network.gateway.disconnect()
     result = [{ 
         "id": "123",
         "PT":"UI",
@@ -115,7 +137,12 @@ exports.getAllDosen = async(user) => {
     return result
 }
 
-exports.getDosenByPT = async(user) => {
+exports.getDosenByPT = async(user, idPT) => {
+    const network = await fabric.connectToNetwork("he1.gradechain.com", "he-channel", "he", user)
+    const resultAll = await network.contract.evaluateTransaction("GetAllPtk")
+    network.gateway.disconnect()
+
+    //TODO: Filter by  PT 
     result = {
         "PT":"UI",
         "listDosen":[
@@ -134,24 +161,31 @@ exports.getDosenByPT = async(user) => {
 }
 
 //mahasiswa
-exports.createMahasiswa = async(user, nama) => {
+exports.createMahasiswa = async(user, idPT, idProdi, nama, nipd) => {
     const network = await fabric.connectToNetwork("he1.gradechain.com", "he-channel", "he", user)
-    const result = await fabric.interactWithChaincode(true, network, "CreatePd", "args" )
+    const idMahasiswa = randomUUID()
+    const result = await network.contract.submitTransaction("CreatePd", idMahasiswa, idPT, idProdi, nama, nipd)
+    network.gateway.disconnect()
     return result;
 }
 
-exports.updateMahasiswa = async(user, nama) => {
+exports.updateMahasiswa = async(user, idMahasiswa, idPT, idProdi, nama, nipd) => {
     const network = await fabric.connectToNetwork("he1.gradechain.com", "he-channel", "he", user)
-    const result = await fabric.interactWithChaincode(true, network, "UpdatePd", "args" )
+    const result = await network.contract.submitTransaction("UpdatePd", idMahasiswa, idPT, idProdi, nama, nipd)
+    network.gateway.disconnect()
     return result;
 }
 
-exports.deleteMahasiswa = async(user) => {
+exports.deleteMahasiswa = async(user, idMahasiswa) => {
     const network = await fabric.connectToNetwork("he1.gradechain.com", "he-channel", "he", user)
-    const result = await fabric.interactWithChaincode(true, network, "DeletePd", "args" )
+    const result = await network.contract.submitTransaction("DeletePd", idMahasiswa)
+    network.gateway.disconnect()
     return result;}
 
 exports.getAllMahasiswa = async(user) => {
+    const network = await fabric.connectToNetwork("he1.gradechain.com", "he-channel", "he", user)
+    const result = await network.contract.evaluateTransaction("GetAllPd")
+    network.gateway.disconnect()
     result = [
         { 
             "id": 123,
@@ -167,7 +201,11 @@ exports.getAllMahasiswa = async(user) => {
     return result
 }
 
-exports.getMahasiswaById = async(user) => {
+exports.getMahasiswaById = async(user, idMahasiswa) => {
+    const network = await fabric.connectToNetwork("he1.gradechain.com", "he-channel", "he", user)
+    const result = await network.contract.evaluateTransaction("GetPdById", idMahasiswa)
+    network.gateway.disconnect()
+
     result = { 
         "id": 123,
         "npm": "14567889",
@@ -185,6 +223,11 @@ exports.getMahasiswaById = async(user) => {
 }
 
 exports.getMahasiswaByPT = async(user) => {
+    const network = await fabric.connectToNetwork("he1.gradechain.com", "he-channel", "he", user)
+    const result = await network.contract.evaluateTransaction("GetAllPd")
+    network.gateway.disconnect()
+
+    // Filter by PT
     result = {
         "PT":"UI",
         "listMahasiswa":[{ 
@@ -203,6 +246,11 @@ exports.getMahasiswaByPT = async(user) => {
 }
 
 exports.getMahasiswaByKelas = async(user) => {
+    const network = await fabric.connectToNetwork("he1.gradechain.com", "he-channel", "he", user)
+    const result = await network.contract.evaluateTransaction("GetAllPd")
+    network.gateway.disconnect()
+
+    // Filter by Kelas
     result = {
         "kelas":"basdat A",
         "mahasiswa":[{ 
@@ -219,27 +267,34 @@ exports.getMahasiswaByKelas = async(user) => {
 }
 
 //mata kuliah
-exports.createMataKuliah = async(user, nama) => {
+exports.createMataKuliah = async(user, idProdi, nama, sks, jenjangPendidikan) => {
+    const idMK = randomUUID()
     const network = await fabric.connectToNetwork("he1.gradechain.com", "he-channel", "he", user)
-    const result = await fabric.interactWithChaincode(true, network, "CreateMk", "args" )
+    const result = await network.contract.submitTransaction("CreateMk", idMK, idProdi, nama, sks, jenjangPendidikan)
+    network.gateway.disconnect()
     return result;
 }
 
-exports.updateMataKuliah = async(user, nama) => {
+exports.updateMataKuliah = async(user, idMK, idProdi, nama, sks, jenjangPendidikan) => {
     const network = await fabric.connectToNetwork("he1.gradechain.com", "he-channel", "he", user)
-    const result = await fabric.interactWithChaincode(true, network, "UpdateMk", "args" )
+    const result = await network.contract.submitTransaction("UpdateMk", idMK, idProdi, nama, sks, jenjangPendidikan)
+    network.gateway.disconnect()
     return result;
 }
 
-exports.deleteMataKuliah = async(user) => {
+exports.deleteMataKuliah = async(user, idMK) => {
     const network = await fabric.connectToNetwork("he1.gradechain.com", "he-channel", "he", user)
-    const result = await fabric.interactWithChaincode(true, network, "DeleteMk", "args" )
+    const result = await network.contract.submitTransaction("DeleteMk", idMK)
+    network.gateway.disconnect()
     return result;}
 
 exports.getAllMataKuliah = async(user) => {
+    const network = await fabric.connectToNetwork("he1.gradechain.com", "he-channel", "he", user)
+    const result = await network.contract.evaluateTransaction("GetAllMk")
+    network.gateway.disconnect()
     result = [{ 
         "id": 123,
-        "idProdi":"12334",
+        "namaProdi":"12334",
         "nama": "Univ ABC",
         "kodeMatkul": "user123",
         "sks": 4,
@@ -249,37 +304,45 @@ exports.getAllMataKuliah = async(user) => {
 }
 
 //kelas
-exports.createKelas = async(user, nama) => {
+exports.createKelas = async(user, idProdi, idMk, nama, semeter, sks) => {
+    const idKelas = randomUUID()
     const network = await fabric.connectToNetwork("he1.gradechain.com", "he-channel", "he", user)
-    const result = await fabric.interactWithChaincode(true, network, "CreateKls", "args" )
+    const result = await network.contract.submitTransaction("CreateKls", idKelas, idProdi, idMk, nama, semeter, sks)
+    network.gateway.disconnect()
     return result; 
 }
 
-exports.updateKelas = async(user, nama) => {
+exports.updateKelas = async(user, idKelas, idProdi, idMk, nama, semeter, sks) => {
     const network = await fabric.connectToNetwork("he1.gradechain.com", "he-channel", "he", user)
-    const result = await fabric.interactWithChaincode(true, network, "UpdateKls", "args" )
+    const result = await network.contract.submitTransaction("UpdateKls", idKelas, idProdi, idMk, nama, semeter, sks)
+    network.gateway.disconnect()
     return result;
 }
 
-exports.deleteKelas = async(user) => {
+exports.deleteKelas = async(user, idKelas) => {
     const network = await fabric.connectToNetwork("he1.gradechain.com", "he-channel", "he", user)
-    const result = await fabric.interactWithChaincode(true, network, "DeleteKls", "args" )
+    const result = await network.contract.submitTransaction("DeleteKls", idKelas)
+    network.gateway.disconnect()
     return result;}
 
-exports.assignDosen = async(user, idDosen) => {
-    var listDosen = [];
-    var dosen = idDosen;
-    listDosen.push(dosen)
+exports.assignDosen = async(user, idKelas, idDosen) => {
+    const network = await fabric.connectToNetwork("he1.gradechain.com", "he-channel", "he", user)
+    const result = await network.contract.submitTransaction("AddPtkKls", idKelas, idDosen)
+    network.gateway.disconnect()
 
 }
 
-exports.assignMahasiswa = async(user, idMahasiswa) => {
-    var listMahasiswa = [];
-    var mahasiswa = idMahasiswa;
-    listMahasiswa.push(mahasiswa)
+exports.assignMahasiswa = async(user, idKelas, idMahasiswa) => {
+    const network = await fabric.connectToNetwork("he1.gradechain.com", "he-channel", "he", user)
+    const result = await network.contract.submitTransaction("AddPdKls", idKelas, idMahasiswa)
+    network.gateway.disconnect()
+
 }
 
 exports.getAllKelas = async(user) => {
+    const network = await fabric.connectToNetwork("he1.gradechain.com", "he-channel", "he", user)
+    const result = await network.contract.evaluateTransaction("GetAllKls")
+    network.gateway.disconnect()
     result = [{ 
         "id": 123,
         "Prodi":"Ilmu Komputer",

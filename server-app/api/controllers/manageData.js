@@ -4,9 +4,10 @@ const dataService = require('../services/manageData.js')
 exports.createPT = async(req, res) => {
     try{
         const data = req.body;
-        const name = data.nama;
+        const nama = data.nama;
+        const adminPT = data.emailAdmin;
 
-        const result = await dataService.createPT(1,name)
+        const result = await dataService.createPT(1,nama, adminPT)
         res.status(201).send({
             message: "Pendidikan Tinggi is created",
             result
@@ -20,11 +21,13 @@ exports.createPT = async(req, res) => {
 exports.updatePT = async(req, res) => {
     try{
         const data = req.body;
-        const name = data.nama;
+        const nama = data.nama;
+        const adminPT = data.emailAdmin;
+        const idPT = req.params.id;
 
-        const result = await dataService.updatePT(1,  name)
+        const result = await dataService.updatePT(1,idPT, nama, adminPT)
         res.status(200).send({
-            message: `Pendidikan Tinggi with id ${req.params.id} is updated`,
+            message: `Pendidikan Tinggi with id ${idPT} is updated`,
             
         })
     }
@@ -35,9 +38,10 @@ exports.updatePT = async(req, res) => {
 
 exports.deletePT = async(req, res) => {
     try{
-        const result = await dataService.deletePT(1);
+        const idPT  = req.params.id;
+        const result = await dataService.deletePT(1, idPT);
         res.status(200).send({
-            message: `Pendidikan Tinggi with id ${req.params.id} is deleted`,
+            message: `Pendidikan Tinggi with id ${idPT} is deleted`,
         })
     }
     catch(error){
@@ -55,9 +59,11 @@ exports.getAllPT = async(req, res) => {
 exports.createProdi = async(req, res) => {
     try{
         const data = req.body;
-        const name = data.nama;
+        const idPT =  data.idPT;
+        const nama = data.nama;
+        const jenjang = data.jenjangPendidikan;
 
-        const result = await dataService.createProdi(1,name)
+        const result = await dataService.createProdi(1,idPT, nama, jenjang)
         res.status(201).send({
             message: "Prodi is created",
             data
@@ -71,11 +77,14 @@ exports.createProdi = async(req, res) => {
 exports.updateProdi = async(req, res) => {
     try{
         const data = req.body;
-        const name = data.nama;
+        const idPT =  data.idPT;
+        const nama = data.nama;
+        const jenjang = data.jenjangPendidikan;
+        const idProdi = req.params.id
 
-        const result = await dataService.updateProdi(1,  name)
+        const result = await dataService.updateProdi(1, idProdi, idPT, nama, jenjang)
         res.status(200).send({
-            message: `Prodi with id ${req.params.id} is updated`,
+            message: `Prodi with id ${idProdi} is updated`,
             
         })
     }
@@ -85,10 +94,12 @@ exports.updateProdi = async(req, res) => {
 }
 
 exports.deleteProdi = async(req, res) => {
-    const result = await dataService.deleteProdi(1)
     try{
+        const idProdi = req.params.id;
+        const result = await dataService.deleteProdi(1, idProdi);
+        
         res.status(200).send({
-            message: `Prodi with id ${req.params.id} is deleted`,
+            message: `Prodi with id ${idProdi} is deleted`,
         })
     }
     catch(error){
@@ -102,17 +113,22 @@ exports.getAllProdi = async(req, res) => {
 }
 
 exports.getProdiByPT = async(req, res) => {
-    data = await dataService.getProdiByPT(1) 
-    res.status(200).send({data});
+    const idPT = req.params.id
+
+    result = await dataService.getProdiByPT(1, idPT) 
+    res.status(200).send({result});
 }
 
 // Dosen
 exports.createDosen = async(req, res) => {
     try{
         const data = req.body;
-        const name = data.nama;
+        const idPT = data.idPT;
+        const idProdi = data.idProdi;
+        const nama = data.nama;
+        const nomorST = data.nomorST
 
-        const result = await dataService.createDosen(1,name)
+        const result = await dataService.createDosen(1,idPT,idProdi,nama,nomorST)
         res.status(201).send({
             message: "Dosen is created",
             data
@@ -126,11 +142,15 @@ exports.createDosen = async(req, res) => {
 exports.updateDosen = async(req, res) => {
     try{
         const data = req.body;
-        const name = data.nama;
+        const idPT = data.idPT;
+        const idProdi = data.idProdi;
+        const nama = data.nama;
+        const nomorST = data.nomorST;
+        const idDosen = req.params.id
 
-        const result = await dataService.updateDosen(1,  name)
+        const result = await dataService.updateDosen(1, idDosen, idPT,idProdi,nama,nomorST)
         res.status(200).send({
-            message: `Dosen with id ${req.params.id} is updated`,
+            message: `Dosen with id ${idDosen} is updated`,
             
         })
     }
@@ -140,10 +160,12 @@ exports.updateDosen = async(req, res) => {
 }
 
 exports.deleteDosen = async(req, res) => {
-    const result = await dataService.deleteDosen(1)
     try{
+        const idDosen  = req.params.id;
+        const result = await dataService.deleteProdi(1, idDosen);
+
         res.status(200).send({
-            message: `Dosen with id ${req.params.id} is deleted`,
+            message: `Dosen with id ${idDosen} is deleted`,
         })
     }
     catch(error){
@@ -158,7 +180,8 @@ exports.getAllDosen = async(req, res) => {
 }
 
 exports.getDosenByPT = async(req, res) => {
-    data = await dataService.getDosenByPT(1) 
+    const idPT  = req.params.id;
+    data = await dataService.getDosenByPT(1, idPT) 
     res.status(200).send({data});
 }
 
@@ -167,9 +190,12 @@ exports.getDosenByPT = async(req, res) => {
 exports.createMahasiswa = async(req, res) => {
     try{
         const data = req.body;
-        const name = data.nama;
+        const idPT = data.idPT;
+        const idProdi = data.idProdi;
+        const nama = data.nama;
+        const nipd = data.nipd;
 
-        const result = await dataService.createMahasiswa(1,name)
+        const result = await dataService.createMahasiswa(1,idPT, idProdi, nama, nipd)
         res.status(201).send({
             message: "Mahasiswa is created",
             data
@@ -183,11 +209,15 @@ exports.createMahasiswa = async(req, res) => {
 exports.updateMahasiswa = async(req, res) => {
     try{
         const data = req.body;
-        const name = data.nama;
+        const idPT = data.idPT;
+        const idProdi = data.idProdi;
+        const nama = data.nama;
+        const nipd = data.nipd;
+        const idMahasiswa = req.params.id
 
-        const result = await dataService.updateMahasiswa(1,  name)
+        const result = await dataService.updateMahasiswa(1, idMahasiswa, idPT, idProdi, nama, nipd)
         res.status(200).send({
-            message: `Mahasiswa with id ${req.params.id} is updated`,
+            message: `Mahasiswa with id ${idMahasiswa} is updated`,
             
         })
     }
@@ -198,9 +228,10 @@ exports.updateMahasiswa = async(req, res) => {
 
 exports.deleteMahasiswa = async(req, res) => {
     try{
-        const result = await dataService.deleteMahasiswa(1)
+        const idMahasiswa = req.params.id
+        const result = await dataService.deleteMahasiswa(1, idMahasiswa)
         res.status(200).send({
-            message: `Mahasiswa with id ${req.params.id} is deleted`,
+            message: `Mahasiswa with id ${idMahasiswa} is deleted`,
         })
     }
     catch(error){
@@ -215,17 +246,20 @@ exports.getAllMahasiswa = async(req, res) => {
 }
 
 exports.getMahasiswaByPT = async(req, res) => {
-    data = await dataService.getMahasiswaByPT(1) 
+    const idPT = request.params.id
+    data = await dataService.getMahasiswaByPT(1, idPT) 
     res.status(200).send({data});
 }
 
 exports.getMahasiswaById = async(req, res) => {
-    data = await dataService.getMahasiswaById(1) 
+    const idMahasiswa = req.params.id
+    data = await dataService.getMahasiswaById(1, idMahasiswa) 
     res.status(200).send({data});
 }
 
 exports.getMahasiswaByKelas = async(req, res) => {
-    data = await dataService.getMahasiswaByKelas(1) 
+    const idKelas = req.params.id 
+    data = await dataService.getMahasiswaByKelas(1, idKelas) 
     res.status(200).send({data});
 }
 
@@ -233,9 +267,12 @@ exports.getMahasiswaByKelas = async(req, res) => {
 exports.createMataKuliah = async(req, res) => {
     try{
         const data = req.body;
-        const name = data.nama;
+        const idProdi  = data.idProdi;
+        const nama = data.nama;
+        const sks = data.sks;
+        const jenjangPendidikan = data.jenjangPendidikan
 
-        const result = await dataService.createMataKuliah(1,name)
+        const result = await dataService.createMataKuliah(1, idProdi, nama, sks, jenjangPendidikan)
         res.status(201).send({
             message: "Mata Kuliah is created",
             data
@@ -250,10 +287,15 @@ exports.updateMataKuliah = async(req, res) => {
     try{
         const data = req.body;
         const name = data.nama;
+        const idProdi  = data.idProdi;
+        const nama = data.nama;
+        const sks = data.sks;
+        const jenjangPendidikan = data.jenjangPendidikan
+        const idMk = req.params.id;
 
-        const result = await dataService.updateMataKuliah(1,  name)
+        const result = await dataService.updateMataKuliah(1, idMk, idProdi, nama, sks, jenjangPendidikan)
         res.status(200).send({
-            message: `Mata Kuliah with id ${req.params.id} is updated`,
+            message: `Mata Kuliah with id ${idMK} is updated`,
             
         })
     }
@@ -264,7 +306,8 @@ exports.updateMataKuliah = async(req, res) => {
 
 exports.deleteMataKuliah = async(req, res) => {
     try{
-        const result = await dataService.deleteMataKuliah(1)
+        const idMk = req.params.id;
+        const result = await dataService.deleteMataKuliah(1, idMk)
         res.status(200).send({
             message: `MataKuliah with id ${req.params.id} is deleted`,
         })
@@ -286,9 +329,13 @@ exports.getAllMataKuliah = async(req, res) => {
 exports.createKelas = async(req, res) => {
     try{
         const data = req.body;
-        const name = data.nama;
+        const nama = data.nama;
+        const idMk = data.idMk;
+        const semeter = data.semeter;
+        const sks = data.sks;
+        const idKelas = req.params.id;
 
-        const result = await dataService.createKelas(1,name)
+        const result = await dataService.createKelas(1, idProdi, idMk, nama, semeter, sks)
         res.status(201).send({
             message: "Kelas is created",
             data
@@ -302,11 +349,16 @@ exports.createKelas = async(req, res) => {
 exports.updateKelas = async(req, res) => {
     try{
         const data = req.body;
-        const name = data.nama;
+        const nama = data.nama;
+        const idProdi = data.idProdi;
+        const idMk = data.idMk;
+        const semeter = data.semeter;
+        const sks = data.sks;
+        const idKelas = req.params.id;
 
-        const result = await dataService.updateKelas(1,  name)
+        const result = await dataService.updateKelas(1,  idKelas, idProdi, idMk, nama, semeter, sks)
         res.status(200).send({
-            message: `Kelas with id ${req.params.id} is updated`,
+            message: `Kelas with id ${idKelas} is updated`,
             
         })
     }
@@ -317,7 +369,8 @@ exports.updateKelas = async(req, res) => {
 
 exports.deleteKelas = async(req, res) => {
     try{
-        const result = await dataService.deleteKelas(1)
+        const idKelas = req.params.id;
+        const result = await dataService.deleteKelas(1, idKelas)
         res.status(200).send({
             message: `Kelas with id ${req.params.id} is deleted`,
         })
@@ -333,7 +386,7 @@ exports.assignDosen = async(req, res) => {
         const idKelas = data.idKelas;
         const idDosen = data.idDosen;
 
-        const result = await dataService.assignDosen(1,idDosen)
+        const result = await dataService.assignDosen(1,idKelas, idDosen)
         res.status(200).send({
             message: `Dosen with id ${idDosen} is assign to class with id ${idKelas}`,
             data
@@ -351,7 +404,7 @@ exports.assignMahasiswa = async(req, res) => {
         const idKelas = data.idKelas;
         const idMahasiswa = data.idMahasiswa;
 
-        const result = await dataService.assignMahasiswa(1,idMahasiswa)
+        const result = await dataService.assignMahasiswa(1, idKelas, idMahasiswa)
         res.status(200).send({
             message: `Mahasiswa with id ${idMahasiswa} is assign to class with id ${idKelas}`,
             data

@@ -3,9 +3,14 @@ const dataService = require('../services/academicRecord.js')
 exports.createAcademicRecord = async(req, res) => {
     try{
         const data = req.body;
-        const name = data.nama;
+        const idKls = data.idKls;
+        const idDosen = data.idDosen;
+        const idMahasiswa = data.idMahasiswa;
+        const nilaiAngka = data.nilaiAngka;
+        const nilaiHuruf = data.nilaiHuruf;
+        const nilaiIndex = data.nilaiIndex;
 
-        const result = await dataService.createAcademicRecord(1,name)
+        const result = await dataService.createAcademicRecord(1,idKls, idDosen, idMahasiswa, nilaiAngka, nilaiHuruf, nilaiIndex)
         res.status(201).send({
             message: "Pendidikan Tinggi is created",
             result
@@ -19,11 +24,17 @@ exports.createAcademicRecord = async(req, res) => {
 exports.updateAcademicRecord = async(req, res) => {
     try{
         const data = req.body;
-        const name = data.nama;
+        const idKls = data.idKls;
+        const idDosen = data.idDosen;
+        const idMahasiswa = data.idMahasiswa;
+        const nilaiAngka = data.nilaiAngka;
+        const nilaiHuruf = data.nilaiHuruf;
+        const nilaiIndex = data.nilaiIndex;
+        const idNilai = req.params.id
 
-        const result = await dataService.updateAcademicRecord(1,  name)
+        const result = await dataService.updateAcademicRecord(1,  idNilai, idKls, idDosen, idMahasiswa, nilaiAngka, nilaiHuruf, nilaiIndex)
         res.status(200).send({
-            message: `Pendidikan Tinggi with id ${req.params.id} is updated`,
+            message: `Pendidikan Tinggi with id ${idNilai} is updated`,
             
         })
     }
@@ -34,9 +45,10 @@ exports.updateAcademicRecord = async(req, res) => {
 
 exports.deleteAcademicRecord = async(req, res) => {
     try{
-        const result = await dataService.deleteAcademicRecord(1);
+        const idNilai = req.params.id
+        const result = await dataService.deleteAcademicRecord(1, idNilai);
         res.status(200).send({
-            message: `Pendidikan Tinggi with id ${req.params.id} is deleted`,
+            message: `Pendidikan Tinggi with id ${idNilai} is deleted`,
         })
     }
     catch(error){

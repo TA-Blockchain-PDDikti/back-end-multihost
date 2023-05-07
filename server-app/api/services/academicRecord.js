@@ -1,24 +1,32 @@
 const { Gateway, Wallets } = require('fabric-network');
+const { randomUUID } = require('crypto');
 
-exports.createAcademicRecord = async(user, nama) => {
+exports.createAcademicRecord = async(user, idKls, idDosen, idMahasiswa, nilaiAngka, nilaiHuruf, nilaiIndex) => {
+    const idNilai = randomUUID()
     const network = await fabric.connectToNetwork("he1.gradechain.com", "he-channel", "he", user)
-    const result = await fabric.interactWithChaincode(true, network, "CreateNmhs", "args" )
+    const result = await network.contract.submitTransaction("CreateNmhs", idNilai, idKls, idDosen, idMahasiswa, nilaiAngka, nilaiHuruf, nilaiIndex, new Date())
+    network.gateway.disconnect()
     return result;
 }
 
-exports.updateAcademicRecord = async(user, nama) => {
+exports.updateAcademicRecord = async(user, idNilai, idKls, idDosen, idMahasiswa, nilaiAngka, nilaiHuruf, nilaiIndex) => {
     const network = await fabric.connectToNetwork("he1.gradechain.com", "he-channel", "he", user)
-    const result = await fabric.interactWithChaincode(true, network, "UpdateNmhs", "args" )
+    const result = await network.contract.submitTransaction("UpdateNmhs", idNilai, idKls, idDosen, idMahasiswa, nilaiAngka, nilaiHuruf, nilaiIndex)
+    network.gateway.disconnect()
     return result;
 }
 
-exports.deleteAcademicRecord = async(user) => {
+exports.deleteAcademicRecord = async(user, idNilai) => {
     const network = await fabric.connectToNetwork("he1.gradechain.com", "he-channel", "he", user)
-    const result = await fabric.interactWithChaincode(true, network, "DeleteNmhs", "args" )
+    const result = await network.contract.submitTransaction("DeleteNmhs", idNilai)
+    network.gateway.disconnect()
     return result;
 }
 
-exports.getAcademicRecordById = async(user) => {
+exports.getAcademicRecordById = async(user, idNilai) => {
+    const network = await fabric.connectToNetwork("he1.gradechain.com", "he-channel", "he", user)
+    const result = await network.contract.evaluateTransaction("GetNmhsById", idNilai)
+    network.gateway.disconnect()
     result = [
         { 
             "id": 123,
