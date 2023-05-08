@@ -110,8 +110,8 @@ function networkUp() {
 
   . scripts/networkStart.sh
 
-  startNetwork $CHANNEL_NAME
-  # startNetwork "syschannel"
+  # startNetwork $CHANNEL_NAME
+  startNetwork "syschannel"
   println ""
 
   println "###########################################################################"

@@ -42,10 +42,6 @@ createChannel() {
 		sleep $DELAY
 		set -x
 		osnadmin channel join --channelID $CHANNEL_NAME --config-block ./channel-artifacts/${CHANNEL_NAME}.block -o localhost:7053 --ca-file "$ORDERER_CA" --client-cert "$ORDERER_ADMIN_TLS_SIGN_CERT" --client-key "$ORDERER_ADMIN_TLS_PRIVATE_KEY" >&log.txt
-		# peer channel create -o localhost:7050 -c $CHANNEL_NAME \
-    	# --ordererTLSHostnameOverride orderer.example.com \
-    	# -f ./channel-artifacts/channel.tx --outputBlock ./channel-artifacts/${CHANNEL_NAME}.block \
-    	# --tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA
 		res=$?
 		{ set +x; } 2>/dev/null
 		let rc=$res
@@ -85,27 +81,27 @@ CORE_PEER_TLS_ENABLED=true
 ORDERER_CA=$PWD/organizations/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
 FABRIC_CFG_PATH=./configtx/
 
-## Create channel genesis block
-# infoln "Generating channel genesis block '${CHANNEL_NAME}.block'"
-# createChannelGenesisBlock
-
 BLOCKFILE="./channel-artifacts/${CHANNEL_NAME}.block"
 
-## Create channel
-# infoln "Creating channel ${CHANNEL_NAME}"
-# createChannel
-# successln "Channel '$CHANNEL_NAME' created"
+# Create channel genesis block
+infoln "Generating channel genesis block '${CHANNEL_NAME}.block'"
+createChannelGenesisBlock
 
-## Join all the peers to the channel
-# infoln "Joining kemdikbud peer to the channel..."
-# joinChannel 'kemdikbud'
+# Create channel
+infoln "Creating channel ${CHANNEL_NAME}"
+createChannel
+successln "Channel '$CHANNEL_NAME' created"
+
+# Join all the peers to the channel
+infoln "Joining kemdikbud peer to the channel..."
+joinChannel 'kemdikbud'
 infoln "Joining he1 peer to the channel..."
 joinChannel 'he1'
 
-# ## Set the anchor peers for each org in the channel
-# infoln "Setting anchor peer for kemdikbud..."
-# setAnchorPeer 'kemdikbud'
-# infoln "Setting anchor peer for he1..."
-# setAnchorPeer 'he1'
+# Set the anchor peers for each org in the channel
+infoln "Setting anchor peer for kemdikbud..."
+setAnchorPeer 'kemdikbud'
+infoln "Setting anchor peer for he1..."
+setAnchorPeer 'he1'
 
-# successln "Channel '$CHANNEL_NAME' joined"
+successln "Channel '$CHANNEL_NAME' joined"
