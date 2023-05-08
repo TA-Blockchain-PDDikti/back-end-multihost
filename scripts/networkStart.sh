@@ -378,10 +378,10 @@ function createChannelArtifact() {
   generateGenesisBlock
   generateChannelConfigTx
 
-  # Generate anchor peer
+  # # Generate anchor peer
 
-  generateAnchorPeerKemdikbud
-  generateAnchorPeerHE1
+  # generateAnchorPeerKemdikbud
+  # generateAnchorPeerHE1
 
   println ""
 }
