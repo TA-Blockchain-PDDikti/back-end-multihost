@@ -6,9 +6,16 @@ const registerUser = async(req, res) => {
         const data = req.body;
         const email = data.email;
         const orgName = data.organizationName;
+        const role = data.role;
         
-        const result = await userService.registerUser(email, orgName)
-        res.status(200).send({result})
+        const result = await userService.registerUser(email, orgName, role)
+        
+        if (!result.error){
+            res.status(200).send(result)
+        }
+        else{
+            res.status(500).send(result)
+        }
     }
     catch(error){
         console.log("ERROR", error)
@@ -22,7 +29,12 @@ const enrollAdmin = async(req, res) => {
         const password = data.password;
         const orgName = data.organizationName;
         const result = await userService.enrollAdmin(email, password, orgName)
-        res.status(200).send({result})
+        if (!result.error){
+            res.status(200).send(result)
+        }
+        else{
+            res.status(500).send(result)
+        }
     }
     catch(error){
         console.log("ERROR", error)

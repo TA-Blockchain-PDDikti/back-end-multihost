@@ -3,7 +3,7 @@
 const FabricCAServices = require('fabric-ca-client');
 const fabric = require("../utils/fabric.js")
 
-const registerUser = async(userId, organizationName) =>  {
+const registerUser = async(userId, organizationName, role) =>  {
     try {
     
         const ccp = await fabric.getCcp(organizationName)
@@ -17,7 +17,11 @@ const registerUser = async(userId, organizationName) =>  {
         // Check to see if we've already enrolled the user.
         const userIdentity = await wallet.get(userId);
         if (userIdentity) {
-            throw `An identity for the user "${userId}" already exists in the wallet`;
+            const response = {
+                "success":false,
+                "message":`An identity for the user "${userId}" already exists in the wallet`,
+            }
+            return response
         }
 
         // Check to see if we've already enrolled the admin user.
@@ -31,17 +35,17 @@ const registerUser = async(userId, organizationName) =>  {
         const adminUser = await provider.getUserContext(adminIdentity, 'admin');
 
         // Register the user, enroll the user, and import the new identity into the wallet.
-        console.log('register')
         const secret = await ca.register({
             affiliation: 'he1.department1',
             enrollmentID: userId,
-            role: 'client'
+            role: 'client',
+            attrs: [{ "name": "userType", "value": role }]
         }, adminUser);
 
-        console.log('enroll', secret)
         const enrollment = await ca.enroll({
             enrollmentID: userId,
-            enrollmentSecret: secret
+            enrollmentSecret: secret,
+            attr_reqs: [{ name: "userType", optional: false }]
         });
         const x509Identity = {
             credentials: {
@@ -55,6 +59,7 @@ const registerUser = async(userId, organizationName) =>  {
    
         const response = {
             "success":true,
+            "userSecret": secret,
             "message":"Successfully registered user and imported it into the wallet",
         }
         return response
@@ -62,7 +67,7 @@ const registerUser = async(userId, organizationName) =>  {
     } catch (error) {
         const response = {
             "success": false,
-            "message": `Failed to register user: ${error}`
+            "error":error.toString()
         };
         return response
     }
@@ -83,7 +88,11 @@ const enrollAdmin = async(adminId, adminSecret, organizationName) => {
         // Check to see if we've already enrolled the admin user.
         const identity = await wallet.get(adminId);
         if (identity) {
-            throw 'An identity for the admin user "admin" already exists in the wallet';
+            const response = {
+                "success":false,
+                "message":'An identity for the admin user "admin" already exists in the wallet',
+            }
+            return response
         }
 
         // Enroll the admin user, and import the new identity into the wallet.
@@ -108,8 +117,8 @@ const enrollAdmin = async(adminId, adminSecret, organizationName) => {
 
     } catch (error) {
         const response = {
-            "success": false,
-            "message": `Failed to enroll admin user "admin": ${error}`
+            "success": false, 
+            "error": error.toString()
         };
         return response
     }
