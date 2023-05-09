@@ -55,6 +55,11 @@ exports.getAllPT = async(req, res) => {
     res.status(200).send({data});
 }
 
+exports.getPTById = async(req, res) => {
+    const idPT = req.params.id
+    data = await dataService.getPTById(1,idPT) 
+    res.status(200).send({data});
+}
 
 //Prodi
 exports.createProdi = async(req, res) => {
@@ -117,6 +122,13 @@ exports.getProdiByPT = async(req, res) => {
     const idPT = req.params.id
 
     result = await dataService.getProdiByPT(1, idPT) 
+    res.status(200).send({result});
+}
+
+exports.getProdiById = async(req, res) => {
+    const idProdi = req.params.id
+
+    result = await dataService.getProdiById(1, idProdi) 
     res.status(200).send({result});
 }
 
@@ -185,6 +197,13 @@ exports.getDosenByPT = async(req, res) => {
     const idPT  = req.params.id;
     data = await dataService.getDosenByPT(1, idPT) 
     res.status(200).send({data});
+}
+
+exports.getDosenById = async(req, res) => {
+    const idDosen = req.params.id
+
+    result = await dataService.getDosenById(1, idDosen) 
+    res.status(200).send({result});
 }
 
 //Mahasiswa
@@ -326,6 +345,11 @@ exports.getAllMataKuliah = async(req, res) => {
     res.status(200).send({data});
 }
 
+exports.getMataKuliahById = async(req, res) => {
+    const idMk = req.params.id
+    data = await dataService.getMataKuliahById(1, idMk) 
+    res.status(200).send({data});
+}
 
 
 //Kelas
@@ -423,6 +447,12 @@ exports.getAllKelas = async(req, res) => {
     res.status(200).send({data});
 }
 
+exports.getKelasById = async(req, res) => {
+    const idKelas = req.params.id
+
+    result = await dataService.getKelasById(1, idKelas) 
+    res.status(200).send({result});
+}
 
 //Verifier
 exports.createVerifier = async(req, res) => {
