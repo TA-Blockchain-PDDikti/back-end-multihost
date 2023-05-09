@@ -1,8 +1,8 @@
 const { Gateway, Wallets } = require('fabric-network');
-const { randomUUID } = require('crypto');
+const { v4: uuidv4 } = require('uuid')
 
 exports.createAcademicRecord = async(user, idKls, idDosen, idMahasiswa, nilaiAngka, nilaiHuruf, nilaiIndex) => {
-    const idNilai = randomUUID()
+    const idNilai = uuidv4()
     const network = await fabric.connectToNetwork("he1.gradechain.com", "he-channel", "he", user)
     const result = await network.contract.submitTransaction("CreateNmhs", idNilai, idKls, idDosen, idMahasiswa, nilaiAngka, nilaiHuruf, nilaiIndex, new Date())
     network.gateway.disconnect()

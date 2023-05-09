@@ -41,6 +41,7 @@ const connectToNetwork = async(organizationName, channelName, chaincodeName, use
         return {gateway, network, contract}
 
     } catch (error) {
+        console.log(error.toString())
         return error.toString()
     }
 

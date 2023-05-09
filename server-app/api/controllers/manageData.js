@@ -6,7 +6,8 @@ exports.createPT = async(req, res) => {
         const data = req.body;
         const nama = data.nama;
         const adminPT = data.emailAdmin;
-
+        
+        console.log(nama, adminPT)
         const result = await dataService.createPT(1,nama, adminPT)
         res.status(201).send({
             message: "Pendidikan Tinggi is created",
@@ -126,9 +127,10 @@ exports.createDosen = async(req, res) => {
         const idPT = data.idPT;
         const idProdi = data.idProdi;
         const nama = data.nama;
-        const nomorST = data.nomorST
+        const nomorST = data.nomorST;
+        const email = data.email;
 
-        const result = await dataService.createDosen(1,idPT,idProdi,nama,nomorST)
+        const result = await dataService.createDosen(1,idPT,idProdi,nama,nomorST, email)
         res.status(201).send({
             message: "Dosen is created",
             data
@@ -194,8 +196,9 @@ exports.createMahasiswa = async(req, res) => {
         const idProdi = data.idProdi;
         const nama = data.nama;
         const nipd = data.nipd;
+        const email = data.email;
 
-        const result = await dataService.createMahasiswa(1,idPT, idProdi, nama, nipd)
+        const result = await dataService.createMahasiswa(1,idPT, idProdi, nama, nipd, email)
         res.status(201).send({
             message: "Mahasiswa is created",
             data
