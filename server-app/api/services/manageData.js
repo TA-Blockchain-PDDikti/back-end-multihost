@@ -137,7 +137,7 @@ exports.getProdiById = async(user, idProdi) => {
 }
 
 //dosen
-exports.createDosen = async(user,idPT,idProdi,nama,nomorST, email) => {
+exports.createDosen = async(user,idPT,idProdi,nama,nomorST, username) => {
     // Add 'dosen' data to blockchain
     const network = await fabric.connectToNetwork("he1", "he-channel", "he", user)
     const idDosen = uuidv4()
@@ -145,7 +145,7 @@ exports.createDosen = async(user,idPT,idProdi,nama,nomorST, email) => {
     network.gateway.disconnect()
 
     // Register dosen identity to CA
-    const registerResult = await user.registerUser(email, 'he1', "dosen")
+    const registerResult = await user.registerUser(username, 'he1', "dosen")
     return result;
 }
 
@@ -228,7 +228,7 @@ exports.getDosenById = async(user, idDosen) => {
 }
 
 //mahasiswa
-exports.createMahasiswa = async(user, idPT, idProdi, nama, nipd, email) => {
+exports.createMahasiswa = async(user, idPT, idProdi, nama, nipd, username) => {
     // Add 'mahasiswa' data to blockchain
     const network = await fabric.connectToNetwork("he1", "he-channel", "he", user)
     const idMahasiswa = uuidv4()
@@ -236,7 +236,7 @@ exports.createMahasiswa = async(user, idPT, idProdi, nama, nipd, email) => {
     network.gateway.disconnect()
 
     // Register mahasiswa identity to CA
-    const registerResult = await user.registerUser(email, 'he1', "mahasiswa")
+    const registerResult = await user.registerUser(username, 'he1', "mahasiswa")
     return result;
 }
 

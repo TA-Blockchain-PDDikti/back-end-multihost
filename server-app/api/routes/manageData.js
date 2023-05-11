@@ -4,7 +4,7 @@ const dataController = require('../controllers/manageData.js')
 //pendidikan tinggi
 dataRouter.post('/pendidikan-tinggi', dataController.createPT)
 dataRouter.get('/pendidikan-tinggi', dataController.getAllPT)
-dataRouter.get('/pendidikan-tinggi/:id', dataController.getPTBYId)
+dataRouter.get('/pendidikan-tinggi/:id', dataController.getPTById)
 dataRouter.put('/pendidikan-tinggi/:id', dataController.updatePT)
 dataRouter.delete('/pendidikan-tinggi/:id', dataController.deletePT)
 
