@@ -1,5 +1,8 @@
 const dataRouter = require('express').Router()
 const dataController = require('../controllers/manageData.js')
+const auth = require('../middleware/auth.js')
+
+dataRouter.use(auth)
 
 //pendidikan tinggi
 dataRouter.post('/pendidikan-tinggi', dataController.createPT)

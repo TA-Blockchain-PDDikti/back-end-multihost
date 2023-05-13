@@ -13,8 +13,8 @@ exports.createAcademicCertificate = async(req, res) => {
         const totalSks = data.totalSks;
         const ipk = data.ipk
     
-        const resultIjazah = await certificateService.createIjazah(1, idPT, idProdi, idMahasiswa, jenjangPendidikan, nomorIjazah, tanggalLulus)
-        const resultTranskrip = await certificateService.createTranskrip(1, idPT, idProdi, idMahasiswa, jenjangPendidikan, totalMutu, totalSks, ipk)
+        const resultIjazah = await certificateService.createIjazah(req.user.username, idPT, idProdi, idMahasiswa, jenjangPendidikan, nomorIjazah, tanggalLulus)
+        const resultTranskrip = await certificateService.createTranskrip(req.user.username, idPT, idProdi, idMahasiswa, jenjangPendidikan, totalMutu, totalSks, ipk)
         const result = {}
        
         res.status(201).send({
@@ -39,7 +39,7 @@ exports.updateIjazah = async(req, res) => {
         const tanggalLulus = data.tanggalLulus;
         const idIjazah = req.params.id
 
-        const result = await certificateService.updateIjazah(1, idIjazah, idPT, idProdi, idMahasiswa, jenjangPendidikan, nomorIjazah, tanggalLulus )
+        const result = await certificateService.updateIjazah(req.user.username, idIjazah, idPT, idProdi, idMahasiswa, jenjangPendidikan, nomorIjazah, tanggalLulus )
         res.status(200).send({
             message: "Ijazah is updated",
             result
@@ -60,7 +60,7 @@ exports.updateTranskrip = async(req, res) => {
         const jenjangPendidikan = data.jenjangPendidikan;
         const idIjazah = req.params.id
 
-        const result = await certificateService.updateTranskrip(1, idIjazah, idPT, idProdi, idMahasiswa, jenjangPendidikan, nomorIjazah, tanggalLulus )
+        const result = await certificateService.updateTranskrip(req.user.username, idIjazah, idPT, idProdi, idMahasiswa, jenjangPendidikan, nomorIjazah, tanggalLulus )
         res.status(200).send({
             message: "Transkrip is updated",
             result
@@ -76,7 +76,7 @@ exports.signIjazah = async(req, res) => {
         const data = req.body;
         const name = data.nama;
 
-        const result = await certificateService.signIjazah(1, name)
+        const result = await certificateService.signIjazah(req.user.username, name)
         res.status(200).send({
             message: "Ijazah is signed",
             result
@@ -92,7 +92,7 @@ exports.getIdentifier = async(req, res) => {
         const data = req.body;
         const name = data.nama;
 
-        const result = await certificateService.getIdentifier(1, name)
+        const result = await certificateService.getIdentifier(req.user.username, name)
         res.status(200).send({
             result
         })
@@ -107,7 +107,7 @@ exports.generateIdentifier = async(req, res) => {
         const data = req.body;
         const name = data.nama;
 
-        const result = await certificateService.generateIdentifier(1, name)
+        const result = await certificateService.generateIdentifier(req.user.username, name)
         res.status(201).send({
             message: "Identifier is generated",
             result
@@ -123,7 +123,7 @@ exports.addSigner = async(req, res) => {
         const data = req.body;
         const name = data.nama;
 
-        const result = await certificateService.addSigner(1, name)
+        const result = await certificateService.addSigner(req.user.username, name)
         res.status(201).send({
             message: "Signer is added",
             result
@@ -140,7 +140,7 @@ exports.verify = async(req, res) => {
         const data = req.body;
         const name = data.nama;
 
-        const result = await certificateService.verify(1, name)
+        const result = await certificateService.verify(req.user.username, name)
         res.status(200).send({
             message: "Ijazah and Transkrip is verified",
             result
@@ -155,7 +155,7 @@ exports.getIjazahById = async(req, res) => {
     try{
         const idIjazah = req.params.id
 
-        const result = await certificateService.getIjazahById(1, idIjazah)
+        const result = await certificateService.getIjazahById(req.user.username, idIjazah)
         res.status(200).send({
             result
         })
@@ -169,7 +169,7 @@ exports.getITranskripById = async(req, res) => {
     try{
         const idTranskrip = req.params.id
 
-        const result = await certificateService.getIjazahById(1, idTranskrip)
+        const result = await certificateService.getIjazahById(req.user.username, idTranskrip)
         res.status(200).send({
             result
         })

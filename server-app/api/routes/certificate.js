@@ -1,5 +1,8 @@
 const certificateRouter = require('express').Router()
 const certificateController = require('../controllers/certificate.js')
+const auth = require('../middleware/auth.js')
+
+certificateRouter.use(auth)
 
 certificateRouter.post('/', certificateController.createAcademicCertificate)
 certificateRouter.get('/ijazah/:id', certificateController.getIjazahById)

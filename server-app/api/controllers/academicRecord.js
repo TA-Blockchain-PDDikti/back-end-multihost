@@ -10,7 +10,7 @@ exports.createAcademicRecord = async(req, res) => {
         const nilaiHuruf = data.nilaiHuruf;
         const nilaiIndex = data.nilaiIndex;
 
-        const result = await dataService.createAcademicRecord(1,idKls, idDosen, idMahasiswa, nilaiAngka, nilaiHuruf, nilaiIndex)
+        const result = await dataService.createAcademicRecord(req.user.username,idKls, idDosen, idMahasiswa, nilaiAngka, nilaiHuruf, nilaiIndex)
         res.status(201).send({
             message: "Pendidikan Tinggi is created",
             result
@@ -32,7 +32,7 @@ exports.updateAcademicRecord = async(req, res) => {
         const nilaiIndex = data.nilaiIndex;
         const idNilai = req.params.id
 
-        const result = await dataService.updateAcademicRecord(1,  idNilai, idKls, idDosen, idMahasiswa, nilaiAngka, nilaiHuruf, nilaiIndex)
+        const result = await dataService.updateAcademicRecord(req.user.username,  idNilai, idKls, idDosen, idMahasiswa, nilaiAngka, nilaiHuruf, nilaiIndex)
         res.status(200).send({
             message: `Pendidikan Tinggi with id ${idNilai} is updated`,
             
@@ -46,7 +46,7 @@ exports.updateAcademicRecord = async(req, res) => {
 exports.deleteAcademicRecord = async(req, res) => {
     try{
         const idNilai = req.params.id
-        const result = await dataService.deleteAcademicRecord(1, idNilai);
+        const result = await dataService.deleteAcademicRecord(req.user.username, idNilai);
         res.status(200).send({
             message: `Pendidikan Tinggi with id ${idNilai} is deleted`,
         })
