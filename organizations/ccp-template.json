@@ -1,5 +1,5 @@
 {
-    "name": "test-network-${ORG}",
+    "name": "academic_network-${ORG}",
     "version": "1.0.0",
     "client": {
         "organization": "${ORGCAP}",
@@ -37,7 +37,7 @@
     "certificateAuthorities": {
         "ca.${ORG}.example.com": {
             "url": "https://localhost:${CAPORT}",
-            "caName": "ca-${ORG}",
+            "caName": "ca.${ORG}.example.com",
             "tlsCACerts": {
                 "pem": ["${CAPEM}"]
             },
