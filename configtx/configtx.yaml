@@ -71,12 +71,12 @@ Organizations:
                 Type: Signature
                 Rule: "OR('KemdikbudMSP.peer')"
 
-        AnchorPeers:
-            # AnchorPeers defines the location of peers which can be used
-            # for cross org gossip communication.  Note, this value is only
-            # encoded in the genesis block in the Application section context
-            - Host: peer0.kemdikbud.example.com
-              Port: 7051
+        # AnchorPeers:
+        #     # AnchorPeers defines the location of peers which can be used
+        #     # for cross org gossip communication.  Note, this value is only
+        #     # encoded in the genesis block in the Application section context
+        #     - Host: peer0.kemdikbud.example.com
+        #       Port: 7051
 
     - &HE1
         # DefaultOrg defines the organization which is used in the sampleconfig
@@ -105,12 +105,12 @@ Organizations:
                 Type: Signature
                 Rule: "OR('HE1MSP.peer')"
 
-        AnchorPeers:
-            # AnchorPeers defines the location of peers which can be used
-            # for cross org gossip communication.  Note, this value is only
-            # encoded in the genesis block in the Application section context
-            - Host: peer0.he1.example.com
-              Port: 9051
+        # AnchorPeers:
+        #     # AnchorPeers defines the location of peers which can be used
+        #     # for cross org gossip communication.  Note, this value is only
+        #     # encoded in the genesis block in the Application section context
+        #     - Host: peer0.he1.example.com
+        #       Port: 9051
 
 ################################################################################
 #
@@ -200,7 +200,7 @@ Application: &ApplicationDefaults
             Rule: "MAJORITY Endorsement"
         Endorsement:
             Type: ImplicitMeta
-            Rule: "MAJORITY Endorsement"
+            Rule: "ANY Endorsement"
 
     Capabilities:
         <<: *ApplicationCapabilities
@@ -327,6 +327,20 @@ Profiles:
                 Organizations:
                 - *Kemdikbud
                 - *HE1
+
+    TwoOrgsGenesis:
+        <<: *ChannelDefaults
+        Orderer:
+            <<: *OrdererDefaults
+            Organizations:
+                - *OrdererOrg
+            Capabilities: *OrdererCapabilities
+        Application:
+            <<: *ApplicationDefaults
+            Organizations:
+                - *Kemdikbud
+                - *HE1
+            Capabilities: *ApplicationCapabilities
 
     AcademicChannel:
         Consortium: SampleConsortium
