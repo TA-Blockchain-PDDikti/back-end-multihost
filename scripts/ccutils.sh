@@ -140,10 +140,91 @@ function chaincodeInvokeInit() {
   successln "Invoke transaction successful on $PEERS on channel '$CHANNEL_NAME'"
 }
 
+chaincodeInvoke() {
+  # parse flags
+  while [[ $# -ge 1 ]] ; do
+    key="$1"
+    case $key in
+    -f )
+      FUNCTION="$2"
+      shift
+      ;;
+    -args )
+      ARGS="$2"
+      shift
+      ;;
+    -peer )
+      shift
+      parsePeerConnectionParameters $@
+      res=$?
+      verifyResult $res "Invoke transaction failed on channel '$CHANNEL_NAME' due to uneven number of peer and org parameters "
+      ;;
+    * )
+      errorln "Unknown flag: $key"
+      printHelp
+      exit 1
+      ;;
+    esac
+    shift
+  done
+
+  # ORG=$1
+  # setGlobals $ORG
+  # infoln "Invoking on peer0.${ORG} on channel '$CHANNEL_NAME'..."
+  local rc=1
+  local COUNTER=1
+
+  while [ $rc -ne 0 -a $COUNTER -lt $MAX_RETRY ]; do
+    sleep $DELAY
+    infoln "Attempting to Query peer0.${ORG}, Retry after $DELAY seconds."
+    set -x
+    peer chaincode invoke -o localhost:7050 --ordererTLSHostnameOverride orderer.example.com --tls --cafile "$ORDERER_CA" -C $CHANNEL_NAME -n ${CC_NAME} "${PEER_CONN_PARMS[@]}" -c "{\"function\": \"${FUNCTION}\",\"Args\":[${ARGS}]}" --waitForEvent >&log.txt
+    # peer chaincode invoke -o localhost:7050 --ordererTLSHostnameOverride orderer.example.com --tls --cafile "$ORDERER_CA" -C $CHANNEL_NAME -n ${CC_NAME} "${PEER_CONN_PARMS[@]}" -c '{"Args":["SMSContract:CreateSms", "1", "1", "MIK", "S2"]}' --waitForEvent >&log.txt
+    # peer chaincode invoke -o localhost:7050 --ordererTLSHostnameOverride orderer.example.com --tls --cafile "$ORDERER_CA" -C $CHANNEL_NAME -n ${CC_NAME} "${PEER_CONN_PARMS[@]}" -c '{"Args":["SPContract:CreateSp", "3", "1", "UIN"]}' --waitForEvent >&log.txt
+    # peer chaincode invoke -o localhost:7050 --ordererTLSHostnameOverride orderer.example.com --tls --cafile "$ORDERER_CA" -C $CHANNEL_NAME -n ${CC_NAME} "${PEER_CONN_PARMS[@]}" -c '{"Args":["SPContract:CreateSp", "2", "2", "UI"]}' --waitForEvent >&log.txt
+    res=$?
+    { set +x; } 2>/dev/null
+    let rc=$res
+    COUNTER=$(expr $COUNTER + 1)
+  done
+  cat log.txt
+  if test $rc -eq 0; then
+    successln "Invoke successful on peer0.${ORG} on channel '$CHANNEL_NAME'"
+  else
+    fatalln "After $MAX_RETRY attempts, Invoke result on peer0.${ORG} is INVALID!"
+  fi
+}
+
 function chaincodeQuery() {
-  ORG=$1
-  setGlobals $ORG
-  infoln "Querying on peer0.${ORG} on channel '$CHANNEL_NAME'..."
+  FUNCTION=""
+  ARGS=""
+  ORG=""
+  while [[ $# -ge 1 ]] ; do
+    key="$1"
+    case $key in
+    -f )
+      FUNCTION="$2"
+      shift
+      ;;
+    -args )
+      ARGS="$2"
+      shift
+      ;;
+    -peer )
+      ORG="$2"
+      setGlobals $ORG
+      infoln "Querying on peer0.${ORG} on channel '$CHANNEL_NAME'..."
+      shift
+      ;;
+    * )
+      errorln "Unknown flag: $key"
+      printHelp
+      exit 1
+      ;;
+    esac
+    shift
+  done
+
   local rc=1
   local COUNTER=1
   # continue to poll
@@ -152,7 +233,9 @@ function chaincodeQuery() {
     sleep $DELAY
     infoln "Attempting to Query peer0.${ORG}, Retry after $DELAY seconds."
     set -x
-    peer chaincode query -C $CHANNEL_NAME -n ${CC_NAME} -c '{"Args":["org.hyperledger.fabric:GetMetadata"]}' >&log.txt
+    peer chaincode query -C $CHANNEL_NAME -n ${CC_NAME} -c "{\"function\": \"${FUNCTION}\",\"Args\":[${ARGS}]}" >&log.txt
+    # peer chaincode query -C $CHANNEL_NAME -n ${CC_NAME} -c '{"Args":["SMSContract:GetSmsById", "2"]}' >&log.txt
+    # peer chaincode query -C $CHANNEL_NAME -n ${CC_NAME} -c '{"Args":["org.hyperledger.fabric:GetMetadata"]}' >&log.txt
     res=$?
     { set +x; } 2>/dev/null
     let rc=$res

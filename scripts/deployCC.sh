@@ -29,7 +29,7 @@ println "- DELAY: ${C_GREEN}${DELAY}${C_RESET}"
 println "- MAX_RETRY: ${C_GREEN}${MAX_RETRY}${C_RESET}"
 println "- VERBOSE: ${C_GREEN}${VERBOSE}${C_RESET}"
 
-FABRIC_CFG_PATH=$PWD/../configtx/
+FABRIC_CFG_PATH=$PWD/configtx/
 
 #User has not provided a name
 if [ -z "$CC_NAME" ] || [ "$CC_NAME" = "NA" ]; then
@@ -54,9 +54,15 @@ CC_SRC_LANGUAGE=$(echo "$CC_SRC_LANGUAGE" | tr [:upper:] [:lower:])
 if [ "$CC_SRC_LANGUAGE" = "go" ]; then
   CC_RUNTIME_LANGUAGE=golang
 
-  infoln "Vendoring Go dependencies at $CC_SRC_PATH"
   pushd $CC_SRC_PATH
-  GO111MODULE=on go mod vendor
+  if [[ ! -f "go.mod" ]]; then
+    go mod init contract/$CC_NAME
+  fi
+  go mod tidy
+
+  infoln "Vendoring Go dependencies at $CC_SRC_PATH"
+  GO111MODULE=on
+  go mod vendor
   popd
   successln "Finished vendoring Go dependencies"
 
@@ -130,16 +136,16 @@ approveForMyOrg "kemdikbud"
 
 ## check whether the chaincode definition is ready to be committed
 ## expect kemdikbud to have approved and he1 not to
-checkCommitReadiness "kemdikbud" "\"KemdikbudMSP\": true" "\"HE1MSP\": false"
-checkCommitReadiness "he1" "\"KemdikbudMSP\": true" "\"HE1MSP\": false"
+checkCommitReadiness "kemdikbud" "\"HE1MSP\": false" "\"KemdikbudMSP\": true"
+checkCommitReadiness "he1" "\"HE1MSP\": false" "\"KemdikbudMSP\": true"
 
 ## now approve also for he1
 approveForMyOrg "he1"
 
 ## check whether the chaincode definition is ready to be committed
 ## expect them both to have approved
-checkCommitReadiness "kemdikbud" "\"KemdikbudMSP\": true" "\"HE1MSP\": true"
-checkCommitReadiness "he1" "\"KemdikbudMSP\": true" "\"HE1MSP\": true"
+checkCommitReadiness "kemdikbud" "\"HE1MSP\": true" "\"KemdikbudMSP\": true"
+checkCommitReadiness "he1" "\"HE1MSP\": true" "\"KemdikbudMSP\": true"
 
 ## now that we know for sure both orgs have approved, commit the definition
 commitChaincodeDefinition "kemdikbud" "he1"

@@ -201,6 +201,14 @@ function deployCC() {
   fi
 }
 
+function accessCC() {
+  scripts/accessCC.sh $CHANNEL_NAME $CC_NAME $CLI_DELAY $MAX_RETRY $VERBOSE
+
+  if [ $? -ne 0 ]; then
+    fatalln "Accessing chaincode failed"
+  fi
+}
+
 ## Call the script to deploy a chaincode to the channel
 function deployCCAAS() {
   scripts/deployCCAAS.sh $CHANNEL_NAME $CC_NAME $CC_SRC_PATH $CCAAS_DOCKER_RUN $CC_VERSION $CC_SEQUENCE $CC_INIT_FCN $CC_END_POLICY $CC_COLL_CONFIG $CLI_DELAY $MAX_RETRY $VERBOSE $CCAAS_DOCKER_RUN
@@ -221,7 +229,7 @@ CLI_DELAY=3
 CHANNEL_NAME="academicchannel"
 # chaincode name defaults to "NA"
 # CC_NAME="NA"
-CC_NAME="hecontract"
+CC_NAME="heContract"
 # chaincode path defaults to "NA"
 # CC_SRC_PATH="NA"
 CC_SRC_PATH="./chaincode/"
@@ -384,6 +392,9 @@ elif [ "$MODE" == "deployCC" ]; then
 elif [ "$MODE" == "deployCCAAS" ]; then
   infoln "deploying chaincode-as-a-service on channel '${CHANNEL_NAME}'"
   deployCCAAS
+elif [ "$MODE" == "accessCC" ]; then
+  infoln "access the chaincode on channel '${CHANNEL_NAME}'"
+  accessCC
 else
   printHelp
   exit 1
