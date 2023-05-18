@@ -17,3 +17,6 @@ organizations/ordererOrganizations
 */vendor
 */go.mod
 */go.sum
+chaincode/*/vendor
+chaincode/*/go.mod
+chaincode/*/go.sum
