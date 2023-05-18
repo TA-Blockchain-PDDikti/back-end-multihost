@@ -3,6 +3,7 @@ package chaincode
 import (
 	"encoding/json"
 	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/hyperledger/fabric/common/flogging"
@@ -14,35 +15,34 @@ import (
 // Logger
 // ============================================================================================================================
 
-var logger = flogging.MustGetLogger("IJZContract")
+var logger = flogging.MustGetLogger("NPDContract")
 
 
 // ============================================================================================================================
 // Contract Definitions
 // ============================================================================================================================
 
-type IJZContract struct {
+type NPDContract struct {
 	contractapi.Contract
 }
 
 
 // ============================================================================================================================
-// Asset Definitions - The ledger will store Ijazah Mahasiswa (IJZ) data
+// Asset Definitions - The ledger will store Nilai Peserta Didik (NPD) data
 // ============================================================================================================================
 
-type Ijazah struct {
+type NilaiPesertaDidik struct {
 	ID      			string 			`json:"id"`
-	IdSP				string 			`json:"idSp"`
-	IdSMS				string 			`json:"idSms"`
+	IdKLS				string 			`json:"idKls"`
+	IdPTK				string 			`json:"idPtk"`
 	IdPD				string 			`json:"idPd"`
-	JenjangPendidikan	string 			`json:"jenjangPendidikan"`
-	NomorIjazah			string 			`json:"nomorIjazah"`
-	TanggalLulus		string 			`json:"tanggalLulus"`
-	SignStep			int 			`json:"signStep"`
-	Signatures			[]SignatureIJZ 	`json:"signatures"`
+	NilaiAngka			float64			`json:"nilaiAngka"`
+	NilaiHuruf			string 			`json:"nilaiHuruf"`
+	NilaiIndex			float64 		`json:"nilaiIndex"`
+	Signature			SignatureNPD 	`json:"signature"`
 }
 
-type SignatureIJZ struct {
+type SignatureNPD struct {
 	Sign			string 	`json:"sign"`
 	SignerId		string 	`json:"signerId"`
 	SignTime		string 	`json:"signTime"`
@@ -55,8 +55,8 @@ type SignatureIJZ struct {
 
 const (
 	ER11 string = "ER11-Incorrect number of arguments. Required %d arguments, but you have %d arguments."
-	ER12        = "ER12-Ijazah with id '%s' already exists."
-	ER13        = "ER13-Ijazah with id '%s' doesn't exist."
+	ER12        = "ER12-NilaiPesertaDidik with id '%s' already exists."
+	ER13        = "ER13-NilaiPesertaDidik with id '%s' doesn't exist."
 	ER31        = "ER31-Failed to change to world state: %v."
 	ER32        = "ER32-Failed to read from world state: %v."
 	ER33        = "ER33-Failed to get result from iterator: %v."
@@ -69,14 +69,14 @@ const (
 
 
 // ============================================================================================================================
-// CreateIjz - Issues a new Ijazah Mahasiswa (IJZ) to the world state with given details.
-// Arguments - ID, Id SP, Id SMS, Id PD, Jenjang Pendidikan, Nomor Ijazah, Tanggal Lulus
+// CreateNpd - Issues a new Nilai Peserta Didik (NPD) to the world state with given details.
+// Arguments - ID, Id KLS, Id PTK, Id PD, Nilai Angka, Nilai Huruf, Nilai Index
 // ============================================================================================================================
 
-func (s *IJZContract) CreateIjz (ctx contractapi.TransactionContextInterface) error {
+func (s *NPDContract) CreateNpd(ctx contractapi.TransactionContextInterface) error {
 	args := ctx.GetStub().GetStringArgs()[1:]
 
-	logger.Infof("Run CreateIjz function with args: %+q.", args)
+	logger.Infof("Run CreateNpd function with args: %+q.", args)
 
 	if len(args) != 7 {
 		logger.Errorf(ER11, 7, len(args))
@@ -84,14 +84,14 @@ func (s *IJZContract) CreateIjz (ctx contractapi.TransactionContextInterface) er
 	}
 
 	id:= args[0]
-	idSp:= args[1]
-	idSms:= args[2]
+	idKls:= args[1]
+	idPtk:= args[2]
 	idPd:= args[3]
-	jenjangPendidikan:= args[4]
-	nomorIjazah:= args[5]
-	tanggalLulus:= args[6]
+	nilaiAngkaStr:= args[4]
+	nilaiHuruf:= args[5]
+	nilaiIndexStr:= args[6]
 
-	exists, err := isIjzExists(ctx, id)
+	exists, err := isNpdExists(ctx, id)
 	if err != nil {
 		return err
 	}
@@ -100,24 +100,35 @@ func (s *IJZContract) CreateIjz (ctx contractapi.TransactionContextInterface) er
 		return fmt.Errorf(ER12, id)
 	}
 
-	ijz := Ijazah{
-		ID:      			id,
-		IdSP:				idSp,
-		IdSMS:				idSms,
-		IdPD:				idPd,
-		JenjangPendidikan:	jenjangPendidikan,
-		NomorIjazah:		nomorIjazah,
-		TanggalLulus:		tanggalLulus,
-		SignStep:			0,
-		Signatures:			[]SignatureIJZ{},
+	nilaiAngka, err := strconv.ParseFloat(nilaiAngkaStr, 64)
+	if err != nil {
+		logger.Errorf(ER36, id)
+		return fmt.Errorf(ER36, id)
 	}
 
-	ijzJSON, err := json.Marshal(ijz)
+	nilaiIndex, err := strconv.ParseFloat(nilaiIndexStr, 64)
+	if err != nil {
+		logger.Errorf(ER36, id)
+		return fmt.Errorf(ER36, id)
+	}
+
+	npd := NilaiPesertaDidik{
+		ID:      			id,
+		IdKLS:				idKls,
+		IdPTK:				idPtk,
+		IdPD:				idPd,
+		NilaiAngka:			nilaiAngka,
+		NilaiHuruf:			nilaiHuruf,
+		NilaiIndex:			nilaiIndex,
+		Signature:			SignatureNPD{},
+	}
+
+	npdJSON, err := json.Marshal(npd)
 	if err != nil {
 		return err
 	}
 
-	err = ctx.GetStub().PutState(id, ijzJSON)
+	err = ctx.GetStub().PutState(id, npdJSON)
 	if err != nil {
 		logger.Errorf(ER31, err)
 	}
@@ -127,14 +138,14 @@ func (s *IJZContract) CreateIjz (ctx contractapi.TransactionContextInterface) er
 
 
 // ============================================================================================================================
-// UpdateIjz - Updates an existing Ijazah Mahasiswa (IJZ) in the world state with provided parameters.
-// Arguments - ID, Id SP, Id SMS, Id PD, Jenjang Pendidikan, Nomor Ijazah, Tanggal Lulus
+// UpdateNpd - Updates an existing Nilai Peserta Didik (NPD) in the world state with provided parameters.
+// Arguments - ID, Id KLS, Id PTK, Id PD, Nilai Angka, Nilai Huruf, Nilai Index
 // ============================================================================================================================
 
-func (s *IJZContract) UpdateIjz (ctx contractapi.TransactionContextInterface) error {
+func (s *NPDContract) UpdateNpd(ctx contractapi.TransactionContextInterface) error {
 	args := ctx.GetStub().GetStringArgs()[1:]
 
-	logger.Infof("Run UpdateIjz function with args: %+q.", args)
+	logger.Infof("Run UpdateNpd function with args: %+q.", args)
 
 	if len(args) != 7 {
 		logger.Errorf(ER11, 7, len(args))
@@ -142,14 +153,14 @@ func (s *IJZContract) UpdateIjz (ctx contractapi.TransactionContextInterface) er
 	}
 
 	id:= args[0]
-	idSp:= args[1]
-	idSms:= args[2]
+	idKls:= args[1]
+	idPtk:= args[2]
 	idPd:= args[3]
-	jenjangPendidikan:= args[4]
-	nomorIjazah:= args[5]
-	tanggalLulus:= args[6]
+	nilaiAngkaStr:= args[4]
+	nilaiHuruf:= args[5]
+	nilaiIndexStr:= args[6]
 
-	exists, err := isIjzExists(ctx, id)
+	exists, err := isNpdExists(ctx, id)
 	if err != nil {
 		return err
 	}
@@ -157,24 +168,35 @@ func (s *IJZContract) UpdateIjz (ctx contractapi.TransactionContextInterface) er
 		return fmt.Errorf(ER13, id)
 	}
 
-	ijz := Ijazah{
-		ID:      			id,
-		IdSP:				idSp,
-		IdSMS:				idSms,
-		IdPD:				idPd,
-		JenjangPendidikan:	jenjangPendidikan,
-		NomorIjazah:		nomorIjazah,
-		TanggalLulus:		tanggalLulus,
-		SignStep:			0,
-		Signatures:			[]SignatureIJZ{},
+	nilaiAngka, err := strconv.ParseFloat(nilaiAngkaStr, 64)
+	if err != nil {
+		logger.Errorf(ER36, id)
+		return fmt.Errorf(ER36, id)
 	}
 
-	ijzJSON, err := json.Marshal(ijz)
+	nilaiIndex, err := strconv.ParseFloat(nilaiIndexStr, 64)
+	if err != nil {
+		logger.Errorf(ER36, id)
+		return fmt.Errorf(ER36, id)
+	}
+
+	npd := NilaiPesertaDidik{
+		ID:      			id,
+		IdKLS:				idKls,
+		IdPTK:				idPtk,
+		IdPD:				idPd,
+		NilaiAngka:			nilaiAngka,
+		NilaiHuruf:			nilaiHuruf,
+		NilaiIndex:			nilaiIndex,
+		Signature:			SignatureNPD{},
+	}
+
+	npdJSON, err := json.Marshal(npd)
 	if err != nil {
 		return err
 	}
 
-	err = ctx.GetStub().PutState(id, ijzJSON)
+	err = ctx.GetStub().PutState(id, npdJSON)
 	if err != nil {
 		logger.Errorf(ER31, err)
 	}
@@ -182,15 +204,16 @@ func (s *IJZContract) UpdateIjz (ctx contractapi.TransactionContextInterface) er
 	return err
 }
 
+
 // ============================================================================================================================
-// AddIjzSignature - Add Signature for an existing Ijazah Mahasiswa (IJZ) in the world state.
-// Arguments - ID, Sign, Signer Id
+// UpdateNpdSignature - Updates List PTK of an existing Nilai Peserta Didik (NPD) in the world state.
+// Arguments - Sign, Signer ID
 // ============================================================================================================================
 
-func (s *IJZContract) AddIjzSignature (ctx contractapi.TransactionContextInterface) error {
+func (s *NPDContract) UpdateNpdSignature(ctx contractapi.TransactionContextInterface) error {
 	args := ctx.GetStub().GetStringArgs()[1:]
 
-	logger.Infof("Run AddIjzSignature function with args: %+q.", args)
+	logger.Infof("Run UpdateNpdSignature function with args: %+q.", args)
 
 	if len(args) != 3 {
 		logger.Errorf(ER11, 3, len(args))
@@ -201,7 +224,7 @@ func (s *IJZContract) AddIjzSignature (ctx contractapi.TransactionContextInterfa
 	sign:= args[1]
 	signerId:= args[2]
 
-	exists, err := isIjzExists(ctx, id)
+	exists, err := isNpdExists(ctx, id)
 	if err != nil {
 		return err
 	}
@@ -209,28 +232,27 @@ func (s *IJZContract) AddIjzSignature (ctx contractapi.TransactionContextInterfa
 		return fmt.Errorf(ER13, id)
 	}
 
-	ijz, err := getIjzStateById(ctx, id)
-	if err != nil {
-		return err
-	}
-
 	loc, _ := time.LoadLocation("Asia/Jakarta")
 
-	signature := SignatureIJZ{
+	signature := SignatureNPD{
 		Sign:			sign,
 		SignerId:		signerId,
 		SignTime:		time.Now().In(loc).Format(time.RFC822),
 	}
 
-	ijz.Signatures = append(ijz.Signatures, signature)
-	ijz.SignStep = ijz.SignStep + 1
-
-	ijzJSON, err := json.Marshal(ijz)
+	npd, err := getNpdStateById(ctx, id)
 	if err != nil {
 		return err
 	}
 
-	err = ctx.GetStub().PutState(id, ijzJSON)
+	npd.Signature = signature
+
+	npdJSON, err := json.Marshal(npd)
+	if err != nil {
+		return err
+	}
+
+	err = ctx.GetStub().PutState(id, npdJSON)
 	if err != nil {
 		logger.Errorf(ER31, err)
 	}
@@ -238,16 +260,15 @@ func (s *IJZContract) AddIjzSignature (ctx contractapi.TransactionContextInterfa
 	return err
 }
 
-
 // ============================================================================================================================
-// DeleteIjz - Deletes an given Ijazah Mahasiswa (IJZ) from the world state.
+// DeleteNpd - Deletes an given Nilai Peserta Didik (NPD) from the world state.
 // Arguments - ID
 // ============================================================================================================================
 
-func (s *IJZContract) DeleteIjz(ctx contractapi.TransactionContextInterface) error {
+func (s *NPDContract) DeleteNpd(ctx contractapi.TransactionContextInterface) error {
 	args := ctx.GetStub().GetStringArgs()[1:]
 
-	logger.Infof("Run DeleteIjz function with args: %+q.", args)
+	logger.Infof("Run DeleteNpd function with args: %+q.", args)
 
 	if len(args) != 1 {
 		logger.Errorf(ER11, 1, len(args))
@@ -256,7 +277,7 @@ func (s *IJZContract) DeleteIjz(ctx contractapi.TransactionContextInterface) err
 
 	id:= args[0]
 
-	exists, err := isIjzExists(ctx, id)
+	exists, err := isNpdExists(ctx, id)
 	if err != nil {
 		return err
 	}
@@ -274,14 +295,14 @@ func (s *IJZContract) DeleteIjz(ctx contractapi.TransactionContextInterface) err
 
 
 // ============================================================================================================================
-// GetAllIjz - Returns all Ijazah Mahasiswa (IJZ) found in world state.
+// GetAllNpd - Returns all Nilai Peserta Didik (NPD) found in world state.
 // No Arguments
 // ============================================================================================================================
 
-func (s *IJZContract) GetAllIjz(ctx contractapi.TransactionContextInterface) ([]*Ijazah, error) {
+func (s *NPDContract) GetAllNpd(ctx contractapi.TransactionContextInterface) ([]*NilaiPesertaDidik, error) {
 	args := ctx.GetStub().GetStringArgs()[1:]
 
-	logger.Infof("Run GetAllIjz function with args: %+q.", args)
+	logger.Infof("Run GetAllNpd function with args: %+q.", args)
 
 	if len(args) != 0 {
 		logger.Errorf(ER11, 0, len(args))
@@ -299,14 +320,14 @@ func (s *IJZContract) GetAllIjz(ctx contractapi.TransactionContextInterface) ([]
 
 
 // ============================================================================================================================
-// GetIjzById - Get the Ijazah Mahasiswa (IJZ) stored in the world state with given id.
+// GetNpdById - Get the Nilai Peserta Didik (NPD) stored in the world state with given id.
 // Arguments - ID
 // ============================================================================================================================
 
-func (s *IJZContract) GetIjzById (ctx contractapi.TransactionContextInterface) (*Ijazah, error) {
+func (s *NPDContract) GetNpdById(ctx contractapi.TransactionContextInterface) (*NilaiPesertaDidik, error) {
 	args := ctx.GetStub().GetStringArgs()[1:]
 
-	logger.Infof("Run GetIjzById function with args: %+q.", args)
+	logger.Infof("Run GetNpdById function with args: %+q.", args)
 
 	if len(args) != 1 {
 		logger.Errorf(ER11, 1, len(args))
@@ -315,67 +336,46 @@ func (s *IJZContract) GetIjzById (ctx contractapi.TransactionContextInterface) (
 
 	id:= args[0]
 
-	ijz, err := getIjzStateById(ctx, id)
+	npd, err := getNpdStateById(ctx, id)
 	if err != nil {
 		return nil, err
 	}
 
-	return ijz, nil
+	return npd, nil
 }
 
 
 // ============================================================================================================================
-// GetIjzByIdSp - Get the Ijazah Mahasiswa (IJZ) stored in the world state with given IdSp.
-// Arguments - idSp
+// GetNpdByIdKls - Get the Nilai Peserta Didik (NPD) stored in the world state with given IdKls.
+// Arguments - idKls
 // ============================================================================================================================
 
-func (t *IJZContract) GetIjzByIdSp(ctx contractapi.TransactionContextInterface) ([]*Ijazah, error) {
+func (t *NPDContract) GetNpdByIdKls(ctx contractapi.TransactionContextInterface) ([]*NilaiPesertaDidik, error) {
 	args := ctx.GetStub().GetStringArgs()[1:]
 
-	logger.Infof("Run GetIjzByIdSp function with args: %+q.", args)
+	logger.Infof("Run GetNpdByIdKls function with args: %+q.", args)
 
 	if len(args) != 1 {
 		logger.Errorf(ER11, 1, len(args))
 		return nil, fmt.Errorf(ER11, 1, len(args))
 	}
 
-	idSp:= args[0]
+	idKls:= args[0]
 
-	queryString := fmt.Sprintf(`{"selector":{"idSp":"%s"}}`, idSp)
-	return getQueryResultForQueryString(ctx, queryString)
-}
-
-// ============================================================================================================================
-// GetIjzByIdSms - Get the Ijazah Mahasiswa (IJZ) stored in the world state with given IdSms.
-// Arguments - idSms
-// ============================================================================================================================
-
-func (t *IJZContract) GetIjzByIdSms(ctx contractapi.TransactionContextInterface) ([]*Ijazah, error) {
-	args := ctx.GetStub().GetStringArgs()[1:]
-
-	logger.Infof("Run GetIjzByIdSms function with args: %+q.", args)
-
-	if len(args) != 1 {
-		logger.Errorf(ER11, 1, len(args))
-		return nil, fmt.Errorf(ER11, 1, len(args))
-	}
-
-	idSms:= args[0]
-
-	queryString := fmt.Sprintf(`{"selector":{"idSms":"%s"}}`, idSms)
+	queryString := fmt.Sprintf(`{"selector":{"idKls":"%s"}}`, idKls)
 	return getQueryResultForQueryString(ctx, queryString)
 }
 
 
 // ============================================================================================================================
-// GetIjzByIdPd - Get the Ijazah Mahasiswa (IJZ) stored in the world state with given IdPd.
+// GetNpdByIdPd - Get the Nilai Peserta Didik (NPD) stored in the world state with given IdPd.
 // Arguments - idPd
 // ============================================================================================================================
 
-func (t *IJZContract) GetIjzByIdPd(ctx contractapi.TransactionContextInterface) ([]*Ijazah, error) {
+func (t *NPDContract) GetNpdByIdPd(ctx contractapi.TransactionContextInterface) ([]*NilaiPesertaDidik, error) {
 	args := ctx.GetStub().GetStringArgs()[1:]
 
-	logger.Infof("Run GetIjzByIdPd function with args: %+q.", args)
+	logger.Infof("Run GetNpdByIdPd function with args: %+q.", args)
 
 	if len(args) != 1 {
 		logger.Errorf(ER11, 1, len(args))
@@ -390,28 +390,28 @@ func (t *IJZContract) GetIjzByIdPd(ctx contractapi.TransactionContextInterface) 
 
 
 // ============================================================================================================================
-// isIjzExists - Returns true when Ijazah Mahasiswa (IJZ) with given ID exists in world state.
+// isNpdExists - Returns true when Nilai Peserta Didik (NPD) with given ID exists in world state.
 // ============================================================================================================================
 
-func isIjzExists(ctx contractapi.TransactionContextInterface, id string) (bool, error) {
-	logger.Infof("Run isIjzExists function with id: '%s'.", id)
+func isNpdExists(ctx contractapi.TransactionContextInterface, id string) (bool, error) {
+	logger.Infof("Run isNpdExists function with id: '%s'.", id)
 
-	ijzJSON, err := ctx.GetStub().GetState(id)
+	npdJSON, err := ctx.GetStub().GetState(id)
 	if err != nil {
 		logger.Errorf(ER32, err)
 		return false, fmt.Errorf(ER32, err)
 	}
 
-	return ijzJSON != nil, nil
+	return npdJSON != nil, nil
 }
 
 
 // ============================================================================================================================
-// getIjzStateById - Get IJZ state with given id.
+// getNpdStateById - Get KLS state with given id.
 // ============================================================================================================================
 
-func getIjzStateById(ctx contractapi.TransactionContextInterface, id string) (*Ijazah, error) {
-	logger.Infof("Run getIjzStateById function with id: '%s'.", id)
+func getNpdStateById(ctx contractapi.TransactionContextInterface, id string) (*NilaiPesertaDidik, error) {
+	logger.Infof("Run getNpdStateById function with id: '%s'.", id)
 
 	npdJSON, err := ctx.GetStub().GetState(id)
 	if err != nil {
@@ -421,7 +421,7 @@ func getIjzStateById(ctx contractapi.TransactionContextInterface, id string) (*I
 		return nil, fmt.Errorf(ER13, id)
 	}
 
-	var npd Ijazah
+	var npd NilaiPesertaDidik
 	err = json.Unmarshal(npdJSON, &npd)
 	if err != nil {
 		return nil, fmt.Errorf(ER34, err)
@@ -435,10 +435,10 @@ func getIjzStateById(ctx contractapi.TransactionContextInterface, id string) (*I
 // constructQueryResponseFromIterator - Constructs a slice of assets from the resultsIterator.
 // ============================================================================================================================
 
-func constructQueryResponseFromIterator(resultsIterator shim.StateQueryIteratorInterface) ([]*Ijazah, error) {
+func constructQueryResponseFromIterator(resultsIterator shim.StateQueryIteratorInterface) ([]*NilaiPesertaDidik, error) {
 	logger.Infof("Run constructQueryResponseFromIterator function.")
 
-	var ijzList []*Ijazah
+	var npdList []*NilaiPesertaDidik
 
 	for resultsIterator.HasNext() {
 		queryResult, err := resultsIterator.Next()
@@ -446,15 +446,15 @@ func constructQueryResponseFromIterator(resultsIterator shim.StateQueryIteratorI
 			return nil, fmt.Errorf(ER33, err)
 		}
 
-		var ijz Ijazah
-		err = json.Unmarshal(queryResult.Value, &ijz)
+		var npd NilaiPesertaDidik
+		err = json.Unmarshal(queryResult.Value, &npd)
 		if err != nil {
 			return nil, fmt.Errorf(ER34, err)
 		}
-		ijzList = append(ijzList, &ijz)
+		npdList = append(npdList, &npd)
 	}
 
-	return ijzList, nil
+	return npdList, nil
 }
 
 
@@ -462,7 +462,7 @@ func constructQueryResponseFromIterator(resultsIterator shim.StateQueryIteratorI
 // getQueryResultForQueryString - Get a query result from query string
 // ============================================================================================================================
 
-func getQueryResultForQueryString(ctx contractapi.TransactionContextInterface, queryString string) ([]*Ijazah, error) {
+func getQueryResultForQueryString(ctx contractapi.TransactionContextInterface, queryString string) ([]*NilaiPesertaDidik, error) {
 	logger.Infof("Run getQueryResultForQueryString function with queryString: '%s'.", queryString)
 
 	resultsIterator, err := ctx.GetStub().GetQueryResult(queryString)

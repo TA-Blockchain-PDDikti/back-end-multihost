@@ -3,7 +3,6 @@ package chaincode
 import (
 	"encoding/json"
 	"fmt"
-	"time"
 
 	"github.com/hyperledger/fabric/common/flogging"
 	"github.com/hyperledger/fabric-chaincode-go/shim"
@@ -14,38 +13,32 @@ import (
 // Logger
 // ============================================================================================================================
 
-var logger = flogging.MustGetLogger("IJZContract")
+var logger = flogging.MustGetLogger("PTKContract")
 
 
 // ============================================================================================================================
 // Contract Definitions
 // ============================================================================================================================
 
-type IJZContract struct {
+type PTKContract struct {
 	contractapi.Contract
 }
 
 
 // ============================================================================================================================
-// Asset Definitions - The ledger will store Ijazah Mahasiswa (IJZ) data
+// Asset Definitions - The ledger will store Pendidik dan Tenaga Kependidikan (PTK) data
 // ============================================================================================================================
 
-type Ijazah struct {
-	ID      			string 			`json:"id"`
-	IdSP				string 			`json:"idSp"`
-	IdSMS				string 			`json:"idSms"`
-	IdPD				string 			`json:"idPd"`
-	JenjangPendidikan	string 			`json:"jenjangPendidikan"`
-	NomorIjazah			string 			`json:"nomorIjazah"`
-	TanggalLulus		string 			`json:"tanggalLulus"`
-	SignStep			int 			`json:"signStep"`
-	Signatures			[]SignatureIJZ 	`json:"signatures"`
-}
-
-type SignatureIJZ struct {
-	Sign			string 	`json:"sign"`
-	SignerId		string 	`json:"signerId"`
-	SignTime		string 	`json:"signTime"`
+type PendidikTenagaKependidikan struct {
+	ID      			string `json:"id"`
+	IdSP				string `json:"idSp"`
+	IdSMS				string `json:"idSms"`
+	NamaPTK				string `json:"namaPtk"`
+	NIDN				string `json:"nidn"`
+	Jabatan				string `json:"jabatan"`
+	NomorSK				string `json:"nomorSk"`
+	SignaturePTK		string `json:"signaturePtk"`
+	SignatureJabatan	string `json:"signatureJabatan"`
 }
 
 
@@ -55,43 +48,38 @@ type SignatureIJZ struct {
 
 const (
 	ER11 string = "ER11-Incorrect number of arguments. Required %d arguments, but you have %d arguments."
-	ER12        = "ER12-Ijazah with id '%s' already exists."
-	ER13        = "ER13-Ijazah with id '%s' doesn't exist."
+	ER12        = "ER12-PendidikTenagaKependidikan with id '%s' already exists."
+	ER13        = "ER13-PendidikTenagaKependidikan with id '%s' doesn't exist."
 	ER31        = "ER31-Failed to change to world state: %v."
 	ER32        = "ER32-Failed to read from world state: %v."
 	ER33        = "ER33-Failed to get result from iterator: %v."
 	ER34        = "ER34-Failed unmarshaling JSON: %v."
-	ER35        = "ER35-Failed parsing string to integer: %v."
-	ER36        = "ER36-Failed parsing string to float: %v."
 	ER41        = "ER41-Access is not permitted with MSDPID '%s'."
 	ER42        = "ER42-Unknown MSPID: '%s'."
 )
 
 
 // ============================================================================================================================
-// CreateIjz - Issues a new Ijazah Mahasiswa (IJZ) to the world state with given details.
-// Arguments - ID, Id SP, Id SMS, Id PD, Jenjang Pendidikan, Nomor Ijazah, Tanggal Lulus
+// CreatePtk - Issues a new Pendidik dan Tenaga Kependidikan (PTK) to the world state with given details.
+// Arguments - ID, Id SP, Id SMS, Nama PTK
 // ============================================================================================================================
 
-func (s *IJZContract) CreateIjz (ctx contractapi.TransactionContextInterface) error {
+func (s *PTKContract) CreatePtk(ctx contractapi.TransactionContextInterface) error {
 	args := ctx.GetStub().GetStringArgs()[1:]
 
-	logger.Infof("Run CreateIjz function with args: %+q.", args)
+	logger.Infof("Run CreatePtk function with args: %+q.", args)
 
-	if len(args) != 7 {
-		logger.Errorf(ER11, 7, len(args))
-		return fmt.Errorf(ER11, 7, len(args))
+	if len(args) != 4 {
+		logger.Errorf(ER11, 4, len(args))
+		return fmt.Errorf(ER11, 4, len(args))
 	}
 
 	id:= args[0]
 	idSp:= args[1]
 	idSms:= args[2]
-	idPd:= args[3]
-	jenjangPendidikan:= args[4]
-	nomorIjazah:= args[5]
-	tanggalLulus:= args[6]
+	namaPtk:= args[3]
 
-	exists, err := isIjzExists(ctx, id)
+	exists, err := isPtkExists(ctx, id)
 	if err != nil {
 		return err
 	}
@@ -100,24 +88,24 @@ func (s *IJZContract) CreateIjz (ctx contractapi.TransactionContextInterface) er
 		return fmt.Errorf(ER12, id)
 	}
 
-	ijz := Ijazah{
+	ptk := PendidikTenagaKependidikan{
 		ID:      			id,
 		IdSP:				idSp,
 		IdSMS:				idSms,
-		IdPD:				idPd,
-		JenjangPendidikan:	jenjangPendidikan,
-		NomorIjazah:		nomorIjazah,
-		TanggalLulus:		tanggalLulus,
-		SignStep:			0,
-		Signatures:			[]SignatureIJZ{},
+		NamaPTK:			namaPtk,
+		NIDN:				"",
+		Jabatan:			"",
+		NomorSK:			"",
+		SignaturePTK:		"",
+		SignatureJabatan:	"",
 	}
 
-	ijzJSON, err := json.Marshal(ijz)
+	ptkJSON, err := json.Marshal(ptk)
 	if err != nil {
 		return err
 	}
 
-	err = ctx.GetStub().PutState(id, ijzJSON)
+	err = ctx.GetStub().PutState(id, ptkJSON)
 	if err != nil {
 		logger.Errorf(ER31, err)
 	}
@@ -127,29 +115,26 @@ func (s *IJZContract) CreateIjz (ctx contractapi.TransactionContextInterface) er
 
 
 // ============================================================================================================================
-// UpdateIjz - Updates an existing Ijazah Mahasiswa (IJZ) in the world state with provided parameters.
-// Arguments - ID, Id SP, Id SMS, Id PD, Jenjang Pendidikan, Nomor Ijazah, Tanggal Lulus
+// UpdatePtk - Updates an existing Pendidik dan Tenaga Kependidikan (PTK) in the world state with provided parameters.
+// Arguments - ID, Id SP, Id SMS, Nama PTK
 // ============================================================================================================================
 
-func (s *IJZContract) UpdateIjz (ctx contractapi.TransactionContextInterface) error {
+func (s *PTKContract) UpdatePtk(ctx contractapi.TransactionContextInterface) error {
 	args := ctx.GetStub().GetStringArgs()[1:]
 
-	logger.Infof("Run UpdateIjz function with args: %+q.", args)
+	logger.Infof("Run UpdatePtk function with args: %+q.", args)
 
-	if len(args) != 7 {
-		logger.Errorf(ER11, 7, len(args))
-		return fmt.Errorf(ER11, 7, len(args))
+	if len(args) != 4 {
+		logger.Errorf(ER11, 4, len(args))
+		return fmt.Errorf(ER11, 4, len(args))
 	}
 
 	id:= args[0]
 	idSp:= args[1]
 	idSms:= args[2]
-	idPd:= args[3]
-	jenjangPendidikan:= args[4]
-	nomorIjazah:= args[5]
-	tanggalLulus:= args[6]
+	namaPtk:= args[3]
 
-	exists, err := isIjzExists(ctx, id)
+	exists, err := isPtkExists(ctx, id)
 	if err != nil {
 		return err
 	}
@@ -157,24 +142,23 @@ func (s *IJZContract) UpdateIjz (ctx contractapi.TransactionContextInterface) er
 		return fmt.Errorf(ER13, id)
 	}
 
-	ijz := Ijazah{
-		ID:      			id,
-		IdSP:				idSp,
-		IdSMS:				idSms,
-		IdPD:				idPd,
-		JenjangPendidikan:	jenjangPendidikan,
-		NomorIjazah:		nomorIjazah,
-		TanggalLulus:		tanggalLulus,
-		SignStep:			0,
-		Signatures:			[]SignatureIJZ{},
-	}
-
-	ijzJSON, err := json.Marshal(ijz)
+	ptk, err := getPtkStateById(ctx, id)
 	if err != nil {
 		return err
 	}
 
-	err = ctx.GetStub().PutState(id, ijzJSON)
+	ptk.IdSP = idSp
+	ptk.IdSMS = idSms
+	ptk.NamaPTK = namaPtk
+	ptk.SignaturePTK = ""
+	ptk.SignatureJabatan = ""
+
+	ptkJSON, err := json.Marshal(ptk)
+	if err != nil {
+		return err
+	}
+
+	err = ctx.GetStub().PutState(id, ptkJSON)
 	if err != nil {
 		logger.Errorf(ER31, err)
 	}
@@ -182,15 +166,16 @@ func (s *IJZContract) UpdateIjz (ctx contractapi.TransactionContextInterface) er
 	return err
 }
 
+
 // ============================================================================================================================
-// AddIjzSignature - Add Signature for an existing Ijazah Mahasiswa (IJZ) in the world state.
-// Arguments - ID, Sign, Signer Id
+// UpdatePtkNidnAndSign - Updates NIDN and SiganturePTK of an existing Pendidik dan Tenaga Kependidikan (PTK) in the world state.
+// Arguments - ID, NIDN, SignaturePTK
 // ============================================================================================================================
 
-func (s *IJZContract) AddIjzSignature (ctx contractapi.TransactionContextInterface) error {
+func (s *PTKContract) UpdatePtkNidnAndSign(ctx contractapi.TransactionContextInterface) error {
 	args := ctx.GetStub().GetStringArgs()[1:]
 
-	logger.Infof("Run AddIjzSignature function with args: %+q.", args)
+	logger.Infof("Run UpdatePtkNidnAndSign function with args: %+q.", args)
 
 	if len(args) != 3 {
 		logger.Errorf(ER11, 3, len(args))
@@ -198,10 +183,10 @@ func (s *IJZContract) AddIjzSignature (ctx contractapi.TransactionContextInterfa
 	}
 
 	id:= args[0]
-	sign:= args[1]
-	signerId:= args[2]
+	nidn:= args[1]
+	signaturePtk:= args[2]
 
-	exists, err := isIjzExists(ctx, id)
+	exists, err := isPtkExists(ctx, id)
 	if err != nil {
 		return err
 	}
@@ -209,28 +194,21 @@ func (s *IJZContract) AddIjzSignature (ctx contractapi.TransactionContextInterfa
 		return fmt.Errorf(ER13, id)
 	}
 
-	ijz, err := getIjzStateById(ctx, id)
+	ptk, err := getPtkStateById(ctx, id)
 	if err != nil {
 		return err
 	}
 
-	loc, _ := time.LoadLocation("Asia/Jakarta")
+	ptk.NIDN = nidn
+	ptk.SignaturePTK = signaturePtk
+	ptk.SignatureJabatan = ""
 
-	signature := SignatureIJZ{
-		Sign:			sign,
-		SignerId:		signerId,
-		SignTime:		time.Now().In(loc).Format(time.RFC822),
-	}
-
-	ijz.Signatures = append(ijz.Signatures, signature)
-	ijz.SignStep = ijz.SignStep + 1
-
-	ijzJSON, err := json.Marshal(ijz)
+	ptkJSON, err := json.Marshal(ptk)
 	if err != nil {
 		return err
 	}
 
-	err = ctx.GetStub().PutState(id, ijzJSON)
+	err = ctx.GetStub().PutState(id, ptkJSON)
 	if err != nil {
 		logger.Errorf(ER31, err)
 	}
@@ -240,14 +218,65 @@ func (s *IJZContract) AddIjzSignature (ctx contractapi.TransactionContextInterfa
 
 
 // ============================================================================================================================
-// DeleteIjz - Deletes an given Ijazah Mahasiswa (IJZ) from the world state.
+// UpdatePtkJabatanAndSign - Updates NIDN and SiganturePTK of an existing Pendidik dan Tenaga Kependidikan (PTK) in the world state.
+// Arguments - ID, Jabatan, Nomor SK, SignaturePTK
+// ============================================================================================================================
+
+func (s *PTKContract) UpdatePtkJabatanAndSign(ctx contractapi.TransactionContextInterface) error {
+	args := ctx.GetStub().GetStringArgs()[1:]
+
+	logger.Infof("Run UpdatePtkJabatanAndSign function with args: %+q.", args)
+
+	if len(args) != 4 {
+		logger.Errorf(ER11, 4, len(args))
+		return fmt.Errorf(ER11, 4, len(args))
+	}
+
+	id:= args[0]
+	jabatan:= args[1]
+	nomorSk:= args[2]
+	signatureJabatan:= args[3]
+
+	exists, err := isPtkExists(ctx, id)
+	if err != nil {
+		return err
+	}
+	if !exists {
+		return fmt.Errorf(ER13, id)
+	}
+
+	ptk, err := getPtkStateById(ctx, id)
+	if err != nil {
+		return err
+	}
+
+	ptk.Jabatan = jabatan
+	ptk.NomorSK = nomorSk
+	ptk.SignatureJabatan = signatureJabatan
+
+	ptkJSON, err := json.Marshal(ptk)
+	if err != nil {
+		return err
+	}
+
+	err = ctx.GetStub().PutState(id, ptkJSON)
+	if err != nil {
+		logger.Errorf(ER31, err)
+	}
+
+	return err
+}
+
+
+// ============================================================================================================================
+// DeletePtk - Deletes an given Pendidik dan Tenaga Kependidikan (PTK) from the world state.
 // Arguments - ID
 // ============================================================================================================================
 
-func (s *IJZContract) DeleteIjz(ctx contractapi.TransactionContextInterface) error {
+func (s *PTKContract) DeletePtk(ctx contractapi.TransactionContextInterface) error {
 	args := ctx.GetStub().GetStringArgs()[1:]
 
-	logger.Infof("Run DeleteIjz function with args: %+q.", args)
+	logger.Infof("Run DeletePtk function with args: %+q.", args)
 
 	if len(args) != 1 {
 		logger.Errorf(ER11, 1, len(args))
@@ -256,7 +285,7 @@ func (s *IJZContract) DeleteIjz(ctx contractapi.TransactionContextInterface) err
 
 	id:= args[0]
 
-	exists, err := isIjzExists(ctx, id)
+	exists, err := isPtkExists(ctx, id)
 	if err != nil {
 		return err
 	}
@@ -274,14 +303,14 @@ func (s *IJZContract) DeleteIjz(ctx contractapi.TransactionContextInterface) err
 
 
 // ============================================================================================================================
-// GetAllIjz - Returns all Ijazah Mahasiswa (IJZ) found in world state.
+// GetAllPtk - Returns all Pendidik dan Tenaga Kependidikan (PTK) found in world state.
 // No Arguments
 // ============================================================================================================================
 
-func (s *IJZContract) GetAllIjz(ctx contractapi.TransactionContextInterface) ([]*Ijazah, error) {
+func (s *PTKContract) GetAllPtk(ctx contractapi.TransactionContextInterface) ([]*PendidikTenagaKependidikan, error) {
 	args := ctx.GetStub().GetStringArgs()[1:]
 
-	logger.Infof("Run GetAllIjz function with args: %+q.", args)
+	logger.Infof("Run GetAllPtk function with args: %+q.", args)
 
 	if len(args) != 0 {
 		logger.Errorf(ER11, 0, len(args))
@@ -299,14 +328,14 @@ func (s *IJZContract) GetAllIjz(ctx contractapi.TransactionContextInterface) ([]
 
 
 // ============================================================================================================================
-// GetIjzById - Get the Ijazah Mahasiswa (IJZ) stored in the world state with given id.
+// GetPtkById - Get the Pendidik dan Tenaga Kependidikan (PTK) stored in the world state with given id.
 // Arguments - ID
 // ============================================================================================================================
 
-func (s *IJZContract) GetIjzById (ctx contractapi.TransactionContextInterface) (*Ijazah, error) {
+func (s *PTKContract) GetPtkById(ctx contractapi.TransactionContextInterface) (*PendidikTenagaKependidikan, error) {
 	args := ctx.GetStub().GetStringArgs()[1:]
 
-	logger.Infof("Run GetIjzById function with args: %+q.", args)
+	logger.Infof("Run GetPtkById function with args: %+q.", args)
 
 	if len(args) != 1 {
 		logger.Errorf(ER11, 1, len(args))
@@ -315,24 +344,33 @@ func (s *IJZContract) GetIjzById (ctx contractapi.TransactionContextInterface) (
 
 	id:= args[0]
 
-	ijz, err := getIjzStateById(ctx, id)
+	ptkJSON, err := ctx.GetStub().GetState(id)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf(ER32, err)
+	}
+	if ptkJSON == nil {
+		return nil, fmt.Errorf(ER13, id)
 	}
 
-	return ijz, nil
+	var ptk PendidikTenagaKependidikan
+	err = json.Unmarshal(ptkJSON, &ptk)
+	if err != nil {
+		return nil, fmt.Errorf(ER34, err)
+	}
+
+	return &ptk, nil
 }
 
 
 // ============================================================================================================================
-// GetIjzByIdSp - Get the Ijazah Mahasiswa (IJZ) stored in the world state with given IdSp.
+// GetPtkByIdSp - Get the Pendidik dan Tenaga Kependidikan (PTK) stored in the world state with given IdSp.
 // Arguments - idSp
 // ============================================================================================================================
 
-func (t *IJZContract) GetIjzByIdSp(ctx contractapi.TransactionContextInterface) ([]*Ijazah, error) {
+func (t *PTKContract) GetPtkByIdSp(ctx contractapi.TransactionContextInterface) ([]*PendidikTenagaKependidikan, error) {
 	args := ctx.GetStub().GetStringArgs()[1:]
 
-	logger.Infof("Run GetIjzByIdSp function with args: %+q.", args)
+	logger.Infof("Run GetPtkByIdSp function with args: %+q.", args)
 
 	if len(args) != 1 {
 		logger.Errorf(ER11, 1, len(args))
@@ -345,15 +383,16 @@ func (t *IJZContract) GetIjzByIdSp(ctx contractapi.TransactionContextInterface) 
 	return getQueryResultForQueryString(ctx, queryString)
 }
 
+
 // ============================================================================================================================
-// GetIjzByIdSms - Get the Ijazah Mahasiswa (IJZ) stored in the world state with given IdSms.
+// GetPtkByIdSms - Get the Pendidik dan Tenaga Kependidikan (PTK) stored in the world state with given IdSms.
 // Arguments - idSms
 // ============================================================================================================================
 
-func (t *IJZContract) GetIjzByIdSms(ctx contractapi.TransactionContextInterface) ([]*Ijazah, error) {
+func (t *PTKContract) GetPtkByIdSms(ctx contractapi.TransactionContextInterface) ([]*PendidikTenagaKependidikan, error) {
 	args := ctx.GetStub().GetStringArgs()[1:]
 
-	logger.Infof("Run GetIjzByIdSms function with args: %+q.", args)
+	logger.Infof("Run GetPtkByIdSms function with args: %+q.", args)
 
 	if len(args) != 1 {
 		logger.Errorf(ER11, 1, len(args))
@@ -368,66 +407,44 @@ func (t *IJZContract) GetIjzByIdSms(ctx contractapi.TransactionContextInterface)
 
 
 // ============================================================================================================================
-// GetIjzByIdPd - Get the Ijazah Mahasiswa (IJZ) stored in the world state with given IdPd.
-// Arguments - idPd
+// isPtkExists - Returns true when Pendidik dan Tenaga Kependidikan (PTK) with given ID exists in world state.
 // ============================================================================================================================
 
-func (t *IJZContract) GetIjzByIdPd(ctx contractapi.TransactionContextInterface) ([]*Ijazah, error) {
-	args := ctx.GetStub().GetStringArgs()[1:]
+func isPtkExists(ctx contractapi.TransactionContextInterface, id string) (bool, error) {
+	logger.Infof("Run isPtkExists function with id: '%s'.", id)
 
-	logger.Infof("Run GetIjzByIdPd function with args: %+q.", args)
-
-	if len(args) != 1 {
-		logger.Errorf(ER11, 1, len(args))
-		return nil, fmt.Errorf(ER11, 1, len(args))
-	}
-
-	idPd:= args[0]
-
-	queryString := fmt.Sprintf(`{"selector":{"idPd":"%s"}}`, idPd)
-	return getQueryResultForQueryString(ctx, queryString)
-}
-
-
-// ============================================================================================================================
-// isIjzExists - Returns true when Ijazah Mahasiswa (IJZ) with given ID exists in world state.
-// ============================================================================================================================
-
-func isIjzExists(ctx contractapi.TransactionContextInterface, id string) (bool, error) {
-	logger.Infof("Run isIjzExists function with id: '%s'.", id)
-
-	ijzJSON, err := ctx.GetStub().GetState(id)
+	ptkJSON, err := ctx.GetStub().GetState(id)
 	if err != nil {
 		logger.Errorf(ER32, err)
 		return false, fmt.Errorf(ER32, err)
 	}
 
-	return ijzJSON != nil, nil
+	return ptkJSON != nil, nil
 }
 
 
 // ============================================================================================================================
-// getIjzStateById - Get IJZ state with given id.
+// getPtkStateById - Get KLS state with given id.
 // ============================================================================================================================
 
-func getIjzStateById(ctx contractapi.TransactionContextInterface, id string) (*Ijazah, error) {
-	logger.Infof("Run getIjzStateById function with id: '%s'.", id)
+func getPtkStateById(ctx contractapi.TransactionContextInterface, id string) (*PendidikTenagaKependidikan, error) {
+	logger.Infof("Run getPtkStateById function with id: '%s'.", id)
 
-	npdJSON, err := ctx.GetStub().GetState(id)
+	ptkJSON, err := ctx.GetStub().GetState(id)
 	if err != nil {
 		return nil, fmt.Errorf(ER32, err)
 	}
-	if npdJSON == nil {
+	if ptkJSON == nil {
 		return nil, fmt.Errorf(ER13, id)
 	}
 
-	var npd Ijazah
-	err = json.Unmarshal(npdJSON, &npd)
+	var ptk PendidikTenagaKependidikan
+	err = json.Unmarshal(ptkJSON, &ptk)
 	if err != nil {
 		return nil, fmt.Errorf(ER34, err)
 	}
 
-	return &npd, nil
+	return &ptk, nil
 }
 
 
@@ -435,10 +452,10 @@ func getIjzStateById(ctx contractapi.TransactionContextInterface, id string) (*I
 // constructQueryResponseFromIterator - Constructs a slice of assets from the resultsIterator.
 // ============================================================================================================================
 
-func constructQueryResponseFromIterator(resultsIterator shim.StateQueryIteratorInterface) ([]*Ijazah, error) {
+func constructQueryResponseFromIterator(resultsIterator shim.StateQueryIteratorInterface) ([]*PendidikTenagaKependidikan, error) {
 	logger.Infof("Run constructQueryResponseFromIterator function.")
 
-	var ijzList []*Ijazah
+	var ptkList []*PendidikTenagaKependidikan
 
 	for resultsIterator.HasNext() {
 		queryResult, err := resultsIterator.Next()
@@ -446,15 +463,15 @@ func constructQueryResponseFromIterator(resultsIterator shim.StateQueryIteratorI
 			return nil, fmt.Errorf(ER33, err)
 		}
 
-		var ijz Ijazah
-		err = json.Unmarshal(queryResult.Value, &ijz)
+		var ptk PendidikTenagaKependidikan
+		err = json.Unmarshal(queryResult.Value, &ptk)
 		if err != nil {
 			return nil, fmt.Errorf(ER34, err)
 		}
-		ijzList = append(ijzList, &ijz)
+		ptkList = append(ptkList, &ptk)
 	}
 
-	return ijzList, nil
+	return ptkList, nil
 }
 
 
@@ -462,7 +479,7 @@ func constructQueryResponseFromIterator(resultsIterator shim.StateQueryIteratorI
 // getQueryResultForQueryString - Get a query result from query string
 // ============================================================================================================================
 
-func getQueryResultForQueryString(ctx contractapi.TransactionContextInterface, queryString string) ([]*Ijazah, error) {
+func getQueryResultForQueryString(ctx contractapi.TransactionContextInterface, queryString string) ([]*PendidikTenagaKependidikan, error) {
 	logger.Infof("Run getQueryResultForQueryString function with queryString: '%s'.", queryString)
 
 	resultsIterator, err := ctx.GetStub().GetQueryResult(queryString)
