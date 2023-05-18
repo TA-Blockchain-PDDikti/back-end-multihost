@@ -3,6 +3,7 @@ package chaincode
 import (
 	"encoding/json"
 	"fmt"
+	"time"
 
 	"github.com/hyperledger/fabric/common/flogging"
 	"github.com/hyperledger/fabric-chaincode-go/shim"
@@ -30,13 +31,21 @@ type IJZContract struct {
 // ============================================================================================================================
 
 type Ijazah struct {
-	ID      			string 	`json:"id"`
-	IdSP				string 	`json:"idSp"`
-	IdSMS				string 	`json:"idSms"`
-	IdPD				string 	`json:"idPd"`
-	JenjangPendidikan	string 	`json:"jenjangPendidikan"`
-	NomorIjazah			string 	`json:"nomorIjazah"`
-	TanggalLulus		string 	`json:"tanggalLulus"`
+	ID      			string 			`json:"id"`
+	IdSP				string 			`json:"idSp"`
+	IdSMS				string 			`json:"idSms"`
+	IdPD				string 			`json:"idPd"`
+	JenjangPendidikan	string 			`json:"jenjangPendidikan"`
+	NomorIjazah			string 			`json:"nomorIjazah"`
+	TanggalLulus		string 			`json:"tanggalLulus"`
+	SignStep			int 			`json:"signStep"`
+	Signatures			[]SignatureIJZ 	`json:"signatures"`
+}
+
+type SignatureIJZ struct {
+	Sign			string 	`json:"sign"`
+	SignerId		string 	`json:"signerId"`
+	SignTime		string 	`json:"signTime"`
 }
 
 
@@ -52,6 +61,8 @@ const (
 	ER32        = "ER32-Failed to read from world state: %v."
 	ER33        = "ER33-Failed to get result from iterator: %v."
 	ER34        = "ER34-Failed unmarshaling JSON: %v."
+	ER35        = "ER35-Failed parsing string to integer: %v."
+	ER36        = "ER36-Failed parsing string to float: %v."
 	ER41        = "ER41-Access is not permitted with MSDPID '%s'."
 	ER42        = "ER42-Unknown MSPID: '%s'."
 )
@@ -97,6 +108,8 @@ func (s *IJZContract) CreateIjz (ctx contractapi.TransactionContextInterface) er
 		JenjangPendidikan:	jenjangPendidikan,
 		NomorIjazah:		nomorIjazah,
 		TanggalLulus:		tanggalLulus,
+		SignStep:			0,
+		Signatures:			[]SignatureIJZ{},
 	}
 
 	ijzJSON, err := json.Marshal(ijz)
@@ -152,7 +165,65 @@ func (s *IJZContract) UpdateIjz (ctx contractapi.TransactionContextInterface) er
 		JenjangPendidikan:	jenjangPendidikan,
 		NomorIjazah:		nomorIjazah,
 		TanggalLulus:		tanggalLulus,
+		SignStep:			0,
+		Signatures:			[]SignatureIJZ{},
 	}
+
+	ijzJSON, err := json.Marshal(ijz)
+	if err != nil {
+		return err
+	}
+
+	err = ctx.GetStub().PutState(id, ijzJSON)
+	if err != nil {
+		logger.Errorf(ER31, err)
+	}
+
+	return err
+}
+
+// ============================================================================================================================
+// AddIjzSignature - Add Signature for an existing Ijazah Mahasiswa (IJZ) in the world state.
+// Arguments - ID, Sign, Signer Id
+// ============================================================================================================================
+
+func (s *IJZContract) AddIjzSignature (ctx contractapi.TransactionContextInterface) error {
+	args := ctx.GetStub().GetStringArgs()[1:]
+
+	logger.Infof("Run AddIjzSignature function with args: %+q.", args)
+
+	if len(args) != 3 {
+		logger.Errorf(ER11, 3, len(args))
+		return fmt.Errorf(ER11, 3, len(args))
+	}
+
+	id:= args[0]
+	sign:= args[1]
+	signerId:= args[2]
+
+	exists, err := isIjzExists(ctx, id)
+	if err != nil {
+		return err
+	}
+	if !exists {
+		return fmt.Errorf(ER13, id)
+	}
+
+	ijz, err := getIjzStateById(ctx, id)
+	if err != nil {
+		return err
+	}
+
+	loc, _ := time.LoadLocation("Asia/Jakarta")
+
+	signature := SignatureIJZ{
+		Sign:			sign,
+		SignerId:		signerId,
+		SignTime:		time.Now().In(loc).Format(time.RFC822),
+	}
+
+	ijz.Signatures = append(ijz.Signatures, signature)
+	ijz.SignStep = ijz.SignStep + 1
 
 	ijzJSON, err := json.Marshal(ijz)
 	if err != nil {
@@ -244,21 +315,12 @@ func (s *IJZContract) GetIjzById (ctx contractapi.TransactionContextInterface) (
 
 	id:= args[0]
 
-	ijzJSON, err := ctx.GetStub().GetState(id)
+	ijz, err := getIjzStateById(ctx, id)
 	if err != nil {
-		return nil, fmt.Errorf(ER32, err)
-	}
-	if ijzJSON == nil {
-		return nil, fmt.Errorf(ER13, id)
+		return nil, err
 	}
 
-	var ijz Ijazah
-	err = json.Unmarshal(ijzJSON, &ijz)
-	if err != nil {
-		rreturn nil, fmt.Errorf(ER34, err)
-	}
-
-	return &ijz, nil
+	return ijz, nil
 }
 
 
@@ -341,6 +403,31 @@ func isIjzExists(ctx contractapi.TransactionContextInterface, id string) (bool, 
 	}
 
 	return ijzJSON != nil, nil
+}
+
+
+// ============================================================================================================================
+// getIjzStateById - Get IJZ state with given id.
+// ============================================================================================================================
+
+func getIjzStateById(ctx contractapi.TransactionContextInterface, id string) (*Ijazah, error) {
+	logger.Infof("Run getIjzStateById function with id: '%s'.", id)
+
+	npdJSON, err := ctx.GetStub().GetState(id)
+	if err != nil {
+		return nil, fmt.Errorf(ER32, err)
+	}
+	if npdJSON == nil {
+		return nil, fmt.Errorf(ER13, id)
+	}
+
+	var npd Ijazah
+	err = json.Unmarshal(npdJSON, &npd)
+	if err != nil {
+		return nil, fmt.Errorf(ER34, err)
+	}
+
+	return &npd, nil
 }
 
 
