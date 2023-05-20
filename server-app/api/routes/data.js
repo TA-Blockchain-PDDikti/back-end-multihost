@@ -1,5 +1,5 @@
 const dataRouter = require('express').Router()
-const dataController = require('../controllers/manageData.js')
+const dataController = require('../controllers/data.js')
 const auth = require('../middleware/auth.js')
 
 dataRouter.use(auth)
@@ -25,6 +25,7 @@ dataRouter.get('/dosen', dataController.getAllDosen)
 dataRouter.get('/dosen/:id', dataController.getDosenById)
 dataRouter.get('/dosen/pt/:id', dataController.getDosenByPT)
 dataRouter.put('/dosen/:id', dataController.updateDosen)
+dataRouter.put('/dosen/sign/:id', dataController.signDosen)
 dataRouter.delete('/dosen/:id', dataController.deleteDosen)
 
 //mahasiswa
@@ -40,6 +41,7 @@ dataRouter.delete('/mahasiswa/:id', dataController.deleteMahasiswa)
 dataRouter.post('/matkul', dataController.createMataKuliah)
 dataRouter.get('/matkul', dataController.getAllMataKuliah)
 dataRouter.get('/matkul/:id', dataController.getMataKuliahById)
+dataRouter.get('/matkul/pt/:id', dataController.getMataKuliahByIdPt)
 dataRouter.put('/matkul/:id', dataController.updateMataKuliah)
 dataRouter.delete('/matkul/:id', dataController.deleteMataKuliah)
 
@@ -52,11 +54,11 @@ dataRouter.delete('/kelas/:id', dataController.deleteKelas)
 dataRouter.post('/kelas/dosen', dataController.assignDosen)
 dataRouter.post('/kelas/mahasiswa', dataController.assignMahasiswa)
 
-//verifier
-dataRouter.post('/verifier', dataController.createVerifier)
-dataRouter.get('/verifier', dataController.getAllVerifier)
-dataRouter.put('/verifier/:id', dataController.updateVerifier)
-dataRouter.delete('/verifier/:id', dataController.deleteVerifier)
+// //verifier
+// dataRouter.post('/verifier', dataController.createVerifier)
+// dataRouter.get('/verifier', dataController.getAllVerifier)
+// dataRouter.put('/verifier/:id', dataController.updateVerifier)
+// dataRouter.delete('/verifier/:id', dataController.deleteVerifier)
 
 
 module.exports = dataRouter;

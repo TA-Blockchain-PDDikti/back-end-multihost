@@ -1,7 +1,7 @@
 const router = require('express').Router()
-const dataRouter = require('./manageData.js')
+const dataRouter = require('./data.js')
 const userRouter = require('./user.js')
-const certificateRouter = require('./certificate.js')
+const certificateRouter = require('./academicCertificate.js')
 const academicRecordRouter = require('./academicRecord.js')
 
 router.use('/data', dataRouter);

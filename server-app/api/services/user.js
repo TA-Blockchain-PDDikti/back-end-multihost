@@ -136,7 +136,7 @@ const loginUser = async(username, password) => {
     // retrieve the registered identity 
     const identityService = ca.newIdentityService()
     const userIdentity = await identityService.getOne(username, adminUser)
-
+ 
     // Get user attr 
     const userAttrs = userIdentity.result.attrs
     const userPassword = userAttrs.find(e => e.name == "password").value

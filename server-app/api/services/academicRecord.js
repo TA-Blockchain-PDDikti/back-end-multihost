@@ -1,46 +1,77 @@
-const { Gateway, Wallets } = require('fabric-network');
-const { v4: uuidv4 } = require('uuid')
+const fabric = require("../utils/fabric.js")
+const { getAllParser, getParser } = require('../utils/converter.js')
 
-exports.createAcademicRecord = async(user, idKls, idDosen, idMahasiswa, nilaiAngka, nilaiHuruf, nilaiIndex) => {
-    const idNilai = uuidv4()
-    const network = await fabric.connectToNetwork("he1.gradechain.com", "he-channel", "he", user)
-    const result = await network.contract.submitTransaction("CreateNmhs", idNilai, idKls, idDosen, idMahasiswa, nilaiAngka, nilaiHuruf, nilaiIndex, new Date())
+exports.createAcademicRecord = async(user, idNilai, idKls, idDosen, idMahasiswa, nilaiAngka, nilaiHuruf, nilaiIndex) => {
+    const network = await fabric.connectToNetwork("he1", "academicchannel", "npdcontract", user)
+    const result = await network.contract.submitTransaction("CreateNpd", idNilai, idKls, idDosen, idMahasiswa, nilaiAngka, nilaiHuruf, nilaiIndex)
     network.gateway.disconnect()
     return result;
 }
 
 exports.updateAcademicRecord = async(user, idNilai, idKls, idDosen, idMahasiswa, nilaiAngka, nilaiHuruf, nilaiIndex) => {
-    const network = await fabric.connectToNetwork("he1.gradechain.com", "he-channel", "he", user)
-    const result = await network.contract.submitTransaction("UpdateNmhs", idNilai, idKls, idDosen, idMahasiswa, nilaiAngka, nilaiHuruf, nilaiIndex)
+    const network = await fabric.connectToNetwork("he1", "academicchannel", "npdcontract", user)
+    const result = await network.contract.submitTransaction("UpdateNpd", idNilai, idKls, idDosen, idMahasiswa, nilaiAngka, nilaiHuruf, nilaiIndex)
+    network.gateway.disconnect()
+    return result;
+}
+
+exports.signAcademicRecord = async(user, idNilai) => {
+    const signature = ""
+
+    const network = await fabric.connectToNetwork("he1", "academicchannel", "npdcontract", user)
+    const result = await network.contract.submitTransaction("UpdateNpdSignature", idNilai, signature, user)
     network.gateway.disconnect()
     return result;
 }
 
 exports.deleteAcademicRecord = async(user, idNilai) => {
-    const network = await fabric.connectToNetwork("he1.gradechain.com", "he-channel", "he", user)
-    const result = await network.contract.submitTransaction("DeleteNmhs", idNilai)
+    const network = await fabric.connectToNetwork("he1", "academicchannel", "npdcontract", user)
+    const result = await network.contract.submitTransaction("DeleteNpd", idNilai)
     network.gateway.disconnect()
     return result;
 }
 
-exports.getAcademicRecordById = async(user, idNilai) => {
-    const network = await fabric.connectToNetwork("he1.gradechain.com", "he-channel", "he", user)
-    const result = await network.contract.evaluateTransaction("GetNmhsById", idNilai)
+exports.getAllAcademicRecord = async(user) => {
+    const network = await fabric.connectToNetwork("he1", "academicchannel", "npdcontract", user)
+    const queryData = await network.contract.evaluateTransaction("GetAllNpd")
     network.gateway.disconnect()
-    result = [
-        { 
-            "id": 123,
-            "mataKuliah": "Univ ABC",
-            "dosen": "user123",
-            "mahasiswa": "far",
-            "nilaiAngka": 87,
-            "nilaiHuruf": "A",
-            "nilaiIndex": 4.0,
-            "createdAt": "4-5-2023",
-            "signMhsw": "hash"  
-        },
-    ]
-    return result
+    try {
+        const result = getAllParser(queryData)
+        return result
+    } catch (error) {
+        return []
+    }
+}
+
+exports.getAcademicRecordById = async(user, id) => {
+    const network = await fabric.connectToNetwork("he1", "academicchannel", "npdcontract", user)
+    const result = await network.contract.evaluateTransaction("GetNpdById", id)
+    network.gateway.disconnect()
+    return getParser(result)
+}
+
+exports.getAcademicRecordByIdMhsw = async(user, id) => {
+    const network = await fabric.connectToNetwork("he1", "academicchannel", "npdcontract", user)
+    const result = await network.contract.evaluateTransaction("GetNpdByIdPd", id)
+    network.gateway.disconnect()
+    try {
+        const result = getAllParser(queryData)
+        return result
+    } catch (error) {
+        return []
+    }
+}
+
+exports.getAcademicRecordByIdKls = async(user, id) => {
+    const network = await fabric.connectToNetwork("he1", "academicchannel", "npdcontract", user)
+    const result = await network.contract.evaluateTransaction("GetNpdByIdKls", id)
+    network.gateway.disconnect()
+    try {
+        const result = getAllParser(queryData)
+        return result
+    } catch (error) {
+        return []
+    }
 }
 
 exports.setGrade = async(user) => {

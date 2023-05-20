@@ -17,8 +17,6 @@ const getWallet = async() => {
 }
 
 const connectToNetwork = async(organizationName, channelName, chaincodeName, user) => {
-
-    try {
         const ccp = await getCcp(organizationName)
         const wallet = await getWallet()
 
@@ -39,11 +37,6 @@ const connectToNetwork = async(organizationName, channelName, chaincodeName, use
         const contract = network.getContract(chaincodeName);
 
         return {gateway, network, contract}
-
-    } catch (error) {
-        console.log(error.toString())
-        return error.toString()
-    }
 
 }
 
