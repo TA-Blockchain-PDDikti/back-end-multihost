@@ -31,19 +31,6 @@ exports.getIjazahByIdPt = async(user, idPt) => {
     const network = await fabric.connectToNetwork("he1", "academicchannel", "ijzcontract", user)
     const queryData = await network.contract.evaluateTransaction( "GetIjzByIdSp", idPt)
     network.gateway.disconnect()
-    result = {
-        "pendidikan tinggi": "UI",
-        "prodi": "Ilkom",
-        "jenjangPendidikan": "S1",
-        "nomorIjazah": "173747",
-        "tanggalLulus": "12-1-2021",
-        "transkrip": {
-            "totalMutu": 400,
-            "totalSks": 144,
-            "ipk": 3.7,
-            "nilai":[]
-        }
-    }
     try {
         const result = getAllParser(queryData)
         return result

@@ -131,19 +131,6 @@ exports.getAllDosen = async(user) => {
     const network = await fabric.connectToNetwork("he1", "academicchannel", "ptkcontract", user)
     const queryData = await network.contract.evaluateTransaction("GetAllPtk")
     network.gateway.disconnect()
-    
-    result = [{ 
-        "id": "123",
-        "PT":"UI",
-        "Prodi":"Ilmu Komputer",
-        "nidn": "12344",
-        "nama": "Petrus Mursanto",
-        "nomorST":"234",
-        "jabatan":"dekan",
-        "nomorSK":"1334",
-        "sign":"hash",
-        "signJab":"hash" 
-    }]
     try {
         const result = getAllParser(queryData)
         return result
@@ -156,22 +143,6 @@ exports.getDosenByPT = async(user, idPT) => {
     const network = await fabric.connectToNetwork("he1", "academicchannel", "ptkcontract", user)
     const queryData = await network.contract.evaluateTransaction("GetPtkByIdSp", idPT)
     network.gateway.disconnect()
-
-    // //TODO: Filter by  PT 
-    // result = {
-    //     "PT":"UI",
-    //     "listDosen":[
-    //     { 
-    //     "id": "123",
-    //     "Prodi":"Ilmu Komputer",
-    //     "nidn": "12344",
-    //     "nama": "Petrus Mursanto",
-    //     "nomorST":"234",
-    //     "jabatan":"dekan",
-    //     "nomorSK":"1334",
-    //     "sign":"hash",
-    //     "signJab":"hash" 
-    // }]}
     try {
         const result = getAllParser(queryData)
         return result
@@ -234,22 +205,6 @@ exports.getMahasiswaByPT = async(user, idPt) => {
     const network = await fabric.connectToNetwork("he1", "academicchannel", "pdcontract", user)
     const queryData = await network.contract.evaluateTransaction("GetPdByIdSp", idPt)
     network.gateway.disconnect()
-
-    // Filter by PT
-    // result = {
-    //     "PT":"UI",
-    //     "listMahasiswa":[{ 
-    //     "id": 123,
-    //     "npm": "14567889",
-    //     "Prodi":"Ilmu Komputer",
-    //     "nama": "Farzana", 
-    //     "jenjangPendidikan": "S1",
-    //     "status": "Lulus",
-    //     "nomorIjazah": "N123",
-    //     "totalMutu":120,
-    //     "totalSks": 140,
-    //     "ipk": 3.7
-    // }]}
     try {
         const result = getAllParser(queryData)
         return result
@@ -262,20 +217,6 @@ exports.getMahasiswaByKelas = async(user, idKelas) => {
     const network = await fabric.connectToNetwork("he1", "academicchannel", "pdcontract", user)
     const queryData = await network.contract.evaluateTransaction("GetPdByIdKls", idKelas)
     network.gateway.disconnect()
-
-    // Filter by Kelas
-    // result = {
-    //     "kelas":"basdat A",
-    //     "mahasiswa":[{ 
-    //     "id": 123,
-    //     "npm": "14567889",
-    //     "pt":"UI",
-    //     "prodi":"Ilmu Komputer",
-    //     "nama": "Farzana", 
-    //     "totalMutu":120,
-    //     "totalSks": 140,
-    //     "ipk": 3.7
-    // }]}
     try {
         const result = getAllParser(queryData)
         return result
@@ -310,14 +251,6 @@ exports.getAllMataKuliah = async(user) => {
     const network = await fabric.connectToNetwork("he1", "academicchannel", "mkcontract", user)
     const queryData = await network.contract.evaluateTransaction("GetAllMk")
     network.gateway.disconnect()
-    // result = [{ 
-    //     "id": 123,
-    //     "namaProdi":"12334",
-    //     "nama": "Univ ABC",
-    //     "kodeMatkul": "user123",
-    //     "sks": 4,
-    //     "jenjangPendidikan":"sarjana"  
-    // }]
     try {
         const result = getAllParser(queryData)
         return result
@@ -331,22 +264,6 @@ exports.getMataKuliahById = async(user, idMk) => {
     const network = await fabric.connectToNetwork("he1", "academicchannel", "mkcontract", user)
     const result = await network.contract.evaluateTransaction("GetMkById", idMk)
     network.gateway.disconnect()
-
-    //TODO: Filter by  PT 
-    // result = {
-    //     "PT":"UI",
-    //     "listDosen":[
-    //     { 
-    //     "id": "123",
-    //     "Prodi":"Ilmu Komputer",
-    //     "nidn": "12344",
-    //     "nama": "Petrus Mursanto",
-    //     "nomorST":"234",
-    //     "jabatan":"dekan",
-    //     "nomorSK":"1334",
-    //     "sign":"hash",
-    //     "signJab":"hash" 
-    // }]}
     return getParser(result)
 }
 
@@ -354,29 +271,12 @@ exports.getMataKuliahByIdPt = async(user, idPt) => {
     const network = await fabric.connectToNetwork("he1", "academicchannel", "mkcontract", user)
     const result = await network.contract.evaluateTransaction("GetMkByIdSp", idPt)
     network.gateway.disconnect()
-
-    //TODO: Filter by  PT 
-    // result = {
-    //     "PT":"UI",
-    //     "listDosen":[
-    //     { 
-    //     "id": "123",
-    //     "Prodi":"Ilmu Komputer",
-    //     "nidn": "12344",
-    //     "nama": "Petrus Mursanto",
-    //     "nomorST":"234",
-    //     "jabatan":"dekan",
-    //     "nomorSK":"1334",
-    //     "sign":"hash",
-    //     "signJab":"hash" 
-    // }]}
     return getAllParser(result)
 }
 
 //kelas
 exports.createKelas = async(user, idKelas, idProdi, idMk, nama, semester, sks) => {
     const network = await fabric.connectToNetwork("he1", "academicchannel", "klscontract", user)
-    console.log("haloo", idKelas, idProdi, idMk, nama, semester, sks)
     const result = await network.contract.submitTransaction("CreateKls", idKelas, idProdi, idMk, nama, semester, sks)
     network.gateway.disconnect()
     return result; 
@@ -413,16 +313,6 @@ exports.getAllKelas = async(user) => {
     const network = await fabric.connectToNetwork("he1", "academicchannel", "klscontract", user)
     const queryData = await network.contract.evaluateTransaction("GetAllKls")
     network.gateway.disconnect()
-    result = [{ 
-        "id": 123,
-        "Prodi":"Ilmu Komputer",
-        "matkul":"Basis Data",
-        "kelas": "Basis Data A",
-        "sks": 3,
-        "semester": "Gasal 2018/2019",
-        "listDosen": [],
-        "listMahasiswa": []
-    }]
     try {
         const result = getAllParser(queryData)
         return result
