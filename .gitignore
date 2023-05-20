@@ -19,7 +19,6 @@ organizations/fabric-ca/*/tls-cert.pem
 organizations/peerOrganizations
 organizations/ordererOrganizations
 
-
 #Go
 */vendor
 */go.mod
