@@ -2,7 +2,10 @@ const academicRecordService = require('../services/academicRecord.js')
 const { v4: uuidv4 } = require('uuid')
 
 exports.createAcademicRecord = async(req, res) => {
-    try{
+    try {
+        if (req.user.userType != "dosen") {
+            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
+        }
         const data = req.body;
         const idKls = data.idKls;
         const idDosen = data.idDosen;
@@ -31,7 +34,10 @@ exports.createAcademicRecord = async(req, res) => {
 }
 
 exports.updateAcademicRecord = async(req, res) => {
-    try{
+    try {
+        if (req.user.userType != "dosen") {
+            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
+        }
         const data = req.body;
         const idKls = data.idKls;
         const idDosen = data.idDosen;
@@ -56,7 +62,10 @@ exports.updateAcademicRecord = async(req, res) => {
 }
 
 exports.signAcademicRecord = async(req, res) => {
-    try{
+    try {
+        if (req.user.userType != "dosen") {
+            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
+        }
         const idNilai = req.body.idNilai
 
         const result = await academicRecordService.signAcademicRecord(req.user.username, idNilai)
@@ -74,7 +83,10 @@ exports.signAcademicRecord = async(req, res) => {
 }
 
 exports.deleteAcademicRecord = async(req, res) => {
-    try{
+    try {
+        if (req.user.userType != "dosen") {
+            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
+        }
         const idNilai = req.params.id
         const result = await academicRecordService.deleteAcademicRecord(req.user.username, idNilai);
         res.status(200).send({
@@ -92,6 +104,9 @@ exports.deleteAcademicRecord = async(req, res) => {
 
 exports.getAllAcademicRecord = async(req, res) => {
     try {
+        if (req.user.userType != "admin pddikti") {
+            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
+        }
         const data = await academicRecordService.getAllAcademicRecord(req.user.username) 
         res.status(200).send({data});
     } catch(error){
@@ -104,6 +119,9 @@ exports.getAllAcademicRecord = async(req, res) => {
 
 exports.getAcademicRecordById = async(req, res) => {
     try {
+        if (req.user.userType != "dosen") {
+            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
+        }
         const id = req.params.id
         const data = await academicRecordService.getAcademicRecordById(req.user.username, id) 
         res.status(200).send({data});
@@ -117,6 +135,9 @@ exports.getAcademicRecordById = async(req, res) => {
 
 exports.getAcademicRecordByIdMhsw = async(req, res) => {
     try {
+        if (req.user.userType != "mahasiswa") {
+            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
+        }
         const id = req.params.id
         const data = await academicRecordService.getAcademicRecordByIdMhsw(req.user.username, id) 
         res.status(200).send({data});
@@ -130,6 +151,9 @@ exports.getAcademicRecordByIdMhsw = async(req, res) => {
 
 exports.getAcademicRecordByIdKls = async(req, res) => {
     try {
+        if (req.user.userType != "dosen") {
+            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
+        }
         const id = req.params.id
         const data = await academicRecordService.getAcademicRecordByIdKls(req.user.username, id) 
         res.status(200).send({data});
@@ -143,6 +167,9 @@ exports.getAcademicRecordByIdKls = async(req, res) => {
 
 exports.setGrade = async(req, res) => {
     try {
+        if (req.user.userType != "dosen") {
+            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
+        }
         const data = await academicRecordService.setGrade(req.user.username)
         res.status(200).send({data});
     } catch(error){

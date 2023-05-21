@@ -5,6 +5,9 @@ const { v4: uuidv4 } = require('uuid')
 //Pendidikan Tinggi
 exports.createPT = async(req, res) => {
     try{
+        if (req.user.userType != "admin pddikti") {
+            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
+        }
         const data = req.body;
         const nama = data.nama;
         const adminPT = data.usernameAdmin;
@@ -34,6 +37,9 @@ exports.createPT = async(req, res) => {
 
 exports.updatePT = async(req, res) => {
     try{
+        if (req.user.userType != "admin pddikti") {
+            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
+        }
         const data = req.body;
         const nama = data.nama;
         const adminPT = data.usernameAdmin;
@@ -55,6 +61,9 @@ exports.updatePT = async(req, res) => {
 
 exports.deletePT = async(req, res) => {
     try{
+        if (req.user.userType != "admin pddikti") {
+            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
+        }
         const idPT  = req.params.id;
         await dataService.deletePT(req.user.username, idPT);
         res.status(200).send({
@@ -72,6 +81,9 @@ exports.deletePT = async(req, res) => {
 
 exports.getAllPT = async(req, res) => {
     try{
+        if (req.user.userType != "admin pddikti") {
+            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
+        }
         data = await dataService.getAllPT(req.user.username) 
         res.status(200).send({data});
     } catch(error) {
@@ -85,6 +97,9 @@ exports.getAllPT = async(req, res) => {
 
 exports.getPTById = async(req, res) => {
     try {
+        if (req.user.userType != "admin pddikti" && req.user.userType != "admin PT" ) {
+            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
+        }
         const idPT = req.params.id
         data = await dataService.getPTById(req.user.username,idPT) 
         res.status(200).send(data);
@@ -98,7 +113,10 @@ exports.getPTById = async(req, res) => {
 
 //Prodi
 exports.createProdi = async(req, res) => {
-    try { 
+    try {
+        if (req.user.userType != "admin PT") {
+            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
+        } 
         const data = req.body;
         const idPT =  data.idPT;
         const nama = data.nama;
@@ -126,6 +144,9 @@ exports.createProdi = async(req, res) => {
 
 exports.updateProdi = async(req, res) => {
     try {
+        if (req.user.userType != "admin PT") {
+            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
+        }
         const data = req.body;
         const idPT =  data.idPT;
         const nama = data.nama;
@@ -148,6 +169,9 @@ exports.updateProdi = async(req, res) => {
 
 exports.deleteProdi = async(req, res) => {
     try{
+        if (req.user.userType != "admin PT") {
+            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
+        }
         const idProdi = req.params.id;
         await dataService.deleteProdi(req.user.username, idProdi);
         
@@ -165,6 +189,9 @@ exports.deleteProdi = async(req, res) => {
 
 exports.getAllProdi = async(req, res) => {
     try{
+        if (req.user.userType != "admin pddikti") {
+            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
+        }
         data = await dataService.getAllProdi(req.user.username) 
         res.status(200).send({data});
     } catch (error){
@@ -177,6 +204,9 @@ exports.getAllProdi = async(req, res) => {
 
 exports.getProdiByPT = async(req, res) => {
     try {
+        if (req.user.userType != "admin PT") {
+            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
+        }
         const idPT = req.params.id
 
         result = await dataService.getProdiByPT(req.user.username, idPT) 
@@ -191,6 +221,9 @@ exports.getProdiByPT = async(req, res) => {
 
 exports.getProdiById = async(req, res) => {
     try {
+        if (req.user.userType != "admin PT") {
+            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
+        }
         const idProdi = req.params.id
 
         result = await dataService.getProdiById(req.user.username, idProdi) 
@@ -206,6 +239,9 @@ exports.getProdiById = async(req, res) => {
 // Dosen
 exports.createDosen = async(req, res) => {
     try{
+        if (req.user.userType != "admin PT") {
+            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
+        }
         const data = req.body;
         const idPT = data.idPT;
         const idProdi = data.idProdi;
@@ -238,6 +274,9 @@ exports.createDosen = async(req, res) => {
 
 exports.updateDosen = async(req, res) => {
     try{
+        if (req.user.userType != "admin PT") {
+            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
+        }
         const data = req.body;
         const idPT = data.idPT;
         const idProdi = data.idProdi;
@@ -261,6 +300,9 @@ exports.updateDosen = async(req, res) => {
 
 exports.signDosen = async(req, res) => {
     try{
+        if (req.user.userType != "admin pddikti") {
+            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
+        }
         const data = req.body;
         const nidn = data.nidn;
         const idDosen = req.params.id
@@ -282,6 +324,9 @@ exports.signDosen = async(req, res) => {
 
 exports.deleteDosen = async(req, res) => {
     try{
+        if (req.user.userType != "admin PT") {
+            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
+        }
         const idDosen  = req.params.id;
         await dataService.deleteDosen(req.user.username, idDosen);
 
@@ -301,6 +346,9 @@ exports.deleteDosen = async(req, res) => {
 
 exports.getAllDosen = async(req, res) => {
     try {
+        if (req.user.userType != "admin pddikti") {
+            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
+        }
         data = await dataService.getAllDosen(req.user.username) 
         res.status(200).send({data});
     } catch(error) {
@@ -313,6 +361,9 @@ exports.getAllDosen = async(req, res) => {
 
 exports.getDosenByPT = async(req, res) => {
     try {
+        if (req.user.userType != "admin PT") {
+            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
+        }
         const idPT  = req.params.id;
         data = await dataService.getDosenByPT(req.user.username, idPT) 
         res.status(200).send({data});
@@ -326,6 +377,9 @@ exports.getDosenByPT = async(req, res) => {
 
 exports.getDosenById = async(req, res) => {
     try {
+        if (req.user.userType != "admin PT" && req.user.userType != "dosen" ) {
+            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
+        }
         const idDosen = req.params.id
         const result = await dataService.getDosenById(req.user.username, idDosen) 
         res.status(200).send(result);
@@ -341,6 +395,9 @@ exports.getDosenById = async(req, res) => {
 
 exports.createMahasiswa = async(req, res) => {
     try{
+        if (req.user.userType != "admin PT") {
+            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
+        }
         const data = req.body;
         const idPT = data.idPT;
         const idProdi = data.idProdi;
@@ -374,6 +431,9 @@ exports.createMahasiswa = async(req, res) => {
 
 exports.updateMahasiswa = async(req, res) => {
     try{
+        if (req.user.userType != "admin PT") {
+            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
+        }
         const data = req.body;
         const idPT = data.idPT;
         const idProdi = data.idProdi;
@@ -398,6 +458,9 @@ exports.updateMahasiswa = async(req, res) => {
 
 exports.deleteMahasiswa = async(req, res) => {
     try{
+        if (req.user.userType != "admin PT") {
+            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
+        }
         const idMahasiswa = req.params.id
         await dataService.deleteMahasiswa(req.user.username, idMahasiswa)
         res.status(200).send({
@@ -417,6 +480,9 @@ exports.deleteMahasiswa = async(req, res) => {
 
 exports.getAllMahasiswa = async(req, res) => {
     try {
+        if (req.user.userType != "admin pddikti") {
+            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
+        }
         data = await dataService.getAllMahasiswa(req.user.username) 
         res.status(200).send({data});
     } catch(error){
@@ -429,6 +495,9 @@ exports.getAllMahasiswa = async(req, res) => {
 
 exports.getMahasiswaByPT = async(req, res) => {
     try {
+        if (req.user.userType != "admin PT") {
+            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
+        }
         const idPT = req.params.id
         data = await dataService.getMahasiswaByPT(req.user.username, idPT) 
         res.status(200).send({data});
@@ -442,6 +511,9 @@ exports.getMahasiswaByPT = async(req, res) => {
 
 exports.getMahasiswaById = async(req, res) => {
     try {
+        if (req.user.userType != "admin PT" && req.user.userType != "mahasiswa") {
+            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
+        }
         const idMahasiswa = req.params.id
         data = await dataService.getMahasiswaById(req.user.username, idMahasiswa) 
         res.status(200).send(data);
@@ -455,6 +527,9 @@ exports.getMahasiswaById = async(req, res) => {
 
 exports.getMahasiswaByKelas = async(req, res) => {
     try {
+        if (req.user.userType != "admin PT" && req.user.userType != "dosen") {
+            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
+        }
         const idKelas = req.params.id 
         data = await dataService.getMahasiswaByKelas(req.user.username, idKelas) 
         res.status(200).send({data});
@@ -469,6 +544,9 @@ exports.getMahasiswaByKelas = async(req, res) => {
 //Mata KUliah
 exports.createMataKuliah = async(req, res) => {
     try{
+        if (req.user.userType != "admin PT") {
+            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
+        }
         const data = req.body;
         const idProdi  = data.idProdi;
         const idPT  = data.idPT;
@@ -499,6 +577,9 @@ exports.createMataKuliah = async(req, res) => {
 
 exports.updateMataKuliah = async(req, res) => {
     try{
+        if (req.user.userType != "admin PT") {
+            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
+        }
         const data = req.body;
         const idProdi  = data.idProdi;
         const idPT  = data.idPT;
@@ -524,6 +605,9 @@ exports.updateMataKuliah = async(req, res) => {
 
 exports.deleteMataKuliah = async(req, res) => {
     try{
+        if (req.user.userType != "admin PT") {
+            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
+        }
         const idMk = req.params.id;
         await dataService.deleteMataKuliah(req.user.username, idMk)
         res.status(200).send({
@@ -542,6 +626,9 @@ exports.deleteMataKuliah = async(req, res) => {
 
 exports.getAllMataKuliah = async(req, res) => {
     try {
+        if (req.user.userType != "admin pddikti") {
+            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
+        }
         data = await dataService.getAllMataKuliah(req.user.username) 
         res.status(200).send({data});
     } catch(error){
@@ -554,6 +641,9 @@ exports.getAllMataKuliah = async(req, res) => {
 
 exports.getMataKuliahById = async(req, res) => {
     try {
+        if (req.user.userType != "admin PT") {
+            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
+        }
         const idMk = req.params.id
         data = await dataService.getMataKuliahById(req.user.username, idMk) 
         res.status(200).send(data);
@@ -567,6 +657,9 @@ exports.getMataKuliahById = async(req, res) => {
 
 exports.getMataKuliahByIdPt = async(req, res) => {
     try {
+        if (req.user.userType != "admin PT") {
+            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
+        }
         const idPt = req.params.id
         data = await dataService.getMataKuliahByIdPt(req.user.username, idPt) 
         res.status(200).send({data});
@@ -582,6 +675,9 @@ exports.getMataKuliahByIdPt = async(req, res) => {
 //Kelas
 exports.createKelas = async(req, res) => {
     try{
+        if (req.user.userType != "admin PT") {
+            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
+        }
         const data = req.body;
         const nama = data.nama;
         const idMk = data.idMk;
@@ -612,6 +708,9 @@ exports.createKelas = async(req, res) => {
 
 exports.updateKelas = async(req, res) => {
     try{
+        if (req.user.userType != "admin PT") {
+            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
+        }
         const data = req.body;
         const nama = data.nama;
         const idProdi = data.idProdi;
@@ -637,6 +736,9 @@ exports.updateKelas = async(req, res) => {
 
 exports.deleteKelas = async(req, res) => {
     try{
+        if (req.user.userType != "admin PT") {
+            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
+        }
         const idKelas = req.params.id;
         await dataService.deleteKelas(req.user.username, idKelas)
         res.status(200).send({
@@ -655,6 +757,9 @@ exports.deleteKelas = async(req, res) => {
 
 exports.assignDosen = async(req, res) => {
     try{
+        if (req.user.userType != "admin PT") {
+            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
+        }
         const data = req.body;
         const idKelas = data.idKelas;
         const idDosen = data.idDosen;
@@ -677,6 +782,9 @@ exports.assignDosen = async(req, res) => {
 
 exports.assignMahasiswa = async(req, res) => {
     try{
+        if (req.user.userType != "admin PT") {
+            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
+        }
         const data = req.body;
         const idKelas = data.idKelas;
         const idMahasiswa = data.idMahasiswa;
@@ -698,6 +806,9 @@ exports.assignMahasiswa = async(req, res) => {
 
 exports.getAllKelas = async(req, res) => {
     try {
+        if (req.user.userType != "admin pddikti") {
+            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
+        }
         data = await dataService.getAllKelas(req.user.username) 
         res.status(200).send({data});
     } catch(error){
@@ -710,6 +821,9 @@ exports.getAllKelas = async(req, res) => {
 
 exports.getKelasById = async(req, res) => {
     try {
+        if (req.user.userType != "admin PT") {
+            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
+        }
         const idKelas = req.params.id
 
         result = await dataService.getKelasById(req.user.username, idKelas) 
@@ -745,6 +859,7 @@ exports.getKelasById = async(req, res) => {
 
 // exports.updateVerifier = async(req, res) => {
 //     try{
+    
 //         const data = req.body;
 //         const name = data.nama;
 
@@ -765,6 +880,8 @@ exports.getKelasById = async(req, res) => {
 
 // exports.deleteVerifier = async(req, res) => {
 //     try{
+
+        
 //         const result = await dataService.deleteVerifier(req.user.username)
 //         res.status(200).send({
 //             message: `Verifier with id ${req.params.id} is deleted`,
