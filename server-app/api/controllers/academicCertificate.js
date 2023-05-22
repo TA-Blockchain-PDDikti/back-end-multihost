@@ -1,12 +1,14 @@
 const certificateService = require('../services/acdemicCertificate.js')
-const { v4: uuidv4 } = require('uuid')
 
 exports.createAcademicCertificate = async(req, res) => {
-    try{
+    try {
+        if (req.user.userType != "admin PT") {
+            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
+        }
         const data = req.body;
-        const idPT = data.idPT;
-        const idProdi = data.idProdi;
-        const idMahasiswa = data.idMahasiswa;
+        const idPT = data.idSp;
+        const idProdi = data.idSms;
+        const idMahasiswa = data.idPd;
         const jenjangPendidikan = data.jenjangPendidikan;
         const nomorIjazah = data.nomorIjazah;
         const tanggalLulus = data.tanggalLulus;
@@ -20,7 +22,7 @@ exports.createAcademicCertificate = async(req, res) => {
        
         res.status(201).send({
             success: true,
-            message: "Ijazah and Transkrip is issued",
+            message: "Ijazah dan Transkrip telah ditambahkan",
         })
       
     } catch(error){
@@ -32,11 +34,14 @@ exports.createAcademicCertificate = async(req, res) => {
 }
 
 exports.updateIjazah = async(req, res) => {
-    try{
+    try {
+        if (req.user.userType != "admin PT") {
+            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
+        }
         const data = req.body;
-        const idPT = data.idPT;
-        const idProdi = data.idProdi;
-        const idMahasiswa = data.idMahasiswa;
+        const idPT = data.idSp;
+        const idProdi = data.idSms;
+        const idMahasiswa = data.idPd;
         const jenjangPendidikan = data.jenjangPendidikan;
         const nomorIjazah = data.nomorIjazah;
         const tanggalLulus = data.tanggalLulus;
@@ -45,7 +50,7 @@ exports.updateIjazah = async(req, res) => {
         const result = await certificateService.updateIjazah(req.user.username, idIjazah, idPT, idProdi, idMahasiswa, jenjangPendidikan, nomorIjazah, tanggalLulus )
         res.status(200).send({
             success : true,
-            message: "Ijazah is updated",
+            message: "Ijazah telah diubah",
         })
     } catch(error){
         res.status(400).send({
@@ -57,11 +62,14 @@ exports.updateIjazah = async(req, res) => {
 
 
 exports.updateTranskrip = async(req, res) => {
-    try{
+    try {
+        if (req.user.userType != "admin PT") {
+            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
+        }
         const data = req.body;
-        const idPT = data.idPT;
-        const idProdi = data.idProdi;
-        const idMahasiswa = data.idMahasiswa;
+        const idPT = data.idSp;
+        const idProdi = data.idSms;
+        const idMahasiswa = data.idPd;
         const jenjangPendidikan = data.jenjangPendidikan;
         const totalMutu = data.totalMutu;
         const totalSks = data.totalSks;
@@ -71,7 +79,7 @@ exports.updateTranskrip = async(req, res) => {
         const result = await certificateService.updateTranskrip(req.user.username, id, idPT, idProdi, idMahasiswa, jenjangPendidikan,  totalMutu, totalSks, ipk )
         res.status(200).send({
             success : true,
-            message: "Transkrip is updated",
+            message: "Transkrip telah diubah",
         })
     } catch(error){
         res.status(400).send({
@@ -82,7 +90,10 @@ exports.updateTranskrip = async(req, res) => {
 }
 
 exports.signIjazah = async(req, res) => {
-    try{
+    try {
+        if (req.user.userType != "dosen") {
+            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
+        }
         const data = req.body;
         const name = data.nama;
 
@@ -100,7 +111,10 @@ exports.signIjazah = async(req, res) => {
 }
 
 exports.getIdentifier = async(req, res) => {
-    try{
+    try {
+        if (req.user.userType != "mahasiswa") {
+            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
+        }
         const data = req.body;
         const name = data.nama;
 
@@ -117,7 +131,10 @@ exports.getIdentifier = async(req, res) => {
 }
 
 exports.generateIdentifier = async(req, res) => {
-    try{
+    try {
+        if (req.user.userType != "admin PT") {
+            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
+        }
         const data = req.body;
         const name = data.nama;
 
@@ -135,7 +152,10 @@ exports.generateIdentifier = async(req, res) => {
 }
 
 exports.addSigner = async(req, res) => {
-    try{
+    try {
+        if (req.user.userType != "admin PT") {
+            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
+        }
         const data = req.body;
         const name = data.nama;
 
@@ -154,7 +174,7 @@ exports.addSigner = async(req, res) => {
 
 
 exports.verify = async(req, res) => {
-    try{
+    try {
         const data = req.body;
         const name = data.nama;
 
@@ -172,7 +192,10 @@ exports.verify = async(req, res) => {
 }
 
 exports.getAllIjazah = async(req, res) => {
-    try{
+    try {
+        if (req.user.userType != "admin pddikti") {
+            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
+        }
         const idIjazah = req.params.id
 
         const result = await certificateService.getAllIjazah(req.user.username)
@@ -188,7 +211,10 @@ exports.getAllIjazah = async(req, res) => {
 }
 
 exports.getAllTranskrip = async(req, res) => {
-    try{
+    try {
+        if (req.user.userType != "admin pddikti") {
+            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
+        }
         const result = await certificateService.getAllTranskrip(req.user.username)
         res.status(200).send({
             result
@@ -204,7 +230,10 @@ exports.getAllTranskrip = async(req, res) => {
 
 
 exports.getIjazahById = async(req, res) => {
-    try{
+    try {
+        if (req.user.userType != "admin PT") {
+            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
+        }
         const idIjazah = req.params.id
 
         const result = await certificateService.getIjazahById(req.user.username, idIjazah)
@@ -218,7 +247,10 @@ exports.getIjazahById = async(req, res) => {
 }
 
 exports.getTranskripById = async(req, res) => {
-    try{
+    try {
+        if (req.user.userType != "admin PT") {
+            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
+        }
         const idTranskrip = req.params.id
 
         const result = await certificateService.getTranskripById(req.user.username, idTranskrip)
@@ -233,7 +265,10 @@ exports.getTranskripById = async(req, res) => {
 }
 
 exports.getIjazahByIdPt = async(req, res) => {
-    try{
+    try {
+        if (req.user.userType != "admin PT") {
+            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
+        }
         const idPt = req.params.id
 
         const result = await certificateService.getIjazahByIdPt(req.user.username, idPt)
@@ -249,7 +284,10 @@ exports.getIjazahByIdPt = async(req, res) => {
 }
 
 exports.getTranskripByIdPt = async(req, res) => {
-    try{
+    try {
+        if (req.user.userType != "admin PT" && req.user.userType != "dosen") {
+            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
+        }
         const idPt = req.params.id
 
         const result = await certificateService.getTranskripByIdPt(req.user.username, id)
@@ -266,7 +304,10 @@ exports.getTranskripByIdPt = async(req, res) => {
 }
 
 exports.getIjazahByIdProdi = async(req, res) => {
-    try{
+    try {
+        if (req.user.userType != "admin PT" && req.user.userType != "dosen") {
+            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
+        }
         const idProdi = req.params.id
 
         const result = await certificateService.getIjazahByIdProdi(req.user.username, idProdi)
@@ -282,7 +323,10 @@ exports.getIjazahByIdProdi = async(req, res) => {
 }
 
 exports.getTranskripByIdProdi = async(req, res) => {
-    try{
+    try {
+        if (req.user.userType != "admin PT" && req.user.userType != "dosen") {
+            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
+        }
         const idProdi = req.params.id
 
         const result = await certificateService.getTranskripByIdProdi(req.user.username, idProdi)
@@ -299,7 +343,10 @@ exports.getTranskripByIdProdi = async(req, res) => {
 }
 
 exports.getIjazahByIdMahasiswa = async(req, res) => {
-    try{
+    try {
+        if (req.user.userType != "admin PT" && req.user.userType != "mahasiswa") {
+            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
+        }
         const idMahasiswa = req.params.id
 
         const result = await certificateService.getIjazahByIdMahasiswa(req.user.username, idMahasiswa)
@@ -315,7 +362,10 @@ exports.getIjazahByIdMahasiswa = async(req, res) => {
 }
 
 exports.getTranskripByIdMahasiswa = async(req, res) => {
-    try{
+    try {
+        if (req.user.userType != "admin PT" && req.user.userType != "mahasiswa") {
+            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
+        }
         const idMahasiswa = req.params.id
 
         const result = await certificateService.getTranskripByIdMahasiswa(req.user.username, idMahasiswa)

@@ -4,7 +4,7 @@ const parser = async(result) => {
     if (result.idSp){
         const id = result.idSp
         const data = await dataService.getPTById('admin', id)
-        result.PT = {
+        result.sp = {
             "id": id,
             "nama": data.namaSp
         }
@@ -15,7 +15,7 @@ const parser = async(result) => {
         const id = result.idSms
         const data = await dataService.getProdiById('admin', id)
         console.log("data", data)
-        result.prodi = {
+        result.sms = {
             "id": id,
             "nama": data.namaSms
         }
@@ -25,7 +25,7 @@ const parser = async(result) => {
     if (result.idMk){
         const id = result.idMk
         const data = await dataService.getMataKuliahById('admin', id)
-        result.matkul = {
+        result.mk = {
             "id": id,
             "nama": data.namaMk
         }
@@ -35,7 +35,7 @@ const parser = async(result) => {
     if (result.idKls){
         const id = result.idKls
         const data = await dataService.getKelasById('admin', id)
-        result.kelas = {
+        result.kls = {
             "id": id,
             "nama": data.namaKls
         }
@@ -45,7 +45,7 @@ const parser = async(result) => {
     if (result.idPtk){
         const id = result.idPtk
         const data = await dataService.getDosenById('admin', id)
-        result.dosen = {
+        result.ptk = {
             "id": id,
             "nama": data.namaPtk
         }
@@ -55,7 +55,7 @@ const parser = async(result) => {
     if (result.idPd){
         const id = result.idPd
         const data = await dataService.getMahasiswaById('admin', id)
-        result.mahasiswa = {
+        result.pd = {
             "id": id,
             "nama": data.namaPd
         }
