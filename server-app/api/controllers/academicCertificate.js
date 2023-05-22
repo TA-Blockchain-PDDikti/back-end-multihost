@@ -6,9 +6,9 @@ exports.createAcademicCertificate = async(req, res) => {
             return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
         }
         const data = req.body;
-        const idPT = data.idPT;
-        const idProdi = data.idProdi;
-        const idMahasiswa = data.idMahasiswa;
+        const idPT = data.idSp;
+        const idProdi = data.idSms;
+        const idMahasiswa = data.idPd;
         const jenjangPendidikan = data.jenjangPendidikan;
         const nomorIjazah = data.nomorIjazah;
         const tanggalLulus = data.tanggalLulus;
@@ -22,7 +22,7 @@ exports.createAcademicCertificate = async(req, res) => {
        
         res.status(201).send({
             success: true,
-            message: "Ijazah and Transkrip is issued",
+            message: "Ijazah dan Transkrip telah ditambahkan",
         })
       
     } catch(error){
@@ -39,9 +39,9 @@ exports.updateIjazah = async(req, res) => {
             return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
         }
         const data = req.body;
-        const idPT = data.idPT;
-        const idProdi = data.idProdi;
-        const idMahasiswa = data.idMahasiswa;
+        const idPT = data.idSp;
+        const idProdi = data.idSms;
+        const idMahasiswa = data.idPd;
         const jenjangPendidikan = data.jenjangPendidikan;
         const nomorIjazah = data.nomorIjazah;
         const tanggalLulus = data.tanggalLulus;
@@ -50,7 +50,7 @@ exports.updateIjazah = async(req, res) => {
         const result = await certificateService.updateIjazah(req.user.username, idIjazah, idPT, idProdi, idMahasiswa, jenjangPendidikan, nomorIjazah, tanggalLulus )
         res.status(200).send({
             success : true,
-            message: "Ijazah is updated",
+            message: "Ijazah telah diubah",
         })
     } catch(error){
         res.status(400).send({
@@ -67,9 +67,9 @@ exports.updateTranskrip = async(req, res) => {
             return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
         }
         const data = req.body;
-        const idPT = data.idPT;
-        const idProdi = data.idProdi;
-        const idMahasiswa = data.idMahasiswa;
+        const idPT = data.idSp;
+        const idProdi = data.idSms;
+        const idMahasiswa = data.idPd;
         const jenjangPendidikan = data.jenjangPendidikan;
         const totalMutu = data.totalMutu;
         const totalSks = data.totalSks;
@@ -79,7 +79,7 @@ exports.updateTranskrip = async(req, res) => {
         const result = await certificateService.updateTranskrip(req.user.username, id, idPT, idProdi, idMahasiswa, jenjangPendidikan,  totalMutu, totalSks, ipk )
         res.status(200).send({
             success : true,
-            message: "Transkrip is updated",
+            message: "Transkrip telah diubah",
         })
     } catch(error){
         res.status(400).send({

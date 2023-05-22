@@ -8,8 +8,8 @@ exports.createAcademicRecord = async(req, res) => {
         }
         const data = req.body;
         const idKls = data.idKls;
-        const idDosen = data.idDosen;
-        const idMahasiswa = data.idMahasiswa;
+        const idDosen = data.idPtk;
+        const idMahasiswa = data.idPd;
         const nilaiAngka = data.nilaiAngka;
         const nilaiHuruf = data.nilaiHuruf;
         const nilaiIndex = data.nilaiIndex;
@@ -40,8 +40,8 @@ exports.updateAcademicRecord = async(req, res) => {
         }
         const data = req.body;
         const idKls = data.idKls;
-        const idDosen = data.idDosen;
-        const idMahasiswa = data.idMahasiswa;
+        const idDosen = data.idPtk;
+        const idMahasiswa = data.idPd;
         const nilaiAngka = data.nilaiAngka;
         const nilaiHuruf = data.nilaiHuruf;
         const nilaiIndex = data.nilaiIndex;
@@ -50,7 +50,7 @@ exports.updateAcademicRecord = async(req, res) => {
         const result = await academicRecordService.updateAcademicRecord(req.user.username,  idNilai, idKls, idDosen, idMahasiswa, nilaiAngka, nilaiHuruf, nilaiIndex)
         res.status(200).send({
             success: true,
-            message: `Record nilai with id ${idNilai} is updated`, 
+            message: `Nilai dengan id ${idNilai} telah diubah`, 
         })
     }
     catch(error){
@@ -71,7 +71,7 @@ exports.signAcademicRecord = async(req, res) => {
         const result = await academicRecordService.signAcademicRecord(req.user.username, idNilai)
         res.status(200).send({
             success: true,
-            message: `Record nilai with id ${idNilai} is signed`,
+            message: `Record nilai dengan id ${idNilai} is signed`,
         })
     }
     catch(error){  
@@ -91,7 +91,7 @@ exports.deleteAcademicRecord = async(req, res) => {
         const result = await academicRecordService.deleteAcademicRecord(req.user.username, idNilai);
         res.status(200).send({
             success: true,
-            message: `Record nilai with id ${idNilai} is deleted`,
+            message: `Record nilai dengan id ${idNilai} telah dihapus`,
         })
     }
     catch(error){
