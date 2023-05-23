@@ -29,7 +29,7 @@ exports.getAllPT = async(user) => {
     const queryData = await network.contract.evaluateTransaction("GetAllSp")
     network.gateway.disconnect()
     try {
-        const result = JSON.parse(queryData)
+        var result = getAllParser(queryData)
         return result
     } catch (error) {
         return []
@@ -41,7 +41,7 @@ exports.getPTById = async(user, idPT) => {
     const network = await fabric.connectToNetwork("he1", "academicchannel", "spcontract", user)
     const queryData = await network.contract.evaluateTransaction("GetSpById", idPT)
     network.gateway.disconnect()
-    return JSON.parse(queryData)
+    return getParser(queryData)
 }
 
 //Prodi
@@ -97,7 +97,7 @@ exports.getProdiById = async(user, idProdi) => {
 }
 
 //dosen
-exports.createDosen = async(user,idDosen, idPT,idProdi,nama) => {
+exports.createDosen = async(user, idDosen, idPT, idProdi, nama, username) => {
     // Add 'dosen' data to blockchain
     const network = await fabric.connectToNetwork("he1", "academicchannel", "ptkcontract", user)
     const result = await network.contract.submitTransaction("CreatePtk", idDosen, idPT, idProdi,nama)
@@ -160,7 +160,7 @@ exports.getDosenById = async(user, idDosen) => {
 }
 
 //mahasiswa
-exports.createMahasiswa = async(user, idMahasiswa, idPT, idProdi, nama, nipd) => {
+exports.createMahasiswa = async(user, idMahasiswa, idPT, idProdi, nama, nipd, username) => {
     // Add 'mahasiswa' data to blockchain
     const network = await fabric.connectToNetwork("he1", "academicchannel", "pdcontract", user)
     const result = await network.contract.submitTransaction("CreatePd", idMahasiswa, idPT, idProdi, nama, nipd)

@@ -1,9 +1,10 @@
 
 const { Gateway, Wallets } = require('fabric-network');
+const FabricCAServices = require('fabric-ca-client');
 const path = require('path');
 const fs = require('fs');
 
-const getCcp = async(organizationName) =>{
+const getCcp = (organizationName) =>{
     // load the network configuration
 
     const ccpPath = path.resolve(__dirname, '..', '..', '..', 'organizations', 'peerOrganizations', `${organizationName}.example.com`, `connection-${organizationName}.json`);
@@ -40,5 +41,34 @@ const connectToNetwork = async(organizationName, channelName, chaincodeName, use
 
 }
 
+const getUserAttrs = async(username) => {
+   
+    const ccp = getCcp('he1')
+    const wallet = await getWallet()
 
-module.exports = {getCcp, getWallet, connectToNetwork}
+    // Create a new CA client for interacting with the CA.
+    const caURL = ccp.certificateAuthorities[`ca.he1.example.com`].url;
+    const ca = new FabricCAServices(caURL, undefined, `ca.he1.example.com`);
+    
+    // Check to see if we've already enrolled the admin user.
+    const adminIdentity = await wallet.get('admin');
+    if (!adminIdentity) {
+        throw "Admin network does not exist"
+    }
+
+    // build a user object for authenticating with the CA
+    const provider = wallet.getProviderRegistry().getProvider(adminIdentity.type);
+    const adminUser = await provider.getUserContext(adminIdentity, 'admin');
+
+    // retrieve the registered identity 
+    const identityService = ca.newIdentityService()
+    const userIdentity = await identityService.getOne(username, adminUser)
+
+    // Get user attr 
+    const userAttrs = userIdentity.result.attrs
+
+    console.log(userAttrs)
+    return userAttrs
+}
+
+module.exports = {getCcp, getWallet, connectToNetwork, getUserAttrs}

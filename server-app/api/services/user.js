@@ -6,7 +6,7 @@ const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 const bcrypt = require("bcrypt")
 
-const registerUser = async(userId, organizationName, userType) =>  {
+const registerUser = async(userId, organizationName, userType, dataUser = {}) =>  {
 
     const ccp = await fabric.getCcp(organizationName)
 
@@ -34,20 +34,24 @@ const registerUser = async(userId, organizationName, userType) =>  {
 
     // Create random password end encrypted
     var password = crypto.randomBytes(4).toString('hex');
-    var encryptedPassword = await bcrypt.hash(password, 10);
+    //var encryptedPassword = await bcrypt.hash(password, 10);
 
     // Register the user, enroll the user, and import the new identity into the wallet.
     const secret = await ca.register({
         affiliation: 'he1.department1',
         enrollmentID: userId,
         role: 'client',
-        attrs: [{ "name": "userType", "value": userType, "ecert": true}, { "name": "password", "value": encryptedPassword, "ecert": true}]
+        attrs: [
+            { "name": "userType", "value": userType, "ecert": true}, 
+            { "name": "password", "value": password, "ecert": true},
+            { "name": "dataUser", "value": JSON.stringify(dataUser), "ecert": true},
+        ]
     }, adminUser);
 
     const enrollment = await ca.enroll({
         enrollmentID: userId,
         enrollmentSecret: secret,
-        attr_reqs: [{ name: "userType", optional: false }, { name: "password", optional: false }]
+        attr_reqs: [{ name: "userType", optional: false }, { name: "password", optional: false }, { name: "dataUser", optional: false }]
     });
 
     const x509Identity = {
@@ -109,12 +113,6 @@ const enrollAdmin = async(adminId, adminSecret, organizationName) => {
 const loginUser = async(username, password) => {
 
     const response = {}
-    const ccp = await fabric.getCcp('he1')
-
-    // Create a new CA client for interacting with the CA.
-    const caURL = ccp.certificateAuthorities[`ca.he1.example.com`].url;
-    const ca = new FabricCAServices(caURL, undefined, `ca.he1.example.com`);
-    
     const wallet = await fabric.getWallet()
 
     // Check to see if we've already registered and enrolled the user.
@@ -123,27 +121,13 @@ const loginUser = async(username, password) => {
         throw `User ${username} is not registered yet`
     }
 
-    // Check to see if we've already enrolled the admin user.
-    const adminIdentity = await wallet.get('admin');
-    if (!adminIdentity) {
-        throw "Admin network does not exist"
-    }
-
-    // build a user object for authenticating with the CA
-    const provider = wallet.getProviderRegistry().getProvider(adminIdentity.type);
-    const adminUser = await provider.getUserContext(adminIdentity, 'admin');
-
-    // retrieve the registered identity 
-    const identityService = ca.newIdentityService()
-    const userIdentity = await identityService.getOne(username, adminUser)
- 
     // Get user attr 
-    const userAttrs = userIdentity.result.attrs
+    const userAttrs = await fabric.getUserAttrs(username)
     const userPassword = userAttrs.find(e => e.name == "password").value
     const userType = userAttrs.find(e => e.name == "userType").value
 
     // Compare input password with password in CA
-    if (await bcrypt.compare(password, userPassword)){
+    if (password == userPassword){
         const payload = {  
             "username": username,
             "userType": userType 

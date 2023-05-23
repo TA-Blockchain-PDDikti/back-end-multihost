@@ -18,13 +18,19 @@ exports.createPT = async(req, res) => {
             id = uuidv4()
         }
 
-        // Register admin PT identity to CA
-        await userService.registerUser(adminPT, 'he1', "admin PT")
+        const dataAdmin = {"idSp": id, "namaSp": nama}
 
+        // Register admin PT identity to CA
+        const registerAkun = await userService.registerUser(adminPT, 'he1', "admin PT", dataAdmin)
+        const akun = {
+            "username": adminPT,
+            "password": registerAkun.password
+        }
         await dataService.createPT(req.user.username, id, nama, adminPT)
         res.status(201).send({
             success: true,
             message: "Pendidikan Tinggi telah ditambahkan",
+            account: akun
         })
     }
     catch(error){
@@ -255,12 +261,17 @@ exports.createDosen = async(req, res) => {
         }
 
          // Register dosen identity to CA
-        await userService.registerUser(username, 'he1', "dosen")
+        const registerAkun = await userService.registerUser(username, 'he1', "dosen")
+        const akun = {
+            "username": username,
+            "password": registerAkun.password
+        }
 
-        await dataService.createDosen(req.user.username, id, idPT,idProdi,nama)
+        await dataService.createDosen(req.user.username, id, idPT, idProdi, nama, username)
         res.status(201).send({
             success: true,
             message: "Dosen telah ditambahkan",
+            account: akun
         })
     }
     catch(error){
@@ -412,12 +423,17 @@ exports.createMahasiswa = async(req, res) => {
         }
 
          // Register mahasiswa identity to CA
-        await userService.registerUser(username, 'he1', "mahasiswa")
+        const registerAkun = await userService.registerUser(username, 'he1', "mahasiswa")
+        const akun = {
+            "username": username,
+            "password": registerAkun.password
+        }
         await dataService.createMahasiswa(req.user.username, id, idPT, idProdi, nama, nipd, username)
         
         res.status(201).send({
             success: true,
             message: "Mahasiswa telah ditambahkan",
+            account: akun
         })
     }
     catch(error){
