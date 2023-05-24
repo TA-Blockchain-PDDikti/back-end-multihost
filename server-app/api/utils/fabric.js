@@ -11,15 +11,15 @@ const getCcp = (organizationName) =>{
     return JSON.parse(fs.readFileSync(ccpPath, 'utf8'));
 }
 
-const getWallet = async() => {
+const getWallet = async(org) => {
     // Create a new file system based wallet for managing identities.
-    const walletPath = path.join(process.cwd(), 'wallet');
+    const walletPath = path.join(process.cwd(), 'wallet', org);
     return await Wallets.newFileSystemWallet(walletPath);
 }
 
-const connectToNetwork = async(organizationName, channelName, chaincodeName, user) => {
+const connectToNetwork = async(organizationName, chaincodeName, user) => {
         const ccp = await getCcp(organizationName)
-        const wallet = await getWallet()
+        const wallet = await getWallet(organizationName)
 
         // Check to see if we've already enrolled the user.
         const identity = await wallet.get(user);
@@ -32,7 +32,7 @@ const connectToNetwork = async(organizationName, channelName, chaincodeName, use
         await gateway.connect(ccp, { wallet, identity: user, discovery: { enabled: true, asLocalhost: true } });
 
         // Get the network (channel) our contract is deployed to.
-        const network = await gateway.getNetwork(channelName);
+        const network = await gateway.getNetwork('academicchannel');
 
         // Get the contract from the network.
         const contract = network.getContract(chaincodeName);
@@ -41,14 +41,14 @@ const connectToNetwork = async(organizationName, channelName, chaincodeName, use
 
 }
 
-const getUserAttrs = async(username) => {
+const getUserAttrs = async(username, organizationName) => {
    
-    const ccp = getCcp('he1')
-    const wallet = await getWallet()
+    const ccp = getCcp(organizationName)
+    const wallet = await getWallet(organizationName)
 
     // Create a new CA client for interacting with the CA.
-    const caURL = ccp.certificateAuthorities[`ca.he1.example.com`].url;
-    const ca = new FabricCAServices(caURL, undefined, `ca.he1.example.com`);
+    const caURL = ccp.certificateAuthorities[`ca.${organizationName}.example.com`].url;
+    const ca = new FabricCAServices(caURL, undefined, `ca.${organizationName}.example.com`);
     
     // Check to see if we've already enrolled the admin user.
     const adminIdentity = await wallet.get('admin');

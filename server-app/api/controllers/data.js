@@ -22,15 +22,11 @@ exports.createPT = async(req, res) => {
 
         // Register admin PT identity to CA
         const registerAkun = await userService.registerUser(adminPT, 'he1', "admin PT", dataAdmin)
-        const akun = {
-            "username": adminPT,
-            "password": registerAkun.password
-        }
+
         await dataService.createPT(req.user.username, id, nama, adminPT)
         res.status(201).send({
             success: true,
-            message: "Pendidikan Tinggi telah ditambahkan",
-            account: akun
+            message: "Pendidikan Tinggi telah ditambahkan"
         })
     }
     catch(error){
@@ -103,7 +99,7 @@ exports.getAllPT = async(req, res) => {
 
 exports.getPTById = async(req, res) => {
     try {
-        if (req.user.userType != "admin pddikti" && req.user.userType != "admin PT" ) {
+        if (req.user.userType != "admin pddikti" ) {
             return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
         }
         const idPT = req.params.id
@@ -134,7 +130,8 @@ exports.createProdi = async(req, res) => {
             id = uuidv4()
         }
         
-        await dataService.createProdi(req.user.username, id, idPT, nama, jenjang)
+        args = [id, idPT, nama, jenjang]
+        await dataService.createProdi(req.user.username, args)
         res.status(201).send({
             success: true,
             message: "Prodi telah ditambahkan",
@@ -195,9 +192,6 @@ exports.deleteProdi = async(req, res) => {
 
 exports.getAllProdi = async(req, res) => {
     try{
-        if (req.user.userType != "admin pddikti") {
-            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
-        }
         data = await dataService.getAllProdi(req.user.username) 
         res.status(200).send({data});
     } catch (error){
@@ -262,16 +256,11 @@ exports.createDosen = async(req, res) => {
 
          // Register dosen identity to CA
         const registerAkun = await userService.registerUser(username, 'he1', "dosen")
-        const akun = {
-            "username": username,
-            "password": registerAkun.password
-        }
 
         await dataService.createDosen(req.user.username, id, idPT, idProdi, nama, username)
         res.status(201).send({
             success: true,
-            message: "Dosen telah ditambahkan",
-            account: akun
+            message: "Dosen telah ditambahkan"
         })
     }
     catch(error){
@@ -357,9 +346,6 @@ exports.deleteDosen = async(req, res) => {
 
 exports.getAllDosen = async(req, res) => {
     try {
-        if (req.user.userType != "admin pddikti") {
-            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
-        }
         data = await dataService.getAllDosen(req.user.username) 
         res.status(200).send({data});
     } catch(error) {
@@ -424,16 +410,11 @@ exports.createMahasiswa = async(req, res) => {
 
          // Register mahasiswa identity to CA
         const registerAkun = await userService.registerUser(username, 'he1', "mahasiswa")
-        const akun = {
-            "username": username,
-            "password": registerAkun.password
-        }
         await dataService.createMahasiswa(req.user.username, id, idPT, idProdi, nama, nipd, username)
         
         res.status(201).send({
             success: true,
-            message: "Mahasiswa telah ditambahkan",
-            account: akun
+            message: "Mahasiswa telah ditambahkan"
         })
     }
     catch(error){
@@ -472,6 +453,29 @@ exports.updateMahasiswa = async(req, res) => {
     }
 }
 
+exports.setGraduated = async(req, res) => {
+    try{
+        if (req.user.userType != "admin PT") {
+            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
+        }
+        const data = req.body;
+        const calonLulusan = data.calonLulusan;
+
+        await dataService.setGraduated(req.user.username, calonLulusan)
+        res.status(200).send({
+            success: true,
+            message: `Status mahasiswa menjadi lulus`,
+        })
+    }
+    catch(error){
+        console.log("ERROR", error)
+        res.status(400).send({
+            success: false,
+            error: error.toString(),
+        })    
+    }
+}
+
 exports.deleteMahasiswa = async(req, res) => {
     try{
         if (req.user.userType != "admin PT") {
@@ -496,9 +500,6 @@ exports.deleteMahasiswa = async(req, res) => {
 
 exports.getAllMahasiswa = async(req, res) => {
     try {
-        if (req.user.userType != "admin pddikti") {
-            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
-        }
         data = await dataService.getAllMahasiswa(req.user.username) 
         res.status(200).send({data});
     } catch(error){
@@ -642,9 +643,6 @@ exports.deleteMataKuliah = async(req, res) => {
 
 exports.getAllMataKuliah = async(req, res) => {
     try {
-        if (req.user.userType != "admin pddikti") {
-            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
-        }
         data = await dataService.getAllMataKuliah(req.user.username) 
         res.status(200).send({data});
     } catch(error){
@@ -822,9 +820,6 @@ exports.assignMahasiswa = async(req, res) => {
 
 exports.getAllKelas = async(req, res) => {
     try {
-        if (req.user.userType != "admin pddikti") {
-            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
-        }
         data = await dataService.getAllKelas(req.user.username) 
         res.status(200).send({data});
     } catch(error){
@@ -851,73 +846,4 @@ exports.getKelasById = async(req, res) => {
         })    
     }
 }
-
-// //Verifier
-// exports.createVerifier = async(req, res) => {
-//     try{
-//         const data = req.body;
-//         const name = data.nama;
-
-//         const result = await dataService.createVerifier(req.user.username,name)
-//         res.status(201).send({
-//             message: "Verifier telah ditambahkan",
-//             data
-//         })
-//     }
-//     catch(error){
-//         console.log("ERROR", error)
-//         res.status(400).send({
-//             success: false,
-//             error: error.toString(),
-//         })    
-//     }
-// }
-
-// exports.updateVerifier = async(req, res) => {
-//     try{
-    
-//         const data = req.body;
-//         const name = data.nama;
-
-//         const result = await dataService.updateVerifier(req.user.username,  name)
-//         res.status(200).send({
-//             message: `Verifier dengan id ${req.params.id} telah diubah`,
-            
-//         })
-//     }
-//     catch(error){
-//         console.log("ERROR", error)
-//         res.status(400).send({
-//             success: false,
-//             error: error.toString(),
-//         })    
-//     }
-// }
-
-// exports.deleteVerifier = async(req, res) => {
-//     try{
-
-        
-//         const result = await dataService.deleteVerifier(req.user.username)
-//         res.status(200).send({
-//             message: `Verifier dengan id ${req.params.id} telah dihapus`,
-//         })
-//     }
-//     catch(error){
-//         console.log("ERROR", error)
-//         res.status(400).send({
-//             success: false,
-//             error: error.toString(),
-//         })    
-//     }
-// }
-
-
-// exports.getAllVerifier = async(req, res) => {
-//     data = await dataService.getAllVerifier(req.user.username) 
-//     res.status(200).send({data});
-// }
-
-
-
 

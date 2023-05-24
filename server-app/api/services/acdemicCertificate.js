@@ -5,7 +5,7 @@ const { getAllParser, getParser } = require('../utils/converter.js')
 // Ijazah
 exports.createIjazah = async(user, idPT, idProdi, idMahasiswa, jenjangPendidikan, nomorIjazah, tanggalLulus) => {
     const idIjazah = uuidv4()
-    const network = await fabric.connectToNetwork("he1", "academicchannel", "ijzcontract", user)
+    const network = await fabric.connectToNetwork("he1", "ijzcontract", user)
     const result = await network.contract.submitTransaction( "CreateIjz", idIjazah, idPT, idProdi, idMahasiswa, jenjangPendidikan, nomorIjazah, tanggalLulus)
 
     network.gateway.disconnect()
@@ -14,21 +14,21 @@ exports.createIjazah = async(user, idPT, idProdi, idMahasiswa, jenjangPendidikan
 
 
 exports.updateIjazah = async(user, idIjazah, idPT, idProdi, idMahasiswa, jenjangPendidikan, nomorIjazah, tanggalLulus) => {
-    const network = await fabric.connectToNetwork("he1", "academicchannel", "ijzcontract", user)
+    const network = await fabric.connectToNetwork("he1", "ijzcontract", user)
     const result = await network.contract.submitTransaction( "UpdateIjz", idIjazah, idPT, idProdi, idMahasiswa, jenjangPendidikan, nomorIjazah, tanggalLulus)
     network.gateway.disconnect()
     return result;
 }
 
 exports.getIjazahById = async(user, idIjazah) => {
-    const network = await fabric.connectToNetwork("he1", "academicchannel", "ijzcontract", user)
+    const network = await fabric.connectToNetwork("he1", "ijzcontract", user)
     const result = await network.contract.evaluateTransaction( "GetIjzById", idIjazah)
     network.gateway.disconnect()
     return getParser(result);
 }
 
 exports.getIjazahByIdPt = async(user, idPt) => {
-    const network = await fabric.connectToNetwork("he1", "academicchannel", "ijzcontract", user)
+    const network = await fabric.connectToNetwork("he1", "ijzcontract", user)
     const queryData = await network.contract.evaluateTransaction( "GetIjzByIdSp", idPt)
     network.gateway.disconnect()
     try {
@@ -40,7 +40,7 @@ exports.getIjazahByIdPt = async(user, idPt) => {
 }
 
 exports.getIjazahByIdProdi = async(user, idProdi) => {
-    const network = await fabric.connectToNetwork("he1", "academicchannel", "ijzcontract", user)
+    const network = await fabric.connectToNetwork("he1", "ijzcontract", user)
     const queryData = await network.contract.evaluateTransaction( "GetIjzByIdSms", idProdi)
     network.gateway.disconnect()
     try {
@@ -52,7 +52,7 @@ exports.getIjazahByIdProdi = async(user, idProdi) => {
 }
 
 exports.getIjazahByIdMahasiswa = async(user, idMahasiswa) => {
-    const network = await fabric.connectToNetwork("he1", "academicchannel", "ijzcontract", user)
+    const network = await fabric.connectToNetwork("he1", "ijzcontract", user)
     const queryData = await network.contract.evaluateTransaction( "GetIjzByIdPd", idMahasiswa)
     network.gateway.disconnect()
     try {
@@ -64,7 +64,7 @@ exports.getIjazahByIdMahasiswa = async(user, idMahasiswa) => {
 }
 
 exports.getAllIjazah = async(user) => {
-    const network = await fabric.connectToNetwork("he1", "academicchannel", "ijzcontract", user)
+    const network = await fabric.connectToNetwork("he1", "ijzcontract", user)
     const queryData = await network.contract.evaluateTransaction( "GetAllIjz")
     network.gateway.disconnect()
     try {
@@ -78,21 +78,21 @@ exports.getAllIjazah = async(user) => {
 // Transkrip
 exports.createTranskrip = async(user, idPT, idProdi, idMahasiswa, jenjangPendidikan, totalMutu,	totalSks, ipk) => {
     const idTranskrip = uuidv4()
-    const network = await fabric.connectToNetwork("he1", "academicchannel", "tskcontract", user)
+    const network = await fabric.connectToNetwork("he1", "tskcontract", user)
     const result = await network.contract.submitTransaction( "CreateTsk", idTranskrip, idPT, idProdi, idMahasiswa, jenjangPendidikan, totalMutu,	totalSks, ipk)
     network.gateway.disconnect()
     return result;
 }
 
 exports.updateTranskrip = async(user, idranskrip, idPT, idProdi, idMahasiswa, jenjangPendidikan, totalMutu,	totalSks, ipk) => {
-    const network = await fabric.connectToNetwork("he1", "academicchannel", "tskcontract", user)
+    const network = await fabric.connectToNetwork("he1", "tskcontract", user)
     const result = await network.contract.submitTransaction( "UpdateTsk", idranskrip, idPT, idProdi, idMahasiswa, jenjangPendidikan, totalMutu,	totalSks, ipk)
     network.gateway.disconnect()
     return result;
 }
 
 exports.getAllTranskrip = async(user) => {
-    const network = await fabric.connectToNetwork("he1", "academicchannel", "tskcontract", user)
+    const network = await fabric.connectToNetwork("he1", "tskcontract", user)
     const queryData = await network.contract.evaluateTransaction( "GetAllTsk")
     network.gateway.disconnect()
     try {
@@ -104,14 +104,14 @@ exports.getAllTranskrip = async(user) => {
 }
 
 exports.getTranskripById = async(user, idTsk) => {
-    const network = await fabric.connectToNetwork("he1", "academicchannel", "tskcontract", user)
+    const network = await fabric.connectToNetwork("he1", "tskcontract", user)
     const result = await network.contract.evaluateTransaction( "GetTskById", idTsk)
     network.gateway.disconnect()
     return getParser(result);
 }
 
 exports.getTranskripByIdPt = async(user, idTsk) => {
-    const network = await fabric.connectToNetwork("he1", "academicchannel", "tskcontract", user)
+    const network = await fabric.connectToNetwork("he1", "tskcontract", user)
     const queryData = await network.contract.evaluateTransaction( "GetTskByIdSp", idTsk)
     network.gateway.disconnect()
     try {
@@ -123,7 +123,7 @@ exports.getTranskripByIdPt = async(user, idTsk) => {
 }
 
 exports.getTranskripByIdProdi = async(user, idTsk) => {
-    const network = await fabric.connectToNetwork("he1", "academicchannel", "tskcontract", user)
+    const network = await fabric.connectToNetwork("he1", "tskcontract", user)
     const queryData = await network.contract.evaluateTransaction( "GetTskByIdSms", idTsk)
     network.gateway.disconnect()
     try {
@@ -135,7 +135,7 @@ exports.getTranskripByIdProdi = async(user, idTsk) => {
 }
 
 exports.getTranskripByIdMahasiswa = async(user, idTsk) => {
-    const network = await fabric.connectToNetwork("he1", "academicchannel", "tskcontract", user)
+    const network = await fabric.connectToNetwork("he1", "tskcontract", user)
     const queryData = await network.contract.evaluateTransaction( "GetTskByIdPd", idTsk)
     network.gateway.disconnect()
     try {
@@ -147,17 +147,17 @@ exports.getTranskripByIdMahasiswa = async(user, idTsk) => {
 }
 
 
-// ----------------------------------------------------------
+// Sign and Verify----------------------------------------------------------
 
 exports.signIjazah = async(user, nama) => {
-    const network = await fabric.connectToNetwork("he1", "academicchannel", "ijzcontract", user)
+    const network = await fabric.connectToNetwork("he1", "ijzcontract", user)
     const result = await network.contract.submitTransaction( "DeleteIjz", "args" )
     network.gateway.disconnect()
     return result;
 }
 
 exports.getIdentifier = async(user, nama) => {
-    const network = await fabric.connectToNetwork("he1", "academicchannel", "he", user)
+    const network = await fabric.connectToNetwork("he1", "he", user)
     const result = await network.contract.submitTransaction( "DeleteIjz", "args" )
     network.gateway.disconnect()
     result = {
@@ -166,22 +166,34 @@ exports.getIdentifier = async(user, nama) => {
     return result;
 }
 
-exports.generateIdentifier = async(user, nama) => {
-    const network = await fabric.connectToNetwork("he1", "academicchannel", "he", user)
-    const result = await network.contract.submitTransaction( "DeleteIjz", "args" )
+exports.generateIdentifier = async(user, idMahasiswa) => {
+    const transkrip = await getTranskripByIdMahasiswa(idMahasiswa)
+    const ijazah = await this.getIjazahByIdMahasiswa(idMahasiswa)
+
+    var academicCertificate = {
+        "ijazah": ijazah,
+        "transkrip": transkrip
+    }
+
+
+    const network = await fabric.connectToNetwork("he1", "he", user)
+    const result = await network.contract.evaluateTransaction( "DeleteIjz", "args" )
     network.gateway.disconnect()
     return true;
 }
 
 exports.addSigner = async(user, nama) => {
-    const network = await fabric.connectToNetwork("he1", "academicchannel", "he", user)
+    const network = await fabric.connectToNetwork("he1", "he", user)
     const result = await network.contract.submitTransaction( "DeleteIjz", "args" )
     network.gateway.disconnect()
     return true;
 }
 
-exports.verify = async(user, nama) => {
-    const network = await fabric.connectToNetwork("he1", "academicchannel", "he", user)
+exports.verify = async(user, identifier) => {
+    const transkrip = await getTranskripByIdMahasiswa(idMahasiswa)
+    const ijazah = await this.getIjazahByIdMahasiswa(idMahasiswa)
+
+    const network = await fabric.connectToNetwork("he1", "he", user)
     const result = await network.contract.submitTransaction( "DeleteIjz", "args" )
     network.gateway.disconnect()
     return true;

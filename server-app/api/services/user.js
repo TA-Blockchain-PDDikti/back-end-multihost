@@ -2,9 +2,12 @@
 
 const FabricCAServices = require('fabric-ca-client');
 const fabric = require("../utils/fabric.js")
+const {sendEmail} = require("../utils/mail.js")
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 const bcrypt = require("bcrypt")
+const path = require('path')
+const fs = require('fs')
 
 const registerUser = async(userId, organizationName, userType, dataUser = {}) =>  {
 
@@ -14,7 +17,7 @@ const registerUser = async(userId, organizationName, userType, dataUser = {}) =>
     const caURL = ccp.certificateAuthorities[`ca.${organizationName}.example.com`].url;
     const ca = new FabricCAServices(caURL);
 
-    const wallet = await fabric.getWallet()
+    const wallet = await fabric.getWallet(organizationName)
 
     // Check to see if we've already enrolled the user.
     const userIdentity = await wallet.get(userId);
@@ -34,16 +37,16 @@ const registerUser = async(userId, organizationName, userType, dataUser = {}) =>
 
     // Create random password end encrypted
     var password = crypto.randomBytes(4).toString('hex');
-    //var encryptedPassword = await bcrypt.hash(password, 10);
+    var encryptedPassword = await bcrypt.hash(password, 10);
 
     // Register the user, enroll the user, and import the new identity into the wallet.
     const secret = await ca.register({
-        affiliation: 'he1.department1',
+        affiliation: `${organizationName}.department1`,
         enrollmentID: userId,
         role: 'client',
         attrs: [
             { "name": "userType", "value": userType, "ecert": true}, 
-            { "name": "password", "value": password, "ecert": true},
+            { "name": "password", "value": encryptedPassword, "ecert": true},
             { "name": "dataUser", "value": JSON.stringify(dataUser), "ecert": true},
         ]
     }, adminUser);
@@ -51,7 +54,7 @@ const registerUser = async(userId, organizationName, userType, dataUser = {}) =>
     const enrollment = await ca.enroll({
         enrollmentID: userId,
         enrollmentSecret: secret,
-        attr_reqs: [{ name: "userType", optional: false }, { name: "password", optional: false }, { name: "dataUser", optional: false }]
+        attr_reqs: [{ name: "userType", optional: false }, { name: "password", optional: false }]
     });
 
     const x509Identity = {
@@ -63,6 +66,9 @@ const registerUser = async(userId, organizationName, userType, dataUser = {}) =>
         type: 'X.509',
     };
     await wallet.put(userId, x509Identity);
+
+    fs.writeFile(path.join(process.cwd(), 'wallet', 'user.txt'), `${userId}~${userType}~${password}\n`, { flag: 'a+' }, err => {});
+    await sendEmail(userId, password)
     
     const response = {
         "success":true,
@@ -82,7 +88,7 @@ const enrollAdmin = async(adminId, adminSecret, organizationName) => {
     const caTLSCACerts = caInfo.tlsCACerts.pem;
     const ca = new FabricCAServices(caInfo.url, { trustedRoots: caTLSCACerts, verify: false }, caInfo.caName);
 
-    const wallet = await fabric.getWallet()
+    const wallet = await fabric.getWallet(organizationName)
 
     // Check to see if we've already enrolled the admin user.
     const identity = await wallet.get(adminId);
@@ -113,21 +119,29 @@ const enrollAdmin = async(adminId, adminSecret, organizationName) => {
 const loginUser = async(username, password) => {
 
     const response = {}
-    const wallet = await fabric.getWallet()
+    // Check to see if we've already registered and enrolled the user in wallet kemdikbud or HE
+    const walletKemdikbud = await fabric.getWallet('kemdikbud')
+    const walletHe = await fabric.getWallet('he1')
 
-    // Check to see if we've already registered and enrolled the user.
-    const user = await wallet.get(username);
-    if (!user) {
+    const user1 = await walletKemdikbud.get(username);
+    const user2 = await walletHe.get(username);
+    if (user1) {
+        var organizationName = 'kemdikbud'
+    }
+    else if (user2) {
+        var organizationName = 'he1'
+    }
+    else {
         throw `User ${username} is not registered yet`
     }
 
     // Get user attr 
-    const userAttrs = await fabric.getUserAttrs(username)
+    const userAttrs = await fabric.getUserAttrs(username, organizationName)
     const userPassword = userAttrs.find(e => e.name == "password").value
     const userType = userAttrs.find(e => e.name == "userType").value
 
     // Compare input password with password in CA
-    if (password == userPassword){
+    if ( await bcrypt.compare(password, userPassword) ){
         const payload = {  
             "username": username,
             "userType": userType 

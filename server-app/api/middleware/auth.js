@@ -11,6 +11,7 @@ const verifyToken = (req, res, next) => {
         try {
             const decoded = jwt.verify(token, 'secret_key');
             req.user = decoded;
+            console.log(req.user)
         } catch (err) {
             return res.status(401).send({"result":"Invalid Token"});
         }

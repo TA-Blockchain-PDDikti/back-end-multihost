@@ -3,6 +3,7 @@ const fabric = require("../utils/fabric.js")
 
 const parser = async(result) => {
     if (result.idSp){
+        console.log("parse")
         const id = result.idSp
         const data = await dataService.getPTById('admin', id)
         result.sp = {
@@ -63,23 +64,12 @@ const parser = async(result) => {
         delete result.idPd
     }
 
-    if (result.username){
-        const username = result.username
-        const data = await fabric.getUserAttrs(username)
-        result.akun = {
-            "username": username,
-            "password": data.find(e => e.name == "password").value
-        }
-        delete result.username
-    }
-
     return result;
 }
 
 const getAllParser = async (queryData) => {
     let result = JSON.parse(queryData)
     await Promise.all(result.map( async(item, index) => {
-        item.username = "adminpt"
         result[index] = await parser(item)
     }))
     return result;
@@ -87,7 +77,6 @@ const getAllParser = async (queryData) => {
 
 const getParser = (queryData) => {
     const jsonParse = JSON.parse(queryData)
-    jsonParse.username = "adminpt"
     return parser(jsonParse)
 }
 

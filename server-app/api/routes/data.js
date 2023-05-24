@@ -30,6 +30,7 @@ dataRouter.delete('/dosen/:id', dataController.deleteDosen)
 
 //mahasiswa
 dataRouter.post('/mahasiswa', dataController.createMahasiswa)
+dataRouter.post('/mahasiswa/setLulus', dataController.setGraduated)
 dataRouter.get('/mahasiswa', dataController.getAllMahasiswa)
 dataRouter.get('/mahasiswa/pt/:id', dataController.getMahasiswaByPT)
 dataRouter.get('/mahasiswa/:id', dataController.getMahasiswaById)
