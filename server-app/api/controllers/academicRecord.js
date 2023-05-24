@@ -104,9 +104,6 @@ exports.deleteAcademicRecord = async(req, res) => {
 
 exports.getAllAcademicRecord = async(req, res) => {
     try {
-        if (req.user.userType != "admin pddikti") {
-            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
-        }
         const data = await academicRecordService.getAllAcademicRecord(req.user.username) 
         res.status(200).send({data});
     } catch(error){
