@@ -2,21 +2,21 @@ const fabric = require("../utils/fabric.js")
 const sign = require("../utils/sign.js")
 const { getAllParser, getParser } = require('../utils/converter.js')
 
-exports.createAcademicRecord = async(user, idNilai, idKls, idDosen, idMahasiswa, nilaiAngka, nilaiHuruf, nilaiIndex) => {
+exports.createAcademicRecord = async(user, args) => {
     
     // Sign Nilai
-    const nilaiToSign = [nilaiAngka, nilaiHuruf, nilaiIndex]
-    const signature = await sign.createDigitalSignature(nilaiToSign, user)
-    console.log("signature",signature)
+    // const nilaiToSign = [, nilaiHuruf, nilaiIndex]
+    // const signature = await sign.createDigitalSignature(nilaiToSign, user)
+    // console.log("signature",signature)
     const network = await fabric.connectToNetwork("he1", "npdcontract", user)
-    const result = await network.contract.submitTransaction("CreateNpd", idNilai, idKls, idDosen, idMahasiswa, nilaiAngka, nilaiHuruf, nilaiIndex)
+    const result = await network.contract.submitTransaction("CreateNpd", ...args)
     network.gateway.disconnect()
     return result;
 }
 
-exports.updateAcademicRecord = async(user, idNilai, idKls, idDosen, idMahasiswa, nilaiAngka, nilaiHuruf, nilaiIndex) => {
+exports.updateAcademicRecord = async(user, args) => {
     const network = await fabric.connectToNetwork("he1", "npdcontract", user)
-    const result = await network.contract.submitTransaction("UpdateNpd", idNilai, idKls, idDosen, idMahasiswa, nilaiAngka, nilaiHuruf, nilaiIndex)
+    const result = await network.contract.submitTransaction("UpdateNpd", ...args)
     network.gateway.disconnect()
     return result;
 }

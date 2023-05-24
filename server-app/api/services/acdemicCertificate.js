@@ -3,19 +3,19 @@ const { v4: uuidv4 } = require('uuid')
 const { getAllParser, getParser } = require('../utils/converter.js')
 
 // Ijazah
-exports.createIjazah = async(user, idPT, idProdi, idMahasiswa, jenjangPendidikan, nomorIjazah, tanggalLulus) => {
+exports.createIjazah = async(user, args) => {
     const idIjazah = uuidv4()
     const network = await fabric.connectToNetwork("he1", "ijzcontract", user)
-    const result = await network.contract.submitTransaction( "CreateIjz", idIjazah, idPT, idProdi, idMahasiswa, jenjangPendidikan, nomorIjazah, tanggalLulus)
+    const result = await network.contract.submitTransaction( "CreateIjz", idIjazah, ...args)
 
     network.gateway.disconnect()
     return result;
 }
 
 
-exports.updateIjazah = async(user, idIjazah, idPT, idProdi, idMahasiswa, jenjangPendidikan, nomorIjazah, tanggalLulus) => {
+exports.updateIjazah = async(user, args) => {
     const network = await fabric.connectToNetwork("he1", "ijzcontract", user)
-    const result = await network.contract.submitTransaction( "UpdateIjz", idIjazah, idPT, idProdi, idMahasiswa, jenjangPendidikan, nomorIjazah, tanggalLulus)
+    const result = await network.contract.submitTransaction( "UpdateIjz", ...args)
     network.gateway.disconnect()
     return result;
 }
@@ -76,17 +76,17 @@ exports.getAllIjazah = async(user) => {
 }
 
 // Transkrip
-exports.createTranskrip = async(user, idPT, idProdi, idMahasiswa, jenjangPendidikan, totalMutu,	totalSks, ipk) => {
+exports.createTranskrip = async(user, args) => {
     const idTranskrip = uuidv4()
     const network = await fabric.connectToNetwork("he1", "tskcontract", user)
-    const result = await network.contract.submitTransaction( "CreateTsk", idTranskrip, idPT, idProdi, idMahasiswa, jenjangPendidikan, totalMutu,	totalSks, ipk)
+    const result = await network.contract.submitTransaction( "CreateTsk", idTranskrip, ...args)
     network.gateway.disconnect()
     return result;
 }
 
-exports.updateTranskrip = async(user, idranskrip, idPT, idProdi, idMahasiswa, jenjangPendidikan, totalMutu,	totalSks, ipk) => {
+exports.updateTranskrip = async(user, idranskrip, args) => {
     const network = await fabric.connectToNetwork("he1", "tskcontract", user)
-    const result = await network.contract.submitTransaction( "UpdateTsk", idranskrip, idPT, idProdi, idMahasiswa, jenjangPendidikan, totalMutu,	totalSks, ipk)
+    const result = await network.contract.submitTransaction( "UpdateTsk", idranskrip, ...args)
     network.gateway.disconnect()
     return result;
 }

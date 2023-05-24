@@ -19,8 +19,9 @@ exports.createAcademicRecord = async(req, res) => {
         if (!id) {
             id = uuidv4()
         }
-
-        const result = await academicRecordService.createAcademicRecord(req.user.username, id, idKls, idDosen, idMahasiswa, nilaiAngka, nilaiHuruf, nilaiIndex)
+        
+        args = [id, idKls, idDosen, idMahasiswa, nilaiAngka, nilaiHuruf, nilaiIndex]
+        const result = await academicRecordService.createAcademicRecord(req.user.username, args)
         res.status(201).send({
             success: true,
             message: "Transaction nilai has been submitted",
@@ -46,8 +47,9 @@ exports.updateAcademicRecord = async(req, res) => {
         const nilaiHuruf = data.nilaiHuruf;
         const nilaiIndex = data.nilaiIndex;
         const idNilai = req.params.id
-       
-        const result = await academicRecordService.updateAcademicRecord(req.user.username,  idNilai, idKls, idDosen, idMahasiswa, nilaiAngka, nilaiHuruf, nilaiIndex)
+
+       const args = [idNilai, idKls, idDosen, idMahasiswa, nilaiAngka, nilaiHuruf, nilaiIndex]
+        const result = await academicRecordService.updateAcademicRecord(req.user.username, args)
         res.status(200).send({
             success: true,
             message: `Nilai dengan id ${idNilai} telah diubah`, 

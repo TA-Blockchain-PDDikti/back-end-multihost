@@ -23,7 +23,8 @@ exports.createPT = async(req, res) => {
         // Register admin PT identity to CA
         const registerAkun = await userService.registerUser(adminPT, 'he1', "admin PT", dataAdmin)
 
-        await dataService.createPT(req.user.username, id, nama, adminPT)
+        const args = [id, 'HE1MSP', nama,  adminPT]
+        await dataService.createPT(req.user.username, args)
         res.status(201).send({
             success: true,
             message: "Pendidikan Tinggi telah ditambahkan"
@@ -47,7 +48,8 @@ exports.updatePT = async(req, res) => {
         const adminPT = data.usernameAdmin;
         const idPT = req.params.id;
 
-        await dataService.updatePT(req.user.username,idPT, nama, adminPT)
+        args = [idPT, 'HE1MSP', nama, adminPT]
+        await dataService.updatePT(req.user.username, args)
         res.status(200).send({
             success: true,
             message: `Pendidikan Tinggi dengan id ${idPT} telah diubah`,
@@ -156,7 +158,8 @@ exports.updateProdi = async(req, res) => {
         const jenjang = data.jenjangPendidikan;
         const idProdi = req.params.id
 
-        await dataService.updateProdi(req.user.username, idProdi, idPT, nama, jenjang)
+        args = [idProdi, idPT, nama, jenjang]
+        await dataService.updateProdi(req.user.username, args)
         res.status(200).send({
             success: true,
             message: `Prodi dengan id ${idProdi} telah diubah`,
@@ -257,7 +260,8 @@ exports.createDosen = async(req, res) => {
          // Register dosen identity to CA
         const registerAkun = await userService.registerUser(username, 'he1', "dosen")
 
-        await dataService.createDosen(req.user.username, id, idPT, idProdi, nama, username)
+        args = [id, idPT, idProdi, nama, username]
+        await dataService.createDosen(req.user.username, args)
         res.status(201).send({
             success: true,
             message: "Dosen telah ditambahkan"
@@ -283,7 +287,8 @@ exports.updateDosen = async(req, res) => {
         const nama = data.nama;
         const idDosen = req.params.id
 
-        const result = await dataService.updateDosen(req.user.username, idDosen, idPT,idProdi,nama)
+        args = [idDosen, idPT,idProdi,nama]
+        const result = await dataService.updateDosen(req.user.username, args)
         res.status(200).send({
             success: true,
             message: `Dosen dengan id ${idDosen} telah diubah`,
@@ -410,7 +415,8 @@ exports.createMahasiswa = async(req, res) => {
 
          // Register mahasiswa identity to CA
         const registerAkun = await userService.registerUser(username, 'he1', "mahasiswa")
-        await dataService.createMahasiswa(req.user.username, id, idPT, idProdi, nama, nipd, username)
+        args = [id, idPT, idProdi, nama, nipd, username]
+        await dataService.createMahasiswa(req.user.username, args)
         
         res.status(201).send({
             success: true,
@@ -438,7 +444,8 @@ exports.updateMahasiswa = async(req, res) => {
         const nipd = data.nipd;
         const idMahasiswa = req.params.id
 
-        await dataService.updateMahasiswa(req.user.username, idMahasiswa, idPT, idProdi, nama, nipd)
+        args = [idMahasiswa, idPT, idProdi, nama, nipd]
+        await dataService.updateMahasiswa(req.user.username, args)
         res.status(200).send({
             success: true,
             message: `Mahasiswa dengan id ${idMahasiswa} telah diubah`,
@@ -577,7 +584,8 @@ exports.createMataKuliah = async(req, res) => {
             id = uuidv4()
         }
 
-        await dataService.createMataKuliah(req.user.username, id,  idPT, idProdi, nama, sks, jenjangPendidikan)
+        args = [id, idPT, idProdi, nama, sks, jenjangPendidikan]
+        await dataService.createMataKuliah(req.user.username, args)
         res.status(201).send({
             success: true,
             message: "Mata Kuliah telah ditambahkan",
@@ -605,7 +613,8 @@ exports.updateMataKuliah = async(req, res) => {
         const jenjangPendidikan = data.jenjangPendidikan
         const idMk = req.params.id;
 
-        const result = await dataService.updateMataKuliah(req.user.username, idMk,  idPT, idProdi, nama, sks, jenjangPendidikan)
+        args = [idMk,  idPT, idProdi, nama, sks, jenjangPendidikan]
+        const result = await dataService.updateMataKuliah(req.user.username, args)
         res.status(200).send({
             success: true,
             message: `Mata Kuliah dengan id ${idMk} telah diubah`,
@@ -705,7 +714,8 @@ exports.createKelas = async(req, res) => {
             id = uuidv4()
         }
 
-        await dataService.createKelas(req.user.username, id, idProdi, idMk, nama, semester, sks)
+        args = [id, idProdi, idMk, nama, semester, sks]
+        await dataService.createKelas(req.user.username, args)
         res.status(201).send({
             success: true,
             message: "Kelas telah ditambahkan",
@@ -733,7 +743,8 @@ exports.updateKelas = async(req, res) => {
         const sks = data.sks;
         const idKelas = req.params.id;
 
-        const result = await dataService.updateKelas(req.user.username,  idKelas, idProdi, idMk, nama, semester, sks)
+        args = [idKelas, idProdi, idMk, nama, semester, sks]
+        const result = await dataService.updateKelas(req.user.username,  args)
         res.status(200).send({
             success: true,
             message: `Kelas dengan id ${idKelas} telah diubah`,

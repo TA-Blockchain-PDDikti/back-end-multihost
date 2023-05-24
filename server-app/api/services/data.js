@@ -2,17 +2,17 @@
 const fabric = require("../utils/fabric.js")
 const { getAllParser, getParser } = require('../utils/converter.js')
 
-exports.createPT = async(user, idPt, namaPT, adminPT) => {
+exports.createPT = async(user, args) => {
     // Add 'pendidikan tinggi' data to blockchain
     const network = await fabric.connectToNetwork("kemdikbud", "spcontract", user)
-    await network.contract.submitTransaction("CreateSp", idPt, 'HE1MSP', namaPT)
+    await network.contract.submitTransaction("CreateSp", ...args)
     network.gateway.disconnect()
     return idPt;
 }
 
-exports.updatePT = async(user, idPT, namaPT, adminPT) => {
+exports.updatePT = async(user, args) => {
     const network = await fabric.connectToNetwork("kemdikbud", "spcontract", user)
-    const result = await network.contract.submitTransaction("UpdateSp", idPT, 'HE1MSP', namaPT)
+    const result = await network.contract.submitTransaction("UpdateSp", ...args)
     network.gateway.disconnect()
     return result;
 }
@@ -53,9 +53,9 @@ exports.createProdi = async(user, args) => {
     return result;
 }
 
-exports.updateProdi = async(user, idProdi, idPT, nama, jenjangPendidikan) => {
+exports.updateProdi = async(user, args) => {
     const network = await fabric.connectToNetwork("he1", "smscontract", user)
-    const result = await network.contract.submitTransaction("UpdateSms", idProdi, idPT, nama, jenjangPendidikan)
+    const result = await network.contract.submitTransaction("UpdateSms", ...args)
     network.gateway.disconnect()
     return result;
 }
@@ -102,18 +102,18 @@ exports.getProdiById = async(user, idProdi) => {
 }
 
 //dosen
-exports.createDosen = async(user, idDosen, idPT, idProdi, nama, username) => {
+exports.createDosen = async(user, args) => {
     // Add 'dosen' data to blockchain
     const network = await fabric.connectToNetwork("he1", "ptkcontract", user)
-    const result = await network.contract.submitTransaction("CreatePtk", idDosen, idPT, idProdi,nama)
+    const result = await network.contract.submitTransaction("CreatePtk", ...args)
     network.gateway.disconnect()
 
     return result;
 }
 
-exports.updateDosen = async(user,idDosen, idPT,idProdi,nama) => {
+exports.updateDosen = async(user, args) => {
     const network = await fabric.connectToNetwork("he1", "ptkcontract", user)
-    const result = await network.contract.submitTransaction("UpdatePtk",idDosen, idPT,idProdi,nama )
+    const result = await network.contract.submitTransaction("UpdatePtk", ...args)
     network.gateway.disconnect()
     return result;
 }
@@ -165,17 +165,17 @@ exports.getDosenById = async(user, idDosen) => {
 }
 
 //mahasiswa
-exports.createMahasiswa = async(user, idMahasiswa, idPT, idProdi, nama, nipd, username) => {
+exports.createMahasiswa = async(user, args) => {
     // Add 'mahasiswa' data to blockchain
     const network = await fabric.connectToNetwork("he1", "pdcontract", user)
-    const result = await network.contract.submitTransaction("CreatePd", idMahasiswa, idPT, idProdi, nama, nipd)
+    const result = await network.contract.submitTransaction("CreatePd", ...args)
     network.gateway.disconnect()
     return result;
 }
 
-exports.updateMahasiswa = async(user, idMahasiswa, idPT, idProdi, nama, nipd) => {
+exports.updateMahasiswa = async(user, args) => {
     const network = await fabric.connectToNetwork("he1", "pdcontract", user)
-    const result = await network.contract.submitTransaction("UpdatePd", idMahasiswa, idPT, idProdi, nama, nipd)
+    const result = await network.contract.submitTransaction("UpdatePd", ...args)
     network.gateway.disconnect()
     return result;
 }
@@ -239,17 +239,17 @@ exports.setGraduated = async(user, calonLulusan) => {
 }
 
 //mata kuliah
-exports.createMataKuliah = async(user, idMk,  idPt, idProdi,  nama, sks, jenjangPendidikan) => {
+exports.createMataKuliah = async(user, args) => {
     const network = await fabric.connectToNetwork("he1", "mkcontract", user)
-    const result = await network.contract.submitTransaction("CreateMk", idMk, idPt, idProdi, nama, sks, jenjangPendidikan)
+    const result = await network.contract.submitTransaction("CreateMk", ...args)
     network.gateway.disconnect()
     return result;
 }
 
-exports.updateMataKuliah = async(user, idMK, idPt, idProdi,  nama, sks, jenjangPendidikan) => {
+exports.updateMataKuliah = async(user, args) => {
     console.log(idProdi, idPt)
     const network = await fabric.connectToNetwork("he1", "mkcontract", user)
-    const result = await network.contract.submitTransaction("UpdateMk", idMK, idPt, idProdi, nama, sks, jenjangPendidikan)
+    const result = await network.contract.submitTransaction("UpdateMk", ...args)
     network.gateway.disconnect()
     return result;
 }
@@ -288,16 +288,16 @@ exports.getMataKuliahByIdPt = async(user, idPt) => {
 }
 
 //kelas
-exports.createKelas = async(user, idKelas, idProdi, idMk, nama, semester, sks) => {
+exports.createKelas = async(user, args) => {
     const network = await fabric.connectToNetwork("he1", "klscontract", user)
-    const result = await network.contract.submitTransaction("CreateKls", idKelas, idProdi, idMk, nama, semester, sks)
+    const result = await network.contract.submitTransaction("CreateKls", ...args)
     network.gateway.disconnect()
     return result; 
 }
 
-exports.updateKelas = async(user, idKelas, idProdi, idMk, nama, semester, sks) => {
+exports.updateKelas = async(user, args) => {
     const network = await fabric.connectToNetwork("he1", "klscontract", user)
-    const result = await network.contract.submitTransaction("UpdateKls", idKelas, idProdi, idMk, nama, semester, sks)
+    const result = await network.contract.submitTransaction("UpdateKls", ...args)
     network.gateway.disconnect()
     return result;
 }

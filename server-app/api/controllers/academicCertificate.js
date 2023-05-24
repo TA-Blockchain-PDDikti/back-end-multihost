@@ -16,9 +16,10 @@ exports.createAcademicCertificate = async(req, res) => {
         const totalSks = data.totalSks;
         const ipk = data.ipk
 
-    
-        await certificateService.createIjazah(req.user.username, idPT, idProdi, idMahasiswa, jenjangPendidikan, nomorIjazah, tanggalLulus)
-        await certificateService.createTranskrip(req.user.username, idPT, idProdi, idMahasiswa, jenjangPendidikan, totalMutu, totalSks, ipk)
+        argsIjazah = [idPT, idProdi, idMahasiswa, jenjangPendidikan, nomorIjazah, tanggalLulus]
+        argsTranskrip = [idPT, idProdi, idMahasiswa, jenjangPendidikan, totalMutu, totalSks, ipk] 
+        await certificateService.createIjazah(req.user.username, argsIjazah)
+        await certificateService.createTranskrip(req.user.username, argsTranskrip)
        
         res.status(201).send({
             success: true,
@@ -47,7 +48,8 @@ exports.updateIjazah = async(req, res) => {
         const tanggalLulus = data.tanggalLulus;
         const idIjazah = req.params.id
 
-        const result = await certificateService.updateIjazah(req.user.username, idIjazah, idPT, idProdi, idMahasiswa, jenjangPendidikan, nomorIjazah, tanggalLulus )
+        args = [idIjazah, idPT, idProdi, idMahasiswa, jenjangPendidikan, nomorIjazah, tanggalLulus]
+        const result = await certificateService.updateIjazah(req.user.username, args)
         res.status(200).send({
             success : true,
             message: "Ijazah telah diubah",
@@ -76,7 +78,8 @@ exports.updateTranskrip = async(req, res) => {
         const ipk = data.ipk
         const id = req.params.id
 
-        const result = await certificateService.updateTranskrip(req.user.username, id, idPT, idProdi, idMahasiswa, jenjangPendidikan,  totalMutu, totalSks, ipk )
+        args = [id, idPT, idProdi, idMahasiswa, jenjangPendidikan,  totalMutu, totalSks, ipk]
+        const result = await certificateService.updateTranskrip(req.user.username, args)
         res.status(200).send({
             success : true,
             message: "Transkrip telah diubah",
