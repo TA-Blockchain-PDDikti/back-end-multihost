@@ -21,9 +21,9 @@ exports.createPT = async(req, res) => {
         const dataAdmin = {"idSp": id, "namaSp": nama}
 
         // Register admin PT identity to CA
-        const registerAkun = await userService.registerUser(adminPT, 'he1', "admin PT", dataAdmin)
+        const registerAkun = await userService.registerUser(adminPT, 'HE1', "admin PT", dataAdmin)
 
-        const args = [id, 'HE1MSP', nama,  adminPT]
+        const args = [id, 'HE1MSP', nama, adminPT]
         await dataService.createPT(req.user.username, args)
         res.status(201).send({
             success: true,
@@ -48,7 +48,7 @@ exports.updatePT = async(req, res) => {
         const adminPT = data.usernameAdmin;
         const idPT = req.params.id;
 
-        args = [idPT, 'HE1MSP', nama, adminPT]
+        args = [idPT, 'HE1MSP', nama]
         await dataService.updatePT(req.user.username, args)
         res.status(200).send({
             success: true,
@@ -258,7 +258,7 @@ exports.createDosen = async(req, res) => {
         }
 
          // Register dosen identity to CA
-        const registerAkun = await userService.registerUser(username, 'he1', "dosen")
+        const registerAkun = await userService.registerUser(username, 'HE1', "dosen")
 
         args = [id, idPT, idProdi, nama, username]
         await dataService.createDosen(req.user.username, args)
@@ -414,8 +414,8 @@ exports.createMahasiswa = async(req, res) => {
         }
 
          // Register mahasiswa identity to CA
-        const registerAkun = await userService.registerUser(username, 'he1', "mahasiswa")
-        args = [id, idPT, idProdi, nama, nipd, username]
+        const registerAkun = await userService.registerUser(username, 'HE1', "mahasiswa")
+        args = [id, idPT, idProdi, nama, nipd]
         await dataService.createMahasiswa(req.user.username, args)
         
         res.status(201).send({

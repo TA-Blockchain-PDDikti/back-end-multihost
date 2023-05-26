@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#./network.sh deployCC -ccn spcontract -ccp ./chaincode/spcontract
+./network.sh deployCC -ccn spcontract -ccp ./chaincode/spcontract
 ./network.sh deployCC -ccn smscontract -ccp ./chaincode/smscontract
 ./network.sh deployCC -ccn ptkcontract -ccp ./chaincode/ptkcontract
 ./network.sh deployCC -ccn pdcontract -ccp ./chaincode/pdcontract

@@ -19,6 +19,7 @@ exports.createAcademicCertificate = async(req, res) => {
         argsIjazah = [idPT, idProdi, idMahasiswa, jenjangPendidikan, nomorIjazah, tanggalLulus]
         argsTranskrip = [idPT, idProdi, idMahasiswa, jenjangPendidikan, totalMutu, totalSks, ipk] 
         await certificateService.createIjazah(req.user.username, argsIjazah)
+        console.log("yaa")
         await certificateService.createTranskrip(req.user.username, argsTranskrip)
        
         res.status(201).send({
@@ -287,7 +288,7 @@ exports.getTranskripByIdPt = async(req, res) => {
         }
         const idPt = req.params.id
 
-        const result = await certificateService.getTranskripByIdPt(req.user.username, id)
+        const result = await certificateService.getTranskripByIdPt(req.user.username, idPt)
         res.status(200).send({
             result
         })

@@ -14,7 +14,7 @@ const registerUser = async(userId, organizationName, userType, dataUser = {}) =>
     const ccp = await fabric.getCcp(organizationName)
 
     // Create a new CA client for interacting with the CA.
-    const caURL = ccp.certificateAuthorities[`ca.${organizationName}.example.com`].url;
+    const caURL = ccp.certificateAuthorities[`ca.${organizationName.toLowerCase()}.example.com`].url;
     const ca = new FabricCAServices(caURL);
 
     const wallet = await fabric.getWallet(organizationName)
@@ -41,7 +41,7 @@ const registerUser = async(userId, organizationName, userType, dataUser = {}) =>
 
     // Register the user, enroll the user, and import the new identity into the wallet.
     const secret = await ca.register({
-        affiliation: `${organizationName}.department1`,
+        affiliation: `${organizationName.toLowerCase()}.department1`,
         enrollmentID: userId,
         role: 'client',
         attrs: [
@@ -62,7 +62,7 @@ const registerUser = async(userId, organizationName, userType, dataUser = {}) =>
             certificate: enrollment.certificate,
             privateKey: enrollment.key.toBytes(),
         },
-        mspId: `${organizationName.toUpperCase()}MSP`,
+        mspId: `${organizationName}MSP`,
         type: 'X.509',
     };
     await wallet.put(userId, x509Identity);
@@ -84,7 +84,7 @@ const enrollAdmin = async(adminId, adminSecret, organizationName) => {
     const ccp = await fabric.getCcp(organizationName)
 
     // Create a new CA client for interacting with the CA.
-    const caInfo = ccp.certificateAuthorities[`ca.${organizationName}.example.com`];
+    const caInfo = ccp.certificateAuthorities[`ca.${organizationName.toLowerCase()}.example.com`];
     const caTLSCACerts = caInfo.tlsCACerts.pem;
     const ca = new FabricCAServices(caInfo.url, { trustedRoots: caTLSCACerts, verify: false }, caInfo.caName);
 
@@ -104,7 +104,7 @@ const enrollAdmin = async(adminId, adminSecret, organizationName) => {
             certificate: enrollment.certificate,
             privateKey: enrollment.key.toBytes(),
         },
-        mspId: `${organizationName.toUpperCase()}MSP`,
+        mspId: `${organizationName}MSP`,
         type: 'X.509',
     };
     await wallet.put(adminId, x509Identity);
@@ -139,12 +139,14 @@ const loginUser = async(username, password) => {
     const userAttrs = await fabric.getUserAttrs(username, organizationName)
     const userPassword = userAttrs.find(e => e.name == "password").value
     const userType = userAttrs.find(e => e.name == "userType").value
+    const dataUser = userAttrs.find(e => e.name == "dataUser").value
 
     // Compare input password with password in CA
     if ( await bcrypt.compare(password, userPassword) ){
         const payload = {  
             "username": username,
-            "userType": userType 
+            "userType": userType ,
+            "dataUser": dataUser,
         }
         const token = jwt.sign(payload, 'secret_key', {expiresIn: "2h",});
 

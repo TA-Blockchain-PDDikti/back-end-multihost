@@ -7,13 +7,13 @@ const fs = require('fs');
 const getCcp = (organizationName) =>{
     // load the network configuration
 
-    const ccpPath = path.resolve(__dirname, '..', '..', '..', 'organizations', 'peerOrganizations', `${organizationName}.example.com`, `connection-${organizationName}.json`);
+    const ccpPath = path.resolve(__dirname, '..', '..', '..', 'organizations', 'peerOrganizations', `${organizationName.toLowerCase()}.example.com`, `connection-${organizationName.toLowerCase()}.json`);
     return JSON.parse(fs.readFileSync(ccpPath, 'utf8'));
 }
 
 const getWallet = async(org) => {
     // Create a new file system based wallet for managing identities.
-    const walletPath = path.join(process.cwd(), 'wallet', org);
+    const walletPath = path.join(process.cwd(), 'wallet', org.toLowerCase());
     return await Wallets.newFileSystemWallet(walletPath);
 }
 
@@ -36,7 +36,7 @@ const connectToNetwork = async(organizationName, chaincodeName, user) => {
 
         // Get the contract from the network.
         const contract = network.getContract(chaincodeName);
-
+        
         return {gateway, network, contract}
 
 }
