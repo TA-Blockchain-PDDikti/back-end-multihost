@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"strconv"
-	"time"
 
 	"github.com/hyperledger/fabric/common/flogging"
 	"github.com/hyperledger/fabric-chaincode-go/shim"
@@ -40,14 +39,8 @@ type Transkrip struct {
 	TotalMutu			int 			`json:"totalMutu"`
 	TotalSKS			int 			`json:"totalSks"`
 	IPK					float64			`json:"ipk"`
-	SignStep			int 			`json:"signStep"`
-	Signatures			[]SignatureTSK 	`json:"signatures"`
-}
-
-type SignatureTSK struct {
-	Sign			string 	`json:"sign"`
-	SignerId		string 	`json:"signerId"`
-	SignTime		string 	`json:"signTime"`
+	ApprovalStep		int 			`json:"approvalStep"`
+	Approvers			[]string 		`json:"Approvers"`
 }
 
 
@@ -130,8 +123,8 @@ func (s *TSKContract) CreateTsk (ctx contractapi.TransactionContextInterface) er
 		TotalMutu:			totalMutu,
 		TotalSKS:			totalSks,
 		IPK:				ipk,
-		SignStep:			0,
-		Signatures:			[]SignatureTSK{},
+		ApprovalStep:		0,
+		Approvers:			[]string{},
 	}
 
 	tskJSON, err := json.Marshal(tsk)
@@ -207,8 +200,8 @@ func (s *TSKContract) UpdateTsk (ctx contractapi.TransactionContextInterface) er
 		TotalMutu:			totalMutu,
 		TotalSKS:			totalSks,
 		IPK:				ipk,
-		SignStep:			0,
-		Signatures:			[]SignatureTSK{},
+		ApprovalStep:		0,
+		Approvers:			[]string{},
 	}
 
 	tskJSON, err := json.Marshal(tsk)
@@ -225,23 +218,22 @@ func (s *TSKContract) UpdateTsk (ctx contractapi.TransactionContextInterface) er
 }
 
 // ============================================================================================================================
-// AddTskSignature - Add Signature for an existing Transkrip Mahasiswa (TSK) in the world state.
-// Arguments - ID, Sign, Signer ID
+// AddTskApproval - Add Signature for an existing Transkrip Mahasiswa (TSK) in the world state.
+// Arguments - ID, Approver Id
 // ============================================================================================================================
 
-func (s *TSKContract) AddTskSignature (ctx contractapi.TransactionContextInterface) error {
+func (s *TSKContract) AddTskApproval (ctx contractapi.TransactionContextInterface) error {
 	args := ctx.GetStub().GetStringArgs()[1:]
 
-	logger.Infof("Run AddTskSignature function with args: %+q.", args)
+	logger.Infof("Run AddTskApproval function with args: %+q.", args)
 
-	if len(args) != 3 {
-		logger.Errorf(ER11, 3, len(args))
-		return fmt.Errorf(ER11, 3, len(args))
+	if len(args) != 2 {
+		logger.Errorf(ER11, 2, len(args))
+		return fmt.Errorf(ER11, 2, len(args))
 	}
 
 	id:= args[0]
-	sign:= args[1]
-	signerId:= args[2]
+	approver:= args[1]
 
 	exists, err := isTskExists(ctx, id)
 	if err != nil {
@@ -256,16 +248,8 @@ func (s *TSKContract) AddTskSignature (ctx contractapi.TransactionContextInterfa
 		return err
 	}
 
-	loc, _ := time.LoadLocation("Asia/Jakarta")
-
-	signature := SignatureTSK{
-		Sign:			sign,
-		SignerId:		signerId,
-		SignTime:		time.Now().In(loc).Format(time.RFC822),
-	}
-
-	tsk.Signatures = append(tsk.Signatures, signature)
-	tsk.SignStep = tsk.SignStep + 1
+	tsk.Approvers = append(tsk.Approvers, approver)
+	tsk.ApprovalStep = tsk.ApprovalStep + 1
 
 	tskJSON, err := json.Marshal(tsk)
 	if err != nil {
@@ -433,6 +417,54 @@ func (t *TSKContract) GetTskByIdPd(ctx contractapi.TransactionContextInterface) 
 
 
 // ============================================================================================================================
+// GetTskAddApprovalTxIdById - Get the Transkrip Mahasiswa (TSK) stored in the world state with given IdPd.
+// Arguments - ID
+// ============================================================================================================================
+
+func (t *TSKContract) GetTskAddApprovalTxIdById(ctx contractapi.TransactionContextInterface) ([]string, error) {
+	args := ctx.GetStub().GetStringArgs()[1:]
+
+	logger.Infof("Run GetTskAddApprovalTxIdById function with args: %+q.", args)
+
+	if len(args) != 1 {
+		logger.Errorf(ER11, 1, len(args))
+		return []string{}, fmt.Errorf(ER11, 1, len(args))
+	}
+
+	id:= args[0]
+
+	resultsIterator, err := ctx.GetStub().GetHistoryForKey(id)
+	if err != nil {
+		return []string{}, fmt.Errorf(err.Error())
+	}
+	defer resultsIterator.Close()
+
+	txIdList := []string{}
+
+	for resultsIterator.HasNext() {
+		response, err := resultsIterator.Next()
+		if err != nil {
+			return []string{}, fmt.Errorf(err.Error())
+		}
+
+		var tsk Transkrip
+		err = json.Unmarshal([]byte(response.Value), &tsk)
+		if err != nil {
+			return nil, fmt.Errorf(ER34, err)
+		}
+
+		if (tsk.ApprovalStep == 0) {
+			break
+		}
+
+		txIdList = append([]string{response.TxId}, txIdList[0:]...)
+	}
+
+	return txIdList, nil
+}
+
+
+// ============================================================================================================================
 // isTskExists - Returns true when Transkrip Mahasiswa (TSK) with given ID exists in world state.
 // ============================================================================================================================
 
@@ -456,21 +488,21 @@ func isTskExists(ctx contractapi.TransactionContextInterface, id string) (bool, 
 func getTskStateById(ctx contractapi.TransactionContextInterface, id string) (*Transkrip, error) {
 	logger.Infof("Run getTskStateById function with id: '%s'.", id)
 
-	npdJSON, err := ctx.GetStub().GetState(id)
+	tskJSON, err := ctx.GetStub().GetState(id)
 	if err != nil {
 		return nil, fmt.Errorf(ER32, err)
 	}
-	if npdJSON == nil {
+	if tskJSON == nil {
 		return nil, fmt.Errorf(ER13, id)
 	}
 
-	var npd Transkrip
-	err = json.Unmarshal(npdJSON, &npd)
+	var tsk Transkrip
+	err = json.Unmarshal(tskJSON, &tsk)
 	if err != nil {
 		return nil, fmt.Errorf(ER34, err)
 	}
 
-	return &npd, nil
+	return &tsk, nil
 }
 
 

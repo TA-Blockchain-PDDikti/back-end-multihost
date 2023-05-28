@@ -37,8 +37,7 @@ type PendidikTenagaKependidikan struct {
 	NIDN				string `json:"nidn"`
 	Jabatan				string `json:"jabatan"`
 	NomorSK				string `json:"nomorSk"`
-	SignaturePTK		string `json:"signaturePtk"`
-	SignatureJabatan	string `json:"signatureJabatan"`
+	Username			string `json:"username"`
 }
 
 
@@ -61,7 +60,7 @@ const (
 
 // ============================================================================================================================
 // CreatePtk - Issues a new Pendidik dan Tenaga Kependidikan (PTK) to the world state with given details.
-// Arguments - ID, Id SP, Id SMS, Nama PTK
+// Arguments - ID, Id SP, Id SMS, Nama PTK, NIDN, Jabatan, Nomor SK, Username PTK
 // ============================================================================================================================
 
 func (s *PTKContract) CreatePtk(ctx contractapi.TransactionContextInterface) error {
@@ -69,15 +68,19 @@ func (s *PTKContract) CreatePtk(ctx contractapi.TransactionContextInterface) err
 
 	logger.Infof("Run CreatePtk function with args: %+q.", args)
 
-	if len(args) != 4 {
-		logger.Errorf(ER11, 4, len(args))
-		return fmt.Errorf(ER11, 4, len(args))
+	if len(args) != 8 {
+		logger.Errorf(ER11, 8, len(args))
+		return fmt.Errorf(ER11, 8, len(args))
 	}
 
 	id:= args[0]
 	idSp:= args[1]
 	idSms:= args[2]
 	namaPtk:= args[3]
+	nidn:= args[4]
+	jabatan:= args[5]
+	nomorSk:= args[6]
+	username:= args[7]
 
 	exists, err := isPtkExists(ctx, id)
 	if err != nil {
@@ -93,11 +96,10 @@ func (s *PTKContract) CreatePtk(ctx contractapi.TransactionContextInterface) err
 		IdSP:				idSp,
 		IdSMS:				idSms,
 		NamaPTK:			namaPtk,
-		NIDN:				"",
-		Jabatan:			"",
-		NomorSK:			"",
-		SignaturePTK:		"",
-		SignatureJabatan:	"",
+		NIDN:				nidn,
+		Jabatan:			jabatan,
+		NomorSK:			nomorSk,
+		Username:			username,
 	}
 
 	ptkJSON, err := json.Marshal(ptk)
@@ -116,7 +118,7 @@ func (s *PTKContract) CreatePtk(ctx contractapi.TransactionContextInterface) err
 
 // ============================================================================================================================
 // UpdatePtk - Updates an existing Pendidik dan Tenaga Kependidikan (PTK) in the world state with provided parameters.
-// Arguments - ID, Id SP, Id SMS, Nama PTK
+// Arguments - ID, Id SP, Id SMS, Nama PTK, NIDN, Jabatan, Nomor SK
 // ============================================================================================================================
 
 func (s *PTKContract) UpdatePtk(ctx contractapi.TransactionContextInterface) error {
@@ -124,23 +126,18 @@ func (s *PTKContract) UpdatePtk(ctx contractapi.TransactionContextInterface) err
 
 	logger.Infof("Run UpdatePtk function with args: %+q.", args)
 
-	if len(args) != 4 {
-		logger.Errorf(ER11, 4, len(args))
-		return fmt.Errorf(ER11, 4, len(args))
+	if len(args) != 7 {
+		logger.Errorf(ER11, 7, len(args))
+		return fmt.Errorf(ER11, 7, len(args))
 	}
 
 	id:= args[0]
 	idSp:= args[1]
 	idSms:= args[2]
 	namaPtk:= args[3]
-
-	exists, err := isPtkExists(ctx, id)
-	if err != nil {
-		return err
-	}
-	if !exists {
-		return fmt.Errorf(ER13, id)
-	}
+	nidn:= args[4]
+	jabatan:= args[5]
+	nomorSk:= args[6]
 
 	ptk, err := getPtkStateById(ctx, id)
 	if err != nil {
@@ -150,109 +147,9 @@ func (s *PTKContract) UpdatePtk(ctx contractapi.TransactionContextInterface) err
 	ptk.IdSP = idSp
 	ptk.IdSMS = idSms
 	ptk.NamaPTK = namaPtk
-	ptk.SignaturePTK = ""
-	ptk.SignatureJabatan = ""
-
-	ptkJSON, err := json.Marshal(ptk)
-	if err != nil {
-		return err
-	}
-
-	err = ctx.GetStub().PutState(id, ptkJSON)
-	if err != nil {
-		logger.Errorf(ER31, err)
-	}
-
-	return err
-}
-
-
-// ============================================================================================================================
-// UpdatePtkNidnAndSign - Updates NIDN and SiganturePTK of an existing Pendidik dan Tenaga Kependidikan (PTK) in the world state.
-// Arguments - ID, NIDN, SignaturePTK
-// ============================================================================================================================
-
-func (s *PTKContract) UpdatePtkNidnAndSign(ctx contractapi.TransactionContextInterface) error {
-	args := ctx.GetStub().GetStringArgs()[1:]
-
-	logger.Infof("Run UpdatePtkNidnAndSign function with args: %+q.", args)
-
-	if len(args) != 3 {
-		logger.Errorf(ER11, 3, len(args))
-		return fmt.Errorf(ER11, 3, len(args))
-	}
-
-	id:= args[0]
-	nidn:= args[1]
-	signaturePtk:= args[2]
-
-	exists, err := isPtkExists(ctx, id)
-	if err != nil {
-		return err
-	}
-	if !exists {
-		return fmt.Errorf(ER13, id)
-	}
-
-	ptk, err := getPtkStateById(ctx, id)
-	if err != nil {
-		return err
-	}
-
 	ptk.NIDN = nidn
-	ptk.SignaturePTK = signaturePtk
-	ptk.SignatureJabatan = ""
-
-	ptkJSON, err := json.Marshal(ptk)
-	if err != nil {
-		return err
-	}
-
-	err = ctx.GetStub().PutState(id, ptkJSON)
-	if err != nil {
-		logger.Errorf(ER31, err)
-	}
-
-	return err
-}
-
-
-// ============================================================================================================================
-// UpdatePtkJabatanAndSign - Updates NIDN and SiganturePTK of an existing Pendidik dan Tenaga Kependidikan (PTK) in the world state.
-// Arguments - ID, Jabatan, Nomor SK, SignaturePTK
-// ============================================================================================================================
-
-func (s *PTKContract) UpdatePtkJabatanAndSign(ctx contractapi.TransactionContextInterface) error {
-	args := ctx.GetStub().GetStringArgs()[1:]
-
-	logger.Infof("Run UpdatePtkJabatanAndSign function with args: %+q.", args)
-
-	if len(args) != 4 {
-		logger.Errorf(ER11, 4, len(args))
-		return fmt.Errorf(ER11, 4, len(args))
-	}
-
-	id:= args[0]
-	jabatan:= args[1]
-	nomorSk:= args[2]
-	signatureJabatan:= args[3]
-
-	exists, err := isPtkExists(ctx, id)
-	if err != nil {
-		return err
-	}
-	if !exists {
-		return fmt.Errorf(ER13, id)
-	}
-
-	ptk, err := getPtkStateById(ctx, id)
-	if err != nil {
-		return err
-	}
-
 	ptk.Jabatan = jabatan
 	ptk.NomorSK = nomorSk
-	ptk.SignatureJabatan = signatureJabatan
 
 	ptkJSON, err := json.Marshal(ptk)
 	if err != nil {
@@ -344,21 +241,12 @@ func (s *PTKContract) GetPtkById(ctx contractapi.TransactionContextInterface) (*
 
 	id:= args[0]
 
-	ptkJSON, err := ctx.GetStub().GetState(id)
+	ptk, err := getPtkStateById(ctx, id)
 	if err != nil {
-		return nil, fmt.Errorf(ER32, err)
-	}
-	if ptkJSON == nil {
-		return nil, fmt.Errorf(ER13, id)
+		return nil, err
 	}
 
-	var ptk PendidikTenagaKependidikan
-	err = json.Unmarshal(ptkJSON, &ptk)
-	if err != nil {
-		return nil, fmt.Errorf(ER34, err)
-	}
-
-	return &ptk, nil
+	return ptk, nil
 }
 
 

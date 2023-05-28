@@ -36,6 +36,7 @@ type PesertaDidik struct {
 	IdSMS				string 	`json:"idSms"`
 	NamaPD				string 	`json:"namaPd"`
 	NIPD				string 	`json:"nipd"`
+	Username			string 	`json:"username"`
 	TotalMutu			int 	`json:"totalMutu"`
 	TotalSKS			int 	`json:"totalSks"`
 	IPK					float64	`json:"ipk"`
@@ -74,7 +75,7 @@ const (
 
 // ============================================================================================================================
 // CreatePd - Issues a new Peserta Didik (PD) to the world state with given details.
-// Arguments - ID, Id SP, Id SMS, Nama PD, NIPD
+// Arguments - ID, Id SP, Id SMS, Nama PD, NIPD, Username
 // ============================================================================================================================
 
 func (s *PDContract) CreatePd(ctx contractapi.TransactionContextInterface) error {
@@ -82,9 +83,9 @@ func (s *PDContract) CreatePd(ctx contractapi.TransactionContextInterface) error
 
 	logger.Infof("Run CreatePd function with args: %+q.", args)
 
-	if len(args) != 5 {
-		logger.Errorf(ER11, 5, len(args))
-		return fmt.Errorf(ER11, 5, len(args))
+	if len(args) != 6 {
+		logger.Errorf(ER11, 6, len(args))
+		return fmt.Errorf(ER11, 6, len(args))
 	}
 
 	id:= args[0]
@@ -92,6 +93,7 @@ func (s *PDContract) CreatePd(ctx contractapi.TransactionContextInterface) error
 	idSms:= args[2]
 	namaPd:= args[3]
 	nipd:= args[4]
+	username:= args[5]
 
 	exists, err := isPdExists(ctx, id)
 	if err != nil {
@@ -108,6 +110,7 @@ func (s *PDContract) CreatePd(ctx contractapi.TransactionContextInterface) error
 		IdSMS:				idSms,
 		NamaPD:				namaPd,
 		NIPD:				nipd,
+		Username:			username,
 		TotalMutu:			0,
 		TotalSKS:			0,
 		IPK:				0.00,
@@ -148,14 +151,6 @@ func (s *PDContract) UpdatePd(ctx contractapi.TransactionContextInterface) error
 	idSms:= args[2]
 	namaPd:= args[3]
 	nipd:= args[4]
-
-	exists, err := isPdExists(ctx, id)
-	if err != nil {
-		return err
-	}
-	if !exists {
-		return fmt.Errorf(ER13, id)
-	}
 
 	pd, err := getPdStateById(ctx, id)
 	if err != nil {
@@ -201,18 +196,9 @@ func (s *PDContract) UpdatePdRecord(ctx contractapi.TransactionContextInterface)
 	totalSksStr:= args[2]
 	ipkStr:= args[3]
 
-	exists, err := isPdExists(ctx, id)
+	pd, err := getPdStateById(ctx, id)
 	if err != nil {
 		return err
-	}
-	if !exists {
-		return fmt.Errorf(ER13, id)
-	}
-
-	ipk, err := strconv.ParseFloat(ipkStr, 64)
-	if err != nil {
-		logger.Errorf(ER36, id)
-		return fmt.Errorf(ER36, id)
 	}
 
 	totalMutu, err := strconv.Atoi(totalMutuStr)
@@ -227,9 +213,10 @@ func (s *PDContract) UpdatePdRecord(ctx contractapi.TransactionContextInterface)
 		return fmt.Errorf(ER35, id)
 	}
 
-	pd, err := getPdStateById(ctx, id)
+	ipk, err := strconv.ParseFloat(ipkStr, 64)
 	if err != nil {
-		return err
+		logger.Errorf(ER36, id)
+		return fmt.Errorf(ER36, id)
 	}
 
 	pd.TotalMutu = totalMutu
@@ -266,14 +253,6 @@ func (s *PDContract) SetPdGraduated(ctx contractapi.TransactionContextInterface)
 	}
 
 	id:= args[0]
-
-	exists, err := isPdExists(ctx, id)
-	if err != nil {
-		return err
-	}
-	if !exists {
-		return fmt.Errorf(ER13, id)
-	}
 
 	pd, err := getPdStateById(ctx, id)
 	if err != nil {
