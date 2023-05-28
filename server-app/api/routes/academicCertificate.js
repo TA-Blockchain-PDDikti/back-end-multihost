@@ -6,7 +6,6 @@ certificateRouter.use(auth)
 
 certificateRouter.post('/', certificateController.createAcademicCertificate)
 certificateRouter.post('/sign/:id', certificateController.signIjazah)
-certificateRouter.post('/identifier/', certificateController.generateIdentifier)
 certificateRouter.get('/identifier/', certificateController.getIdentifier)
 certificateRouter.post('/verify/', certificateController.verify)
 certificateRouter.post('/signer/', certificateController.addSigner)

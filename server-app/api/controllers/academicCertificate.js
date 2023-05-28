@@ -1,4 +1,4 @@
-const certificateService = require('../services/acdemicCertificate.js')
+const certificateService = require('../services/academicCertificate.js')
 
 exports.createAcademicCertificate = async(req, res) => {
     try {
@@ -99,11 +99,13 @@ exports.signIjazah = async(req, res) => {
             return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
         }
         const data = req.body;
-        const name = data.nama;
+        const idIjazah = data.idIjazah;
+        const idSigner = data.idSigner
 
-        const result = await certificateService.signIjazah(req.user.username, name)
+        const args = [idIjazah, idSigner]
+        const result = await certificateService.signIjazah(req.user.username, args)
         res.status(200).send({
-            message: "Ijazah is signed",
+            message: `Ijazah ditandatangani oleh ${idSigner}`,
             result
         })
     } catch(error){
@@ -122,30 +124,9 @@ exports.getIdentifier = async(req, res) => {
         const data = req.body;
         const name = data.nama;
 
-        const result = await certificateService.getIdentifier(req.user.username, name)
+        const identifier = await certificateService.getIdentifier(req.user.username, name)
         res.status(200).send({
-            result
-        })
-    } catch(error){
-        res.status(400).send({
-            success: false,
-            error: error.toString(),
-        })      
-    }
-}
-
-exports.generateIdentifier = async(req, res) => {
-    try {
-        if (req.user.userType != "admin PT") {
-            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
-        }
-        const data = req.body;
-        const name = data.nama;
-
-        const result = await certificateService.generateIdentifier(req.user.username, name)
-        res.status(201).send({
-            message: "Identifier is generated",
-            result
+            identifier
         })
     } catch(error){
         res.status(400).send({
@@ -183,10 +164,7 @@ exports.verify = async(req, res) => {
         const name = data.nama;
 
         const result = await certificateService.verify(req.user.username, name)
-        res.status(200).send({
-            message: "Ijazah and Transkrip is verified",
-            result
-        })
+        res.status(200).send(result)
     } catch(error){
         res.status(400).send({
             success: false,
