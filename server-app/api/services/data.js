@@ -1,34 +1,6 @@
 
 const fabric = require("../utils/fabric.js")
 const { getAllParser, getParser } = require('../utils/converter.js')
-const { BlockDecoder} = require('fabric-common');
-const fs = require('fs');
-const path = require('path');
-const date = require('date-and-time')
-
-var sha = require('js-sha256');
-var asn = require('asn1.js');
-
-var calculateBlockHash = function(header) {
-  let headerAsn = asn.define('headerAsn', function() {
-    this.seq().obj(
-      this.key('Number').int(),
-      this.key('PreviousHash').octstr(),
-     this.key('DataHash').octstr()
-   );
- });
-
-  let output = headerAsn.encode({
-      Number: parseInt(header.number),
-      PreviousHash: Buffer.from(header.previous_hash, 'hex'),
-      DataHash: Buffer.from(header.data_hash, 'hex')
-    }, 'der');
-console.log('output',output)
-  let hash = sha.sha256(output);
-  console.log('hash',hash)
-  return hash;
-};
-
 
 exports.createPT = async(user, args) => {
     // Add 'pendidikan tinggi' data to blockchain
@@ -220,7 +192,6 @@ exports.createMataKuliah = async(user, args) => {
 }
 
 exports.updateMataKuliah = async(user, args) => {
-    console.log(idProdi, idPt)
     const network = await fabric.connectToNetwork("HE1", "mkcontract", user)
     const result = await network.contract.submitTransaction("UpdateMk", ...args)
     network.gateway.disconnect()

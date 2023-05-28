@@ -251,7 +251,8 @@ exports.createDosen = async(req, res) => {
         const nama = data.nama;
         const username = data.username;
         const jabatan = data.jabatan;
-        const nipd = data.nipd;
+        const nidn = data.nidn;
+        const nomorSk = data.nomorSk;
         var id = data.id;
         
         // Randomize unique Id if there is no request id given
@@ -262,7 +263,7 @@ exports.createDosen = async(req, res) => {
          // Register dosen identity to CA
         const registerAkun = await userService.registerUser(username, 'HE1', "dosen")
 
-        args = [id, idPT, idProdi, nama, jabatan, nipd, username]
+        args = [id, idPT, idProdi, nama, nidn, jabatan, nomorSk, username]
         await dataService.createDosen(req.user.username, args)
         res.status(201).send({
             success: true,
@@ -290,9 +291,10 @@ exports.updateDosen = async(req, res) => {
         const nama = data.nama;
         const idDosen = req.params.id
         const jabatan = data.jabatan;
-        const nipd = data.nipd;
+        const nidn = data.nidn;
+        const nomorSk = data.nomorSk;
 
-        args = [idDosen, idPT, idProdi, nama, jabatan, nipd]
+        args = [idDosen, idPT, idProdi, nama, nidn, jabatan, nomorSk]
         const result = await dataService.updateDosen(req.user.username, args)
         res.status(200).send({
             success: true,

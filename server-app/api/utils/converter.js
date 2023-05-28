@@ -29,8 +29,8 @@ const parser = async(result) => {
         const data = await dataService.getMataKuliahById('admin', id)
         result.mk = {
             "id": id,
-            "nama": data.namaMk
-            //"kodeMk": data.kodeMk,
+            "nama": data.namaMk,
+            "kodeMk": data.kodeMk,
         }
         delete result.idMk
     }
