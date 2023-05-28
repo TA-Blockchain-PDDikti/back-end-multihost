@@ -146,14 +146,6 @@ func (s *KLSContract) UpdateKls(ctx contractapi.TransactionContextInterface) err
 	semester:= args[4]
 	sksStr:= args[5]
 
-	exists, err := isKlsExists(ctx, id)
-	if err != nil {
-		return err
-	}
-	if !exists {
-		return fmt.Errorf(ER13, id)
-	}
-
 	kls, err := getKlsStateById(ctx, id)
 	if err != nil {
 		return err
@@ -203,14 +195,6 @@ func (s *KLSContract) UpdateKlsListPtk(ctx contractapi.TransactionContextInterfa
 	id:= args[0]
 	listPtkStr:= args[1]
 
-	exists, err := isKlsExists(ctx, id)
-	if err != nil {
-		return err
-	}
-	if !exists {
-		return fmt.Errorf(ER13, id)
-	}
-
 	kls, err := getKlsStateById(ctx, id)
 	if err != nil {
 		return err
@@ -254,14 +238,6 @@ func (s *KLSContract) UpdateKlsListPd(ctx contractapi.TransactionContextInterfac
 
 	id:= args[0]
 	listPdStr:= args[1]
-
-	exists, err := isKlsExists(ctx, id)
-	if err != nil {
-		return err
-	}
-	if !exists {
-		return fmt.Errorf(ER13, id)
-	}
 
 	kls, err := getKlsStateById(ctx, id)
 	if err != nil {
