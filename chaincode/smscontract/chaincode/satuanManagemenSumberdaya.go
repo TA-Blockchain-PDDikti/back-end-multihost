@@ -3,6 +3,8 @@ package chaincode
 import (
 	"encoding/json"
 	"fmt"
+	"regexp"
+	"strings"
 
 	"github.com/hyperledger/fabric/common/flogging"
 	"github.com/hyperledger/fabric-chaincode-go/shim"
@@ -30,10 +32,12 @@ type SMSContract struct {
 // ============================================================================================================================
 
 type SatuanManagemenSumberdaya struct {
-	ID      			string `json:"id"`
-	IdSP				string `json:"idSp"`
-	NamaSMS				string `json:"namaSms"`
-	JenjangPendidikan	string `json:"jejangPendidikan"`
+	ID      			string 		`json:"id"`
+	IdSP				string 		`json:"idSp"`
+	NamaSMS				string 		`json:"namaSms"`
+	JenjangPendidikan	string 		`json:"jenjangPendidikan"`
+	SignersTSK			[]string 	`json:"signersTsk"`
+	SignersIJZ			[]string 	`json:"signersIjz"`
 }
 
 
@@ -72,7 +76,7 @@ func (s *SMSContract) CreateSms(ctx contractapi.TransactionContextInterface) err
 	id:= args[0]
 	idSp:= args[1]
 	namaSms:= args[2]
-	jejangPendidikan:= args[3]
+	jenjangPendidikan:= args[3]
 
 	exists, err := isSmsExists(ctx, id)
 	if err != nil {
@@ -87,7 +91,9 @@ func (s *SMSContract) CreateSms(ctx contractapi.TransactionContextInterface) err
 		ID:      			id,
 		IdSP:				idSp,
 		NamaSMS:			namaSms,
-		JenjangPendidikan:	jejangPendidikan,
+		JenjangPendidikan:	jenjangPendidikan,
+		SignersTSK:			[]string{},
+		SignersIJZ:			[]string{},
 	}
 
 	smsJSON, err := json.Marshal(sms)
@@ -122,7 +128,48 @@ func (s *SMSContract) UpdateSms(ctx contractapi.TransactionContextInterface) err
 	id:= args[0]
 	idSp:= args[1]
 	namaSms:= args[2]
-	jejangPendidikan:= args[3]
+	jenjangPendidikan:= args[3]
+
+	sms, err := getSmsStateById(ctx, id)
+	if err != nil {
+		return err
+	}
+
+	sms.IdSP = idSp
+	sms.NamaSMS = namaSms
+	sms.JenjangPendidikan = jenjangPendidikan
+
+	smsJSON, err := json.Marshal(sms)
+	if err != nil {
+		return err
+	}
+
+	err = ctx.GetStub().PutState(id, smsJSON)
+	if err != nil {
+		logger.Errorf(ER31, err)
+	}
+
+	return err
+}
+
+
+// ============================================================================================================================
+// UpdateSmsSignersTsk - Updates an existing Satuan Managemen Sumberdaya (SMS) in the world state with provided parameters.
+// Arguments - ID, Signers TSK
+// ============================================================================================================================
+
+func (s *SMSContract) UpdateSmsSignersTsk(ctx contractapi.TransactionContextInterface) error {
+	args := ctx.GetStub().GetStringArgs()[1:]
+
+	logger.Infof("Run UpdateSmsSignersTsk function with args: %+q.", args)
+
+	if len(args) != 2 {
+		logger.Errorf(ER11, 2, len(args))
+		return fmt.Errorf(ER11, 2, len(args))
+	}
+
+	id:= args[0]
+	signersTskStr:= args[1]
 
 	exists, err := isSmsExists(ctx, id)
 	if err != nil {
@@ -132,12 +179,70 @@ func (s *SMSContract) UpdateSms(ctx contractapi.TransactionContextInterface) err
 		return fmt.Errorf(ER13, id)
 	}
 
-	sms := SatuanManagemenSumberdaya{
-		ID:      			id,
-		IdSP:				idSp,
-		NamaSMS:			namaSms,
-		JenjangPendidikan:	jejangPendidikan,
+	sms, err := getSmsStateById(ctx, id)
+	if err != nil {
+		return err
 	}
+
+	signersTskStr = strings.Replace(signersTskStr, "[", "", -1)
+	signersTskStr = strings.Replace(signersTskStr, "]", "", -1)
+	splitter := regexp.MustCompile(`, `)
+	signersTsk :=  splitter.Split(signersTskStr, -1)
+
+	sms.SignersTSK = signersTsk
+
+	smsJSON, err := json.Marshal(sms)
+	if err != nil {
+		return err
+	}
+
+	err = ctx.GetStub().PutState(id, smsJSON)
+	if err != nil {
+		logger.Errorf(ER31, err)
+	}
+
+	return err
+}
+
+
+
+// ============================================================================================================================
+// UpdateSmsSignersIjz - Updates an existing Satuan Managemen Sumberdaya (SMS) in the world state with provided parameters.
+// Arguments - ID, Signers IJZ
+// ============================================================================================================================
+
+func (s *SMSContract) UpdateSmsSignersIjz(ctx contractapi.TransactionContextInterface) error {
+	args := ctx.GetStub().GetStringArgs()[1:]
+
+	logger.Infof("Run UpdateSmsSignersIjz function with args: %+q.", args)
+
+	if len(args) != 2 {
+		logger.Errorf(ER11, 2, len(args))
+		return fmt.Errorf(ER11, 2, len(args))
+	}
+
+	id:= args[0]
+	signersIjzStr:= args[1]
+
+	exists, err := isSmsExists(ctx, id)
+	if err != nil {
+		return err
+	}
+	if !exists {
+		return fmt.Errorf(ER13, id)
+	}
+
+	sms, err := getSmsStateById(ctx, id)
+	if err != nil {
+		return err
+	}
+
+	signersIjzStr = strings.Replace(signersIjzStr, "[", "", -1)
+	signersIjzStr = strings.Replace(signersIjzStr, "]", "", -1)
+	splitter := regexp.MustCompile(`, `)
+	signersIjz :=  splitter.Split(signersIjzStr, -1)
+
+	sms.SignersIJZ = signersIjz
 
 	smsJSON, err := json.Marshal(sms)
 	if err != nil {
@@ -229,21 +334,12 @@ func (s *SMSContract) GetSmsById(ctx contractapi.TransactionContextInterface) (*
 
 	id:= args[0]
 
-	smsJSON, err := ctx.GetStub().GetState(id)
+	sms, err := getSmsStateById(ctx, id)
 	if err != nil {
-		return nil, fmt.Errorf(ER32, err)
-	}
-	if smsJSON == nil {
-		return nil, fmt.Errorf(ER13, id)
+		return nil, err
 	}
 
-	var sms SatuanManagemenSumberdaya
-	err = json.Unmarshal(smsJSON, &sms)
-	if err != nil {
-		return nil, fmt.Errorf(ER34, err)
-	}
-
-	return &sms, nil
+	return sms, nil
 }
 
 
@@ -283,6 +379,31 @@ func isSmsExists(ctx contractapi.TransactionContextInterface, id string) (bool, 
 	}
 
 	return smsJSON != nil, nil
+}
+
+
+// ============================================================================================================================
+// getSmsStateById - Get SMS state with given id.
+// ============================================================================================================================
+
+func getSmsStateById(ctx contractapi.TransactionContextInterface, id string) (*SatuanManagemenSumberdaya, error) {
+	logger.Infof("Run getSmsStateById function with id: '%s'.", id)
+
+	smsJSON, err := ctx.GetStub().GetState(id)
+	if err != nil {
+		return nil, fmt.Errorf(ER32, err)
+	}
+	if smsJSON == nil {
+		return nil, fmt.Errorf(ER13, id)
+	}
+
+	var sms SatuanManagemenSumberdaya
+	err = json.Unmarshal(smsJSON, &sms)
+	if err != nil {
+		return nil, fmt.Errorf(ER34, err)
+	}
+
+	return &sms, nil
 }
 
 
