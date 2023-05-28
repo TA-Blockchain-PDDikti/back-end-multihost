@@ -33,6 +33,7 @@ type SatuanPendidikan struct {
 	ID      		string `json:"id"`
 	IdMSP			string `json:"idMsp"`
 	NamaSP			string `json:"namaSp"`
+	UsernameAdmin	string `json:"usernameAdmin"`
 }
 
 
@@ -55,7 +56,7 @@ const (
 
 // ============================================================================================================================
 // CreateSp - Issues a new Satuan Pendidikan (SP) to the world state with given details.
-// Arguments - ID, Id MSP, Nama SP
+// Arguments - ID, Id MSP, Nama SP, Username Admin SP
 // ============================================================================================================================
 
 func (s *SPContract) CreateSp(ctx contractapi.TransactionContextInterface) error {
@@ -63,14 +64,15 @@ func (s *SPContract) CreateSp(ctx contractapi.TransactionContextInterface) error
 
 	logger.Infof("Run CreateSp function with args: %+q.", args)
 
-	if len(args) != 3 {
-		logger.Errorf(ER11, 3, len(args))
-		return fmt.Errorf(ER11, 3, len(args))
+	if len(args) != 4 {
+		logger.Errorf(ER11, 4, len(args))
+		return fmt.Errorf(ER11, 4, len(args))
 	}
 
 	id:= args[0]
 	idMsp:= args[1]
 	namaSp:= args[2]
+	usernameAdmin:= args[3]
 
 	exists, err := isSpExists(ctx, id)
 	if err != nil {
@@ -85,6 +87,7 @@ func (s *SPContract) CreateSp(ctx contractapi.TransactionContextInterface) error
 		ID:      		id,
 		IdMSP:			idMsp,
 		NamaSP:			namaSp,
+		UsernameAdmin:	usernameAdmin,
 	}
 
 	spJSON, err := json.Marshal(sp)
@@ -120,19 +123,13 @@ func (s *SPContract) UpdateSp(ctx contractapi.TransactionContextInterface) error
 	idMsp:= args[1]
 	namaSp:= args[2]
 
-	exists, err := isSpExists(ctx, id)
+	sp, err := getSpStateById(ctx, id)
 	if err != nil {
 		return err
 	}
-	if !exists {
-		return fmt.Errorf(ER13, id)
-	}
 
-	sp := SatuanPendidikan{
-		ID:      		id,
-		IdMSP:			idMsp,
-		NamaSP:			namaSp,
-	}
+	sp.IdMSP = idMsp
+	sp.NamaSP = namaSp
 
 	spJSON, err := json.Marshal(sp)
 	if err != nil {
@@ -224,21 +221,12 @@ func (s *SPContract) GetSpById(ctx contractapi.TransactionContextInterface) (*Sa
 
 	id:= args[0]
 
-	spJSON, err := ctx.GetStub().GetState(id)
+	sp, err := getSpStateById(ctx, id)
 	if err != nil {
-		return nil, fmt.Errorf(ER32, err)
-	}
-	if spJSON == nil {
-		return nil, fmt.Errorf(ER13, id)
+		return nil, err
 	}
 
-	var sp SatuanPendidikan
-	err = json.Unmarshal(spJSON, &sp)
-	if err != nil {
-		return nil, fmt.Errorf(ER34, err)
-	}
-
-	return &sp, nil
+	return sp, nil
 }
 
 
@@ -256,6 +244,31 @@ func isSpExists(ctx contractapi.TransactionContextInterface, id string) (bool, e
 	}
 
 	return spJSON != nil, nil
+}
+
+
+// ============================================================================================================================
+// getSpStateById - Get SP state with given id.
+// ============================================================================================================================
+
+func getSpStateById(ctx contractapi.TransactionContextInterface, id string) (*SatuanPendidikan, error) {
+	logger.Infof("Run getSpStateById function with id: '%s'.", id)
+
+	spJSON, err := ctx.GetStub().GetState(id)
+	if err != nil {
+		return nil, fmt.Errorf(ER32, err)
+	}
+	if spJSON == nil {
+		return nil, fmt.Errorf(ER13, id)
+	}
+
+	var sp SatuanPendidikan
+	err = json.Unmarshal(spJSON, &sp)
+	if err != nil {
+		return nil, fmt.Errorf(ER34, err)
+	}
+
+	return &sp, nil
 }
 
 
