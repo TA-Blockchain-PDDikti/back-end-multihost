@@ -5,10 +5,10 @@ const auth = require('../middleware/auth.js')
 certificateRouter.use(auth)
 
 certificateRouter.post('/', certificateController.createAcademicCertificate)
-certificateRouter.post('/sign/:id', certificateController.signIjazah)
+certificateRouter.post('/approve/:id', certificateController.approveIjazah)
 certificateRouter.get('/identifier/', certificateController.getIdentifier)
 certificateRouter.post('/verify/', certificateController.verify)
-certificateRouter.post('/signer/', certificateController.addSigner)
+certificateRouter.post('/approver/', certificateController.addApprover)
 
 // Ijazah
 certificateRouter.get('/ijazah/', certificateController.getAllIjazah)

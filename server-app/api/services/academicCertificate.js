@@ -1,7 +1,7 @@
 const fabric = require("../utils/fabric.js")
 const { v4: uuidv4 } = require('uuid')
 const { getAllParser, getParser } = require('../utils/converter.js')
-const { BlockDecoder} = require('fabric-common');
+const { BlockDecoder } = require('fabric-common');
 const { getAcademicRecordByIdMhsw } = require('./academicRecord.js')
 
 // Ijazah
@@ -110,8 +110,13 @@ exports.getTranskripByIdMahasiswa = async(user, idTsk) => {
 
 
 // Sign and Verify----------------------------------------------------------
+exports.setGraduated = async(user, idMahasiswa) => {
+    const network = await fabric.connectToNetwork("HE1", "pdcontract", user)
+    await network.contract.submitTransaction("SetPdGraduated", idMahasiswa)
+    network.gateway.disconnect()
+}
 
-exports.signIjazah = async(user, args) => {
+exports.approveIjazah = async(user, args) => {
     const network = await fabric.connectToNetwork("HE1", "ijzcontract", user)
     const result = await network.contract.submitTransaction( "AddIjzSignature", ...args)
     network.gateway.disconnect()
@@ -133,7 +138,7 @@ exports.getIdentifier = async(user, idMahasiswa) => {
     return identifier;
 }
 
-exports.addSigner = async(user, nama) => {
+exports.addApprover = async(user, nama) => {
     const network = await fabric.connectToNetwork("HE1", "he", user)
     const result = await network.contract.submitTransaction( "DeleteIjz", "args" )
     network.gateway.disconnect()

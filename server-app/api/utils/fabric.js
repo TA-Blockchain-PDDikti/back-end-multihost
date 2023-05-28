@@ -68,8 +68,6 @@ const getUserAttrs = async(username, organizationName) => {
 
     // Get user attr 
     const userAttrs = userIdentity.result.attrs
-
-    console.log(userAttrs)
     return userAttrs
 }
 

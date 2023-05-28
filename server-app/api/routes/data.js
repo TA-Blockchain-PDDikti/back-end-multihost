@@ -24,13 +24,12 @@ dataRouter.post('/dosen', dataController.createDosen)
 dataRouter.get('/dosen', dataController.getAllDosen)
 dataRouter.get('/dosen/:id', dataController.getDosenById)
 dataRouter.get('/dosen/pt/:id', dataController.getDosenByPT)
+dataRouter.get('/dosen/approval', dataController.getApprovalByPT)
 dataRouter.put('/dosen/:id', dataController.updateDosen)
-dataRouter.put('/dosen/sign/:id', dataController.signDosen)
 dataRouter.delete('/dosen/:id', dataController.deleteDosen)
 
 //mahasiswa
 dataRouter.post('/mahasiswa', dataController.createMahasiswa)
-dataRouter.post('/mahasiswa/setLulus', dataController.setGraduated)
 dataRouter.get('/mahasiswa', dataController.getAllMahasiswa)
 dataRouter.get('/mahasiswa/pt/:id', dataController.getMahasiswaByPT)
 dataRouter.get('/mahasiswa/:id', dataController.getMahasiswaById)
@@ -50,16 +49,13 @@ dataRouter.delete('/matkul/:id', dataController.deleteMataKuliah)
 dataRouter.post('/kelas', dataController.createKelas)
 dataRouter.get('/kelas', dataController.getAllKelas)
 dataRouter.get('/kelas/:id', dataController.getKelasById)
+dataRouter.get('/kelas/mk/:id', dataController.getKelasByIdMk)
+dataRouter.get('/kelas/dosen/:id', dataController.getKelasByIdDosen)
 dataRouter.put('/kelas/:id', dataController.updateKelas)
 dataRouter.delete('/kelas/:id', dataController.deleteKelas)
 dataRouter.post('/kelas/dosen', dataController.assignDosen)
 dataRouter.post('/kelas/mahasiswa', dataController.assignMahasiswa)
 
-// //verifier
-// dataRouter.post('/verifier', dataController.createVerifier)
-// dataRouter.get('/verifier', dataController.getAllVerifier)
-// dataRouter.put('/verifier/:id', dataController.updateVerifier)
-// dataRouter.delete('/verifier/:id', dataController.deleteVerifier)
 
 
 module.exports = dataRouter;

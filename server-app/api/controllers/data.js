@@ -23,11 +23,12 @@ exports.createPT = async(req, res) => {
         // Register admin PT identity to CA
         const registerAkun = await userService.registerUser(adminPT, 'HE1', "admin PT", dataAdmin)
 
-        const args = [id, 'HE1MSP', nama]
+        const args = [id, 'HE1MSP', nama, adminPT]
         await dataService.createPT(req.user.username, args)
         res.status(201).send({
             success: true,
-            message: "Pendidikan Tinggi telah ditambahkan"
+            message: "Pendidikan Tinggi telah ditambahkan",
+            accountPassword: registerAkun.password 
         })
     }
     catch(error){
@@ -45,7 +46,6 @@ exports.updatePT = async(req, res) => {
         }
         const data = req.body;
         const nama = data.nama;
-        const adminPT = data.usernameAdmin;
         const idPT = req.params.id;
 
         args = [idPT, 'HE1MSP', nama]
@@ -250,6 +250,8 @@ exports.createDosen = async(req, res) => {
         const idProdi = data.idSms;
         const nama = data.nama;
         const username = data.username;
+        const jabatan = data.jabatan;
+        const nipd = data.nipd;
         var id = data.id;
         
         // Randomize unique Id if there is no request id given
@@ -260,11 +262,12 @@ exports.createDosen = async(req, res) => {
          // Register dosen identity to CA
         const registerAkun = await userService.registerUser(username, 'HE1', "dosen")
 
-        args = [id, idPT, idProdi, nama, username]
+        args = [id, idPT, idProdi, nama, jabatan, nipd, username]
         await dataService.createDosen(req.user.username, args)
         res.status(201).send({
             success: true,
-            message: "Dosen telah ditambahkan"
+            message: "Dosen telah ditambahkan",
+            accountPassword: registerAkun.password 
         })
     }
     catch(error){
@@ -286,36 +289,14 @@ exports.updateDosen = async(req, res) => {
         const idProdi = data.idSms;
         const nama = data.nama;
         const idDosen = req.params.id
+        const jabatan = data.jabatan;
+        const nipd = data.nipd;
 
-        args = [idDosen, idPT,idProdi,nama]
+        args = [idDosen, idPT, idProdi, nama, jabatan, nipd]
         const result = await dataService.updateDosen(req.user.username, args)
         res.status(200).send({
             success: true,
             message: `Dosen dengan id ${idDosen} telah diubah`,
-        })
-    }
-    catch(error){
-        console.log("ERROR", error)
-        res.status(400).send({
-            success: false,
-            error: error.toString(),
-        })    
-    }
-}
-
-exports.signDosen = async(req, res) => {
-    try{
-        if (req.user.userType != "admin pddikti") {
-            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
-        }
-        const data = req.body;
-        const nidn = data.nidn;
-        const idDosen = req.params.id
-
-        const result = await dataService.signDosen(req.user.username, idDosen, nidn)
-        res.status(200).send({
-            success: true,
-            message: `Dosen dengan id ${idDosen} is signed`,
         })
     }
     catch(error){
@@ -358,6 +339,23 @@ exports.getAllDosen = async(req, res) => {
             success: false,
             error: error.toString(),
         })
+    }
+}
+
+exports.getApprovalByPT = async(req, res) => {
+    try {
+        if (req.user.userType != "admin PT") {
+            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
+        }
+        const idPT  = req.params.id;
+        data = await dataService.getDosenByPT(req.user.username, idPT) 
+        signers = data.data.filter( x => x.jabatan != "")
+        res.status(200).send({signers});
+    } catch(error){
+        res.status(400).send({
+            success: false,
+            error: error.toString(),
+        })    
     }
 }
 
@@ -415,12 +413,13 @@ exports.createMahasiswa = async(req, res) => {
 
          // Register mahasiswa identity to CA
         const registerAkun = await userService.registerUser(username, 'HE1', "mahasiswa")
-        args = [id, idPT, idProdi, nama, nipd]
+        args = [id, idPT, idProdi, nama, nipd, username]
         await dataService.createMahasiswa(req.user.username, args)
         
         res.status(201).send({
             success: true,
-            message: "Mahasiswa telah ditambahkan"
+            message: "Mahasiswa telah ditambahkan",
+            accountPassword: registerAkun.password 
         })
     }
     catch(error){
@@ -449,29 +448,6 @@ exports.updateMahasiswa = async(req, res) => {
         res.status(200).send({
             success: true,
             message: `Mahasiswa dengan id ${idMahasiswa} telah diubah`,
-        })
-    }
-    catch(error){
-        console.log("ERROR", error)
-        res.status(400).send({
-            success: false,
-            error: error.toString(),
-        })    
-    }
-}
-
-exports.setGraduated = async(req, res) => {
-    try{
-        if (req.user.userType != "admin PT") {
-            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
-        }
-        const data = req.body;
-        const calonLulusan = data.calonLulusan;
-
-        await dataService.setGraduated(req.user.username, calonLulusan)
-        res.status(200).send({
-            success: true,
-            message: `Status mahasiswa menjadi lulus`,
         })
     }
     catch(error){
@@ -577,6 +553,7 @@ exports.createMataKuliah = async(req, res) => {
         const nama = data.nama;
         const sks = data.sks;
         const jenjangPendidikan = data.jenjangPendidikan
+        const kodeMk = data.kodeMk;
         var id = data.id;
 
         // Randomize unique Id if there is no request id given
@@ -584,7 +561,7 @@ exports.createMataKuliah = async(req, res) => {
             id = uuidv4()
         }
 
-        args = [id, idPT, idProdi, nama, sks, jenjangPendidikan]
+        args = [id, idPT, idProdi, nama, kodeMk, sks, jenjangPendidikan]
         await dataService.createMataKuliah(req.user.username, args)
         res.status(201).send({
             success: true,
@@ -612,8 +589,9 @@ exports.updateMataKuliah = async(req, res) => {
         const sks = data.sks;
         const jenjangPendidikan = data.jenjangPendidikan
         const idMk = req.params.id;
+        const kodeMk = data.kodeMk;
 
-        args = [idMk,  idPT, idProdi, nama, sks, jenjangPendidikan]
+        args = [idMk,  idPT, idProdi, nama, kodeMk, sks, jenjangPendidikan]
         const result = await dataService.updateMataKuliah(req.user.username, args)
         res.status(200).send({
             success: true,
@@ -851,6 +829,42 @@ exports.getKelasById = async(req, res) => {
         const idKelas = req.params.id
 
         result = await dataService.getKelasById(req.user.username, idKelas) 
+        res.status(200).send(result);
+    } catch(error){
+        res.status(400).send({
+            success: false,
+            error: error.toString(),
+        })    
+    }
+}
+
+exports.getKelasByIdMk = async(req, res) => {
+    try {
+        if (req.user.userType != "admin PT") {
+            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
+        }
+        const idMk = req.params.id
+
+        const result = await dataService.getKelasByIdMk(req.user.username, idMk) 
+        res.status(200).send(result);
+    } catch(error){
+        res.status(400).send({
+            success: false,
+            error: error.toString(),
+        })    
+    }
+}
+
+exports.getKelasByIdDosen = async(req, res) => {
+    try {
+        if (req.user.userType != "dosen") {
+            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
+        }
+
+        const idDosen = req.params.id
+
+        const allKelas = await dataService.getAllKelas(req.user.username) 
+        const result = allKelas.filter(x => x.listPtk.includes(idDosen))
         res.status(200).send(result);
     } catch(error){
         res.status(400).send({
