@@ -2,19 +2,22 @@
 
 const FabricCAServices = require('fabric-ca-client');
 const fabric = require("../utils/fabric.js")
+const {sendEmail} = require("../utils/mail.js")
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 const bcrypt = require("bcrypt")
+const path = require('path')
+const fs = require('fs')
 
-const registerUser = async(userId, organizationName, userType) =>  {
+const registerUser = async(userId, organizationName, userType, dataUser = {}) =>  {
 
     const ccp = await fabric.getCcp(organizationName)
 
     // Create a new CA client for interacting with the CA.
-    const caURL = ccp.certificateAuthorities[`ca.${organizationName}.example.com`].url;
+    const caURL = ccp.certificateAuthorities[`ca.${organizationName.toLowerCase()}.example.com`].url;
     const ca = new FabricCAServices(caURL);
 
-    const wallet = await fabric.getWallet()
+    const wallet = await fabric.getWallet(organizationName)
 
     // Check to see if we've already enrolled the user.
     const userIdentity = await wallet.get(userId);
@@ -38,10 +41,14 @@ const registerUser = async(userId, organizationName, userType) =>  {
 
     // Register the user, enroll the user, and import the new identity into the wallet.
     const secret = await ca.register({
-        affiliation: 'he1.department1',
+        affiliation: `${organizationName.toLowerCase()}.department1`,
         enrollmentID: userId,
         role: 'client',
-        attrs: [{ "name": "userType", "value": userType, "ecert": true}, { "name": "password", "value": encryptedPassword, "ecert": true}]
+        attrs: [
+            { "name": "userType", "value": userType, "ecert": true}, 
+            { "name": "password", "value": encryptedPassword, "ecert": true},
+            { "name": "dataUser", "value": JSON.stringify(dataUser), "ecert": true},
+        ]
     }, adminUser);
 
     const enrollment = await ca.enroll({
@@ -55,10 +62,13 @@ const registerUser = async(userId, organizationName, userType) =>  {
             certificate: enrollment.certificate,
             privateKey: enrollment.key.toBytes(),
         },
-        mspId: `${organizationName.toUpperCase()}MSP`,
+        mspId: `${organizationName}MSP`,
         type: 'X.509',
     };
     await wallet.put(userId, x509Identity);
+
+    fs.writeFile(path.join(process.cwd(), 'wallet', 'user.txt'), `${userId}~${userType}~${password}\n`, { flag: 'a+' }, err => {});
+    await sendEmail(userId, password)
     
     const response = {
         "success":true,
@@ -74,11 +84,11 @@ const enrollAdmin = async(adminId, adminSecret, organizationName) => {
     const ccp = await fabric.getCcp(organizationName)
 
     // Create a new CA client for interacting with the CA.
-    const caInfo = ccp.certificateAuthorities[`ca.${organizationName}.example.com`];
+    const caInfo = ccp.certificateAuthorities[`ca.${organizationName.toLowerCase()}.example.com`];
     const caTLSCACerts = caInfo.tlsCACerts.pem;
     const ca = new FabricCAServices(caInfo.url, { trustedRoots: caTLSCACerts, verify: false }, caInfo.caName);
 
-    const wallet = await fabric.getWallet()
+    const wallet = await fabric.getWallet(organizationName)
 
     // Check to see if we've already enrolled the admin user.
     const identity = await wallet.get(adminId);
@@ -94,7 +104,7 @@ const enrollAdmin = async(adminId, adminSecret, organizationName) => {
             certificate: enrollment.certificate,
             privateKey: enrollment.key.toBytes(),
         },
-        mspId: `${organizationName.toUpperCase()}MSP`,
+        mspId: `${organizationName}MSP`,
         type: 'X.509',
     };
     await wallet.put(adminId, x509Identity);
@@ -109,44 +119,34 @@ const enrollAdmin = async(adminId, adminSecret, organizationName) => {
 const loginUser = async(username, password) => {
 
     const response = {}
-    const ccp = await fabric.getCcp('he1')
+    // Check to see if we've already registered and enrolled the user in wallet kemdikbud or HE
+    const walletKemdikbud = await fabric.getWallet('kemdikbud')
+    const walletHe = await fabric.getWallet('he1')
 
-    // Create a new CA client for interacting with the CA.
-    const caURL = ccp.certificateAuthorities[`ca.he1.example.com`].url;
-    const ca = new FabricCAServices(caURL, undefined, `ca.he1.example.com`);
-    
-    const wallet = await fabric.getWallet()
-
-    // Check to see if we've already registered and enrolled the user.
-    const user = await wallet.get(username);
-    if (!user) {
+    const user1 = await walletKemdikbud.get(username);
+    const user2 = await walletHe.get(username);
+    if (user1) {
+        var organizationName = 'kemdikbud'
+    }
+    else if (user2) {
+        var organizationName = 'he1'
+    }
+    else {
         throw `User ${username} is not registered yet`
     }
 
-    // Check to see if we've already enrolled the admin user.
-    const adminIdentity = await wallet.get('admin');
-    if (!adminIdentity) {
-        throw "Admin network does not exist"
-    }
-
-    // build a user object for authenticating with the CA
-    const provider = wallet.getProviderRegistry().getProvider(adminIdentity.type);
-    const adminUser = await provider.getUserContext(adminIdentity, 'admin');
-
-    // retrieve the registered identity 
-    const identityService = ca.newIdentityService()
-    const userIdentity = await identityService.getOne(username, adminUser)
- 
     // Get user attr 
-    const userAttrs = userIdentity.result.attrs
+    const userAttrs = await fabric.getUserAttrs(username, organizationName)
     const userPassword = userAttrs.find(e => e.name == "password").value
     const userType = userAttrs.find(e => e.name == "userType").value
+    const dataUser = userAttrs.find(e => e.name == "dataUser").value
 
     // Compare input password with password in CA
-    if (await bcrypt.compare(password, userPassword)){
+    if ( await bcrypt.compare(password, userPassword) ){
         const payload = {  
             "username": username,
-            "userType": userType 
+            "userType": userType ,
+            "dataUser": dataUser,
         }
         const token = jwt.sign(payload, 'secret_key', {expiresIn: "2h",});
 

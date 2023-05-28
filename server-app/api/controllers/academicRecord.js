@@ -19,8 +19,9 @@ exports.createAcademicRecord = async(req, res) => {
         if (!id) {
             id = uuidv4()
         }
-
-        const result = await academicRecordService.createAcademicRecord(req.user.username, id, idKls, idDosen, idMahasiswa, nilaiAngka, nilaiHuruf, nilaiIndex)
+        
+        args = [id, idKls, idDosen, idMahasiswa, nilaiAngka, nilaiHuruf, nilaiIndex]
+        const result = await academicRecordService.createAcademicRecord(req.user.username, args)
         res.status(201).send({
             success: true,
             message: "Transaction nilai has been submitted",
@@ -46,35 +47,15 @@ exports.updateAcademicRecord = async(req, res) => {
         const nilaiHuruf = data.nilaiHuruf;
         const nilaiIndex = data.nilaiIndex;
         const idNilai = req.params.id
-       
-        const result = await academicRecordService.updateAcademicRecord(req.user.username,  idNilai, idKls, idDosen, idMahasiswa, nilaiAngka, nilaiHuruf, nilaiIndex)
+
+       const args = [idNilai, idKls, idDosen, idMahasiswa, nilaiAngka, nilaiHuruf, nilaiIndex]
+        const result = await academicRecordService.updateAcademicRecord(req.user.username, args)
         res.status(200).send({
             success: true,
             message: `Nilai dengan id ${idNilai} telah diubah`, 
         })
     }
     catch(error){
-     res.status(400).send({
-            success: false,
-            error: error.toString(),
-        })       
-    }
-}
-
-exports.signAcademicRecord = async(req, res) => {
-    try {
-        if (req.user.userType != "dosen") {
-            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
-        }
-        const idNilai = req.body.idNilai
-
-        const result = await academicRecordService.signAcademicRecord(req.user.username, idNilai)
-        res.status(200).send({
-            success: true,
-            message: `Record nilai dengan id ${idNilai} is signed`,
-        })
-    }
-    catch(error){  
      res.status(400).send({
             success: false,
             error: error.toString(),
@@ -104,9 +85,6 @@ exports.deleteAcademicRecord = async(req, res) => {
 
 exports.getAllAcademicRecord = async(req, res) => {
     try {
-        if (req.user.userType != "admin pddikti") {
-            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
-        }
         const data = await academicRecordService.getAllAcademicRecord(req.user.username) 
         res.status(200).send({data});
     } catch(error){

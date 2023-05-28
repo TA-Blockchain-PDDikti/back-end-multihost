@@ -1,25 +1,32 @@
-const certificateService = require('../services/acdemicCertificate.js')
+const certificateService = require('../services/academicCertificate.js')
 
 exports.createAcademicCertificate = async(req, res) => {
     try {
         if (req.user.userType != "admin PT") {
             return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
         }
-        const data = req.body;
-        const idPT = data.idSp;
-        const idProdi = data.idSms;
-        const idMahasiswa = data.idPd;
-        const jenjangPendidikan = data.jenjangPendidikan;
-        const nomorIjazah = data.nomorIjazah;
-        const tanggalLulus = data.tanggalLulus;
-        const totalMutu = data.totalMutu;
-        const totalSks = data.totalSks;
-        const ipk = data.ipk
 
-    
-        await certificateService.createIjazah(req.user.username, idPT, idProdi, idMahasiswa, jenjangPendidikan, nomorIjazah, tanggalLulus)
-        await certificateService.createTranskrip(req.user.username, idPT, idProdi, idMahasiswa, jenjangPendidikan, totalMutu, totalSks, ipk)
-       
+        const data = req.body;
+        const dataLulusan = data.dataLulusan;
+
+        await Promise.all(dataLulusan.map( async(item, index) => {
+
+            const idProdi = item.idSms;
+            const idMahasiswa = item.idPd;
+            const jenjangPendidikan = item.jenjangPendidikan;
+            const nomorIjazah = item.nomorIjazah;
+            const tanggalLulus = item.tanggalLulus;
+            const totalMutu = item.totalMutu;
+            const totalSks = item.totalSks;
+            const ipk = item.ipk
+
+            argsIjazah = [idPT, idProdi, idMahasiswa, jenjangPendidikan, nomorIjazah, tanggalLulus]
+            argsTranskrip = [idPT, idProdi, idMahasiswa, jenjangPendidikan, totalMutu, totalSks, ipk] 
+            await certificateService.setGraduated(req.user.username, idMahasiswa)
+            await certificateService.createIjazah(req.user.username, argsIjazah)
+            await certificateService.createTranskrip(req.user.username, argsTranskrip)
+        }))
+        
         res.status(201).send({
             success: true,
             message: "Ijazah dan Transkrip telah ditambahkan",
@@ -47,7 +54,8 @@ exports.updateIjazah = async(req, res) => {
         const tanggalLulus = data.tanggalLulus;
         const idIjazah = req.params.id
 
-        const result = await certificateService.updateIjazah(req.user.username, idIjazah, idPT, idProdi, idMahasiswa, jenjangPendidikan, nomorIjazah, tanggalLulus )
+        args = [idIjazah, idPT, idProdi, idMahasiswa, jenjangPendidikan, nomorIjazah, tanggalLulus]
+        const result = await certificateService.updateIjazah(req.user.username, args)
         res.status(200).send({
             success : true,
             message: "Ijazah telah diubah",
@@ -76,7 +84,8 @@ exports.updateTranskrip = async(req, res) => {
         const ipk = data.ipk
         const id = req.params.id
 
-        const result = await certificateService.updateTranskrip(req.user.username, id, idPT, idProdi, idMahasiswa, jenjangPendidikan,  totalMutu, totalSks, ipk )
+        args = [id, idPT, idProdi, idMahasiswa, jenjangPendidikan,  totalMutu, totalSks, ipk]
+        const result = await certificateService.updateTranskrip(req.user.username, args)
         res.status(200).send({
             success : true,
             message: "Transkrip telah diubah",
@@ -89,17 +98,19 @@ exports.updateTranskrip = async(req, res) => {
     }
 }
 
-exports.signIjazah = async(req, res) => {
+exports.approveIjazah = async(req, res) => {
     try {
         if (req.user.userType != "dosen") {
             return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
         }
         const data = req.body;
-        const name = data.nama;
+        const idIjazah = data.idIjazah;
+        const idSigner = data.idSigner
 
-        const result = await certificateService.signIjazah(req.user.username, name)
+        const args = [idIjazah, idSigner]
+        const result = await certificateService.approveIjazah(req.user.username, args)
         res.status(200).send({
-            message: "Ijazah is signed",
+            message: `Ijazah ditandatangani oleh ${idSigner}`,
             result
         })
     } catch(error){
@@ -118,9 +129,9 @@ exports.getIdentifier = async(req, res) => {
         const data = req.body;
         const name = data.nama;
 
-        const result = await certificateService.getIdentifier(req.user.username, name)
+        const identifier = await certificateService.getIdentifier(req.user.username, name)
         res.status(200).send({
-            result
+            identifier
         })
     } catch(error){
         res.status(400).send({
@@ -130,7 +141,7 @@ exports.getIdentifier = async(req, res) => {
     }
 }
 
-exports.generateIdentifier = async(req, res) => {
+exports.addApprover = async(req, res) => {
     try {
         if (req.user.userType != "admin PT") {
             return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
@@ -138,28 +149,7 @@ exports.generateIdentifier = async(req, res) => {
         const data = req.body;
         const name = data.nama;
 
-        const result = await certificateService.generateIdentifier(req.user.username, name)
-        res.status(201).send({
-            message: "Identifier is generated",
-            result
-        })
-    } catch(error){
-        res.status(400).send({
-            success: false,
-            error: error.toString(),
-        })      
-    }
-}
-
-exports.addSigner = async(req, res) => {
-    try {
-        if (req.user.userType != "admin PT") {
-            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
-        }
-        const data = req.body;
-        const name = data.nama;
-
-        const result = await certificateService.addSigner(req.user.username, name)
+        const result = await certificateService.addApprover(req.user.username, name)
         res.status(201).send({
             message: "Signer is added",
             result
@@ -179,10 +169,7 @@ exports.verify = async(req, res) => {
         const name = data.nama;
 
         const result = await certificateService.verify(req.user.username, name)
-        res.status(200).send({
-            message: "Ijazah and Transkrip is verified",
-            result
-        })
+        res.status(200).send(result)
     } catch(error){
         res.status(400).send({
             success: false,
@@ -193,9 +180,6 @@ exports.verify = async(req, res) => {
 
 exports.getAllIjazah = async(req, res) => {
     try {
-        if (req.user.userType != "admin pddikti") {
-            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
-        }
         const idIjazah = req.params.id
 
         const result = await certificateService.getAllIjazah(req.user.username)
@@ -212,9 +196,6 @@ exports.getAllIjazah = async(req, res) => {
 
 exports.getAllTranskrip = async(req, res) => {
     try {
-        if (req.user.userType != "admin pddikti") {
-            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
-        }
         const result = await certificateService.getAllTranskrip(req.user.username)
         res.status(200).send({
             result
@@ -290,7 +271,7 @@ exports.getTranskripByIdPt = async(req, res) => {
         }
         const idPt = req.params.id
 
-        const result = await certificateService.getTranskripByIdPt(req.user.username, id)
+        const result = await certificateService.getTranskripByIdPt(req.user.username, idPt)
         res.status(200).send({
             result
         })

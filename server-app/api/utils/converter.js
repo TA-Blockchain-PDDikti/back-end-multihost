@@ -1,4 +1,5 @@
 const dataService = require('../services/data.js')
+const fabric = require("../utils/fabric.js")
 
 const parser = async(result) => {
     if (result.idSp){
@@ -17,7 +18,8 @@ const parser = async(result) => {
         console.log("data", data)
         result.sms = {
             "id": id,
-            "nama": data.namaSms
+            "nama": data.namaSms,
+            "jenjangPendidikan": data.jenjangPendidikan
         }
         delete result.idSms
     }
@@ -28,6 +30,7 @@ const parser = async(result) => {
         result.mk = {
             "id": id,
             "nama": data.namaMk
+            //"kodeMk": data.kodeMk,
         }
         delete result.idMk
     }
@@ -47,7 +50,8 @@ const parser = async(result) => {
         const data = await dataService.getDosenById('admin', id)
         result.ptk = {
             "id": id,
-            "nama": data.namaPtk
+            "nama": data.namaPtk,
+            "nidn": data.nidn
         }
         delete result.idPtk
     }
@@ -57,24 +61,64 @@ const parser = async(result) => {
         const data = await dataService.getMahasiswaById('admin', id)
         result.pd = {
             "id": id,
-            "nama": data.namaPd
+            "nama": data.namaPd,
+            "nipd": data.nipd
         }
         delete result.idPd
+    }
+
+    if (result.listPd) {
+        const list = result.listPd
+        await Promise.all(list.map( async(item, index) => {
+            const data = await dataService.getMahasiswaById('admin', item)
+            result.listPd[index] = data
+        }))
+    }
+
+    if (result.listPtk) {
+        const list = result.listPtk
+        await Promise.all(list.map( async(item, index) => {
+            const data = await dataService.getDosenById('admin', item)
+            list[index] = data
+        }))
+        result.listPtkDetail = list
+    }
+
+
+    if (result.approvers) {
+        const signatures = result.approvers
+        await Promise.all(signatures.map( async(item, index) => {
+            const id = item
+            const data = await dataService.getDosenById('admin', id)
+            item.signer = {
+                "id": id,
+                "nama": data.namaPtk,
+                "nipd": data.nipd,
+                "jabatan": data.jabatan
+            }
+            delete item.signerId
+            result.approvers[index] = item
+        }))
     }
 
     return result;
 }
 
 const getAllParser = async (queryData) => {
-    let result = JSON.parse(queryData)
-    await Promise.all(result.map( async(item, index) => {
-        result[index] = await parser(item)
-    }))
-    return result;
+    try {
+        let result = JSON.parse(queryData)
+        await Promise.all(result.map( async(item, index) => {
+            result[index] = await parser(item)
+        }))
+        return result;
+    } catch(error) {
+        return []
+    }
 }
 
 const getParser = (queryData) => {
-    return parser(JSON.parse(queryData))
+    const jsonParse = JSON.parse(queryData)
+    return parser(jsonParse)
 }
 
 
