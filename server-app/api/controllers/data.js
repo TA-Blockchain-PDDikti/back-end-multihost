@@ -23,7 +23,7 @@ exports.createPT = async(req, res) => {
         // Register admin PT identity to CA
         const registerAkun = await userService.registerUser(adminPT, 'HE1', "admin PT", dataAdmin)
 
-        const args = [id, 'HE1MSP', nama, adminPT]
+        const args = [id, 'HE1MSP', nama]
         await dataService.createPT(req.user.username, args)
         res.status(201).send({
             success: true,
@@ -789,7 +789,8 @@ exports.assignDosen = async(req, res) => {
         const idKelas = data.idKls;
         const idDosen = data.idPtk;
 
-        const result = await dataService.assignDosen(req.user.username,idKelas, idDosen)
+        const args = [idKelas, idDosen]
+        const result = await dataService.assignDosen(req.user.username, args)
         res.status(200).send({
             success: true,
             message: `Dosen dengan id ${idDosen} is assign to class dengan id ${idKelas}`,
@@ -814,7 +815,8 @@ exports.assignMahasiswa = async(req, res) => {
         const idKelas = data.idKls;
         const idMahasiswa = data.idPd;
 
-        const result = await dataService.assignMahasiswa(req.user.username, idKelas, idMahasiswa)
+        const args = [idKelas, idMahasiswa]
+        const result = await dataService.assignMahasiswa(req.user.username, args)
         res.status(200).send({
             success: true,
             message: `Mahasiswa dengan id ${idMahasiswa} is assign to class dengan id ${idKelas}`,

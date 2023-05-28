@@ -71,8 +71,7 @@ const parser = async(result) => {
         const list = result.listPd
         await Promise.all(list.map( async(item, index) => {
             const data = await dataService.getMahasiswaById('admin', item)
-            item = data
-            result.listPd[index] = item
+            result.listPd[index] = data
         }))
     }
 
@@ -80,8 +79,7 @@ const parser = async(result) => {
         const list = result.listPtk
         await Promise.all(list.map( async(item, index) => {
             const data = await dataService.getDosenById('admin', item)
-            item = data
-            result.listPtk[index] = item
+            result.listPtk[index] = data
         }))
     }
 
@@ -100,6 +98,29 @@ const parser = async(result) => {
             delete item.signerId
             result.signatures[index] = item
         }))
+    }
+
+    if (result.signers) {
+        const signers = result.signers
+        await Promise.all(signers.map( async(item, index) => {
+            const id = item
+            const data = await dataService.getDosenById('admin', id)
+            item = {
+                "id": id,
+                "nama": data.namaPtk,
+                "nipd": data.nipd,
+                "jabatan": data.jabatan
+            }
+            result.signers[index] = item
+        }))
+    }
+
+    if (result.txId) {
+        result.signature = fabric.getSignature(result.txId)
+    }
+    
+    if (result.txIds) {
+        result.signatures = fabric.getAllSignature(result.txIds)
     }
 
     return result;

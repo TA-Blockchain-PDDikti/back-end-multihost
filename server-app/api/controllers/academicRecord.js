@@ -63,27 +63,6 @@ exports.updateAcademicRecord = async(req, res) => {
     }
 }
 
-exports.signAcademicRecord = async(req, res) => {
-    try {
-        if (req.user.userType != "dosen") {
-            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
-        }
-        const idNilai = req.body.idNilai
-
-        const result = await academicRecordService.signAcademicRecord(req.user.username, idNilai)
-        res.status(200).send({
-            success: true,
-            message: `Record nilai dengan id ${idNilai} is signed`,
-        })
-    }
-    catch(error){  
-     res.status(400).send({
-            success: false,
-            error: error.toString(),
-        })       
-    }
-}
-
 exports.deleteAcademicRecord = async(req, res) => {
     try {
         if (req.user.userType != "dosen") {
