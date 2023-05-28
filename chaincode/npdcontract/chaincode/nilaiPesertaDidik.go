@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"strconv"
-	"time"
 
 	"github.com/hyperledger/fabric/common/flogging"
 	"github.com/hyperledger/fabric-chaincode-go/shim"
@@ -39,13 +38,6 @@ type NilaiPesertaDidik struct {
 	NilaiAngka			float64			`json:"nilaiAngka"`
 	NilaiHuruf			string 			`json:"nilaiHuruf"`
 	NilaiIndex			float64 		`json:"nilaiIndex"`
-	Signature			SignatureNPD 	`json:"signature"`
-}
-
-type SignatureNPD struct {
-	Sign			string 	`json:"sign"`
-	SignerId		string 	`json:"signerId"`
-	SignTime		string 	`json:"signTime"`
 }
 
 
@@ -120,7 +112,6 @@ func (s *NPDContract) CreateNpd(ctx contractapi.TransactionContextInterface) err
 		NilaiAngka:			nilaiAngka,
 		NilaiHuruf:			nilaiHuruf,
 		NilaiIndex:			nilaiIndex,
-		Signature:			SignatureNPD{},
 	}
 
 	npdJSON, err := json.Marshal(npd)
@@ -160,12 +151,9 @@ func (s *NPDContract) UpdateNpd(ctx contractapi.TransactionContextInterface) err
 	nilaiHuruf:= args[5]
 	nilaiIndexStr:= args[6]
 
-	exists, err := isNpdExists(ctx, id)
+	npd, err := getNpdStateById(ctx, id)
 	if err != nil {
 		return err
-	}
-	if !exists {
-		return fmt.Errorf(ER13, id)
 	}
 
 	nilaiAngka, err := strconv.ParseFloat(nilaiAngkaStr, 64)
@@ -180,72 +168,12 @@ func (s *NPDContract) UpdateNpd(ctx contractapi.TransactionContextInterface) err
 		return fmt.Errorf(ER36, id)
 	}
 
-	npd := NilaiPesertaDidik{
-		ID:      			id,
-		IdKLS:				idKls,
-		IdPTK:				idPtk,
-		IdPD:				idPd,
-		NilaiAngka:			nilaiAngka,
-		NilaiHuruf:			nilaiHuruf,
-		NilaiIndex:			nilaiIndex,
-		Signature:			SignatureNPD{},
-	}
-
-	npdJSON, err := json.Marshal(npd)
-	if err != nil {
-		return err
-	}
-
-	err = ctx.GetStub().PutState(id, npdJSON)
-	if err != nil {
-		logger.Errorf(ER31, err)
-	}
-
-	return err
-}
-
-
-// ============================================================================================================================
-// UpdateNpdSignature - Updates List PTK of an existing Nilai Peserta Didik (NPD) in the world state.
-// Arguments - Sign, Signer ID
-// ============================================================================================================================
-
-func (s *NPDContract) UpdateNpdSignature(ctx contractapi.TransactionContextInterface) error {
-	args := ctx.GetStub().GetStringArgs()[1:]
-
-	logger.Infof("Run UpdateNpdSignature function with args: %+q.", args)
-
-	if len(args) != 3 {
-		logger.Errorf(ER11, 3, len(args))
-		return fmt.Errorf(ER11, 3, len(args))
-	}
-
-	id:= args[0]
-	sign:= args[1]
-	signerId:= args[2]
-
-	exists, err := isNpdExists(ctx, id)
-	if err != nil {
-		return err
-	}
-	if !exists {
-		return fmt.Errorf(ER13, id)
-	}
-
-	loc, _ := time.LoadLocation("Asia/Jakarta")
-
-	signature := SignatureNPD{
-		Sign:			sign,
-		SignerId:		signerId,
-		SignTime:		time.Now().In(loc).Format(time.RFC822),
-	}
-
-	npd, err := getNpdStateById(ctx, id)
-	if err != nil {
-		return err
-	}
-
-	npd.Signature = signature
+	npd.IdKLS = idKls
+	npd.IdPTK = idPtk
+	npd.IdPD = idPd
+	npd.NilaiAngka = nilaiAngka
+	npd.NilaiHuruf = nilaiHuruf
+	npd.NilaiIndex = nilaiIndex
 
 	npdJSON, err := json.Marshal(npd)
 	if err != nil {
@@ -386,6 +314,38 @@ func (t *NPDContract) GetNpdByIdPd(ctx contractapi.TransactionContextInterface) 
 
 	queryString := fmt.Sprintf(`{"selector":{"idPd":"%s"}}`, idPd)
 	return getQueryResultForQueryString(ctx, queryString)
+}
+
+
+// ============================================================================================================================
+// GetNpdLastTxIdById - Get Last Tx Id of Nilai Peserta Didik (NPD) with given Id.
+// Arguments - ID
+// ============================================================================================================================
+
+func (t *NPDContract) GetNpdLastTxIdById(ctx contractapi.TransactionContextInterface) (string, error) {
+	args := ctx.GetStub().GetStringArgs()[1:]
+
+	logger.Infof("Run GetNpdLastTxIdById function with args: %+q.", args)
+
+	if len(args) != 1 {
+		logger.Errorf(ER11, 1, len(args))
+		return "", fmt.Errorf(ER11, 1, len(args))
+	}
+
+	id:= args[0]
+
+	resultsIterator, err := ctx.GetStub().GetHistoryForKey(id)
+	if err != nil {
+		return "", fmt.Errorf(err.Error())
+	}
+	defer resultsIterator.Close()
+
+	response, err := resultsIterator.Next()
+	if err != nil {
+		return "", fmt.Errorf(err.Error())
+	}
+
+	return response.TxId, nil
 }
 
 

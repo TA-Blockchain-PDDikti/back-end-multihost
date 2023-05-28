@@ -35,6 +35,7 @@ type MataKuliah struct {
 	IdSP				string 	`json:"idSp"`
 	IdSMS				string 	`json:"idSms"`
 	NamaMK				string 	`json:"namaMk"`
+	KodeMK				string 	`json:"kodeMk"`
 	SKS					int 	`json:"sks"`
 	JenjangPendidikan	string 	`json:"jenjangPendidikan"`
 }
@@ -60,7 +61,7 @@ const (
 
 // ============================================================================================================================
 // CreateMk - Issues a new Mata Kuliah (MK) to the world state with given details.
-// Arguments - ID, Id SP, Id SMS, Nama MK, SKS, Jenjang Pendidikan
+// Arguments - ID, Id SP, Id SMS, Nama MK, Kode MK, SKS, Jenjang Pendidikan
 // ============================================================================================================================
 
 func (s *MKContract) CreateMk(ctx contractapi.TransactionContextInterface) error {
@@ -68,17 +69,18 @@ func (s *MKContract) CreateMk(ctx contractapi.TransactionContextInterface) error
 
 	logger.Infof("Run CreateMk function with args: %+q.", args)
 
-	if len(args) != 6 {
-		logger.Errorf(ER11, 6, len(args))
-		return fmt.Errorf(ER11, 6, len(args))
+	if len(args) != 7 {
+		logger.Errorf(ER11, 7, len(args))
+		return fmt.Errorf(ER11, 7, len(args))
 	}
 
 	id:= args[0]
 	idSp:= args[1]
 	idSms:= args[2]
 	namaMk:= args[3]
-	sksStr:= args[4]
-	jenjangPendidikan:= args[5]
+	kodeMk:= args[4]
+	sksStr:= args[5]
+	jenjangPendidikan:= args[6]
 
 	exists, err := isMkExists(ctx, id)
 	if err != nil {
@@ -100,6 +102,7 @@ func (s *MKContract) CreateMk(ctx contractapi.TransactionContextInterface) error
 		IdSMS:				idSms,
 		IdSP:				idSp,
 		NamaMK:				namaMk,
+		KodeMK:				kodeMk,
 		SKS:				sks,
 		JenjangPendidikan:	jenjangPendidikan,
 	}
@@ -120,7 +123,7 @@ func (s *MKContract) CreateMk(ctx contractapi.TransactionContextInterface) error
 
 // ============================================================================================================================
 // UpdateMk - Updates an existing Mata Kuliah (MK) in the world state with provided parameters.
-// Arguments - ID, Id SP, Id SMS, Nama MK, SKS, Jenjang Pendidikan
+// Arguments - ID, Id SP, Id SMS, Nama MK, Kode MK, SKS, Jenjang Pendidikan
 // ============================================================================================================================
 
 func (s *MKContract) UpdateMk(ctx contractapi.TransactionContextInterface) error {
@@ -128,17 +131,18 @@ func (s *MKContract) UpdateMk(ctx contractapi.TransactionContextInterface) error
 
 	logger.Infof("Run UpdateMk function with args: %+q.", args)
 
-	if len(args) != 6 {
-		logger.Errorf(ER11, 6, len(args))
-		return fmt.Errorf(ER11, 6, len(args))
+	if len(args) != 7 {
+		logger.Errorf(ER11, 7, len(args))
+		return fmt.Errorf(ER11, 7, len(args))
 	}
 
 	id:= args[0]
 	idSp:= args[1]
 	idSms:= args[2]
 	namaMk:= args[3]
-	sksStr:= args[4]
-	jenjangPendidikan:= args[5]
+	kodeMk:= args[4]
+	sksStr:= args[5]
+	jenjangPendidikan:= args[6]
 
 	exists, err := isMkExists(ctx, id)
 	if err != nil {
@@ -159,6 +163,7 @@ func (s *MKContract) UpdateMk(ctx contractapi.TransactionContextInterface) error
 		IdSP:				idSp,
 		IdSMS:				idSms,
 		NamaMK:				namaMk,
+		KodeMK:				kodeMk,
 		SKS:				sks,
 		JenjangPendidikan:	jenjangPendidikan,
 	}

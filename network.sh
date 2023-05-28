@@ -201,6 +201,89 @@ function deployCC() {
   fi
 }
 
+function deployAllCC() {
+  infoln ""
+  infoln "Deploy spcontract"
+  scripts/deployCC.sh $CHANNEL_NAME spcontract ./chaincode/spcontract go $CC_VERSION $CC_SEQUENCE $CC_INIT_FCN $CC_END_POLICY $CC_COLL_CONFIG $CLI_DELAY $MAX_RETRY $VERBOSE
+
+  if [ $? -ne 0 ]; then
+    fatalln "Deploying spcontract failed"
+  fi
+  infoln ""
+
+  infoln ""
+  infoln "Deploy smscontract"
+  scripts/deployCC.sh $CHANNEL_NAME smscontract ./chaincode/smscontract go $CC_VERSION $CC_SEQUENCE $CC_INIT_FCN $CC_END_POLICY $CC_COLL_CONFIG $CLI_DELAY $MAX_RETRY $VERBOSE
+
+  if [ $? -ne 0 ]; then
+    fatalln "Deploying smscontract failed"
+  fi
+  infoln ""
+
+  infoln ""
+  infoln "Deploy ptkcontract"
+  scripts/deployCC.sh $CHANNEL_NAME ptkcontract ./chaincode/ptkcontract go $CC_VERSION $CC_SEQUENCE $CC_INIT_FCN $CC_END_POLICY $CC_COLL_CONFIG $CLI_DELAY $MAX_RETRY $VERBOSE
+
+  if [ $? -ne 0 ]; then
+    fatalln "Deploying ptkcontract failed"
+  fi
+  infoln ""
+
+  infoln ""
+  infoln "Deploy pdcontract"
+  scripts/deployCC.sh $CHANNEL_NAME pdcontract ./chaincode/pdcontract go $CC_VERSION $CC_SEQUENCE $CC_INIT_FCN $CC_END_POLICY $CC_COLL_CONFIG $CLI_DELAY $MAX_RETRY $VERBOSE
+
+  if [ $? -ne 0 ]; then
+    fatalln "Deploying pdcontract failed"
+  fi
+  infoln ""
+
+  infoln ""
+  infoln "Deploy mkcontract"
+  scripts/deployCC.sh $CHANNEL_NAME mkcontract ./chaincode/mkcontract go $CC_VERSION $CC_SEQUENCE $CC_INIT_FCN $CC_END_POLICY $CC_COLL_CONFIG $CLI_DELAY $MAX_RETRY $VERBOSE
+
+  if [ $? -ne 0 ]; then
+    fatalln "Deploying mkcontract failed"
+  fi
+  infoln ""
+
+  infoln ""
+  infoln "Deploy klscontract"
+  scripts/deployCC.sh $CHANNEL_NAME klscontract ./chaincode/klscontract go $CC_VERSION $CC_SEQUENCE $CC_INIT_FCN $CC_END_POLICY $CC_COLL_CONFIG $CLI_DELAY $MAX_RETRY $VERBOSE
+
+  if [ $? -ne 0 ]; then
+    fatalln "Deploying klscontract failed"
+  fi
+  infoln ""
+
+  infoln ""
+  infoln "Deploy npdcontract"
+  scripts/deployCC.sh $CHANNEL_NAME npdcontract ./chaincode/npdcontract go $CC_VERSION $CC_SEQUENCE $CC_INIT_FCN $CC_END_POLICY $CC_COLL_CONFIG $CLI_DELAY $MAX_RETRY $VERBOSE
+
+  if [ $? -ne 0 ]; then
+    fatalln "Deploying npdcontract failed"
+  fi
+  infoln ""
+
+  infoln ""
+  infoln "Deploy tskcontract"
+  scripts/deployCC.sh $CHANNEL_NAME tskcontract ./chaincode/tskcontract go $CC_VERSION $CC_SEQUENCE $CC_INIT_FCN $CC_END_POLICY $CC_COLL_CONFIG $CLI_DELAY $MAX_RETRY $VERBOSE
+
+  if [ $? -ne 0 ]; then
+    fatalln "Deploying tskcontract failed"
+  fi
+  infoln ""
+
+  infoln ""
+  infoln "Deploy ijzcontract"
+  scripts/deployCC.sh $CHANNEL_NAME ijzcontract ./chaincode/ijzcontract go $CC_VERSION $CC_SEQUENCE $CC_INIT_FCN $CC_END_POLICY $CC_COLL_CONFIG $CLI_DELAY $MAX_RETRY $VERBOSE
+
+  if [ $? -ne 0 ]; then
+    fatalln "Deploying ijzcontract failed"
+  fi
+  infoln ""
+}
+
 function accessCC() {
   scripts/accessCC.sh $CHANNEL_NAME $CC_NAME $CLI_DELAY $MAX_RETRY $VERBOSE
 
@@ -389,6 +472,9 @@ elif [ "$MODE" == "restart" ]; then
 elif [ "$MODE" == "deployCC" ]; then
   infoln "deploying chaincode on channel '${CHANNEL_NAME}'"
   deployCC
+elif [ "$MODE" == "deployAllCC" ]; then
+  infoln "deploying all chaincode on channel '${CHANNEL_NAME}'"
+  deployAllCC
 elif [ "$MODE" == "deployCCAAS" ]; then
   infoln "deploying chaincode-as-a-service on channel '${CHANNEL_NAME}'"
   deployCCAAS
