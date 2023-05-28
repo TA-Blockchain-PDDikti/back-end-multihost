@@ -28,8 +28,8 @@ function yaml_ccp {
         organizations/ccp-template.yaml | sed -e $'s/\\\\n/\\\n          /g'
 }
 
-ORG=kemdibud
-ORGCAP=Kemdibud
+ORG=kemdikbud
+ORGCAP=Kemdikbud
 P0PORT=7051
 CAPORT=7054
 PEERPEM=organizations/peerOrganizations/kemdikbud.example.com/tlsca/tlsca.kemdikbud.example.com-cert.pem
