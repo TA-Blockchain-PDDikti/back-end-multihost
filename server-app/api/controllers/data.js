@@ -261,7 +261,8 @@ exports.createDosen = async(req, res) => {
         }
 
          // Register dosen identity to CA
-        const registerAkun = await userService.registerUser(username, 'HE1', "dosen")
+        const dataDosen = {"id": id, "nama": nama}
+        const registerAkun = await userService.registerUser(username, 'HE1', "dosen", dataDosen)
 
         args = [id, idPT, idProdi, nama, nidn, jabatan, nomorSk, username]
         await dataService.createDosen(req.user.username, args)
@@ -414,7 +415,8 @@ exports.createMahasiswa = async(req, res) => {
         }
 
          // Register mahasiswa identity to CA
-        const registerAkun = await userService.registerUser(username, 'HE1', "mahasiswa")
+        const dataMahasiswa = {"id": id, "nama": nama}
+        const registerAkun = await userService.registerUser(username, 'HE1', "mahasiswa", dataMahasiswa)
         args = [id, idPT, idProdi, nama, nipd, username]
         await dataService.createMahasiswa(req.user.username, args)
         
