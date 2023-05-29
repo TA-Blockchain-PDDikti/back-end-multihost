@@ -6,6 +6,7 @@ const fs = require('fs');
 const sha = require('js-sha256');
 const asn = require('asn1.js');
 const { BlockDecoder } = require('fabric-common');
+const date = require('date-and-time');
 
 const getCcp = (organizationName) =>{
     // load the network configuration
@@ -91,13 +92,13 @@ const calculateBlockHash = function(header) {
 
 
 const getSignature = async(txId) => {
-    const network = await fabric.connectToNetwork("HE1", "qscc", 'admin')
+    console.log("TXID", txId)
+    const network = await connectToNetwork("HE1", "qscc", 'admin')
     const transaction = await network.contract.evaluateTransaction('GetTransactionByID', 'academicchannel', txId)
     network.gateway.disconnect()
 
     const trDecode = BlockDecoder.decodeTransaction(transaction)
     const signature = Buffer.from(trDecode.transactionEnvelope.signature).toString('base64')
-    console.log("SIGNATURE", signature)
 
     const time = new Date(trDecode.transactionEnvelope.payload.header.channel_header.timestamp)
     const timeFormat =  date.format(time,'YYYY/MM/DD HH:mm:ss')
@@ -106,14 +107,20 @@ const getSignature = async(txId) => {
         "signature": signature,
         "signTime": timeFormat
     }
+    console.log("RES",result)
     return result
 }
 
 const getAllSignature = async(txIds) => {
-    await Promise.all(txIds.map( async(item, index) => {
-        txIds[index] = await getSignature(item)
-    }))
-    return txIds
+    const lstTxId = JSON.parse(txIds) 
+    console.log("get all signature", JSON.parse(txIds), typeof(txIds))
+     await Promise.all(lstTxId.map( async(item, index) => {
+        console.log("halo")
+        console.log(item, typeof(item))
+        lstTxId[index] = await getSignature(item)
+     }))
+     console.log("TESS",JSON.parse(txIds))
+    return lstTxId
 }
 
 module.exports = {getCcp, getWallet, connectToNetwork, getUserAttrs, calculateBlockHash, getSignature, getAllSignature}
