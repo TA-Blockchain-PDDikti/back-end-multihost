@@ -1,5 +1,4 @@
 const dataService = require('../services/data.js')
-const fabric = require("../utils/fabric.js")
 
 const parser = async(result) => {
     if (result.idSp){
@@ -86,19 +85,19 @@ const parser = async(result) => {
     }
 
 
-    if (result.approvers) {
-        const signatures = result.approvers
-        await Promise.all(signatures.map( async(item, index) => {
+    if (result.Approvers) {
+        const approvers = result.Approvers
+        await Promise.all(approvers.map( async(item, index) => {
             const id = item
             const data = await dataService.getDosenById('admin', id)
-            item.signer = {
+            item = {
                 "id": id,
                 "nama": data.namaPtk,
                 "nipd": data.nipd,
                 "jabatan": data.jabatan
             }
-            delete item.signerId
-            result.approvers[index] = item
+           
+            result.Approvers[index] = item
         }))
     }
 
@@ -107,9 +106,7 @@ const parser = async(result) => {
 
 const getAllParser = async (queryData) => {
     try {
-        console.log(queryData)
         let result = JSON.parse(queryData)
-        console.log("data", result)
         await Promise.all(result.map( async(item, index) => {
             result[index] = await parser(item)
         }))

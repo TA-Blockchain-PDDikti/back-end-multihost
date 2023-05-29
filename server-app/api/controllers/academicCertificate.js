@@ -134,7 +134,7 @@ exports.getAllTranskrip = async(req, res) => {
 
 exports.getIjazahById = async(req, res) => {
     try {
-        if (req.user.userType != "admin PT") {
+        if (req.user.userType != "admin PT" && req.user.userType != "mahasiswa") {
             return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
         }
         const idIjazah = req.params.id
@@ -151,7 +151,7 @@ exports.getIjazahById = async(req, res) => {
 
 exports.getTranskripById = async(req, res) => {
     try {
-        if (req.user.userType != "admin PT") {
+        if (req.user.userType != "admin PT" && req.user.userType != "mahasiswa") {
             return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
         }
         const idTranskrip = req.params.id
@@ -290,14 +290,17 @@ exports.approveIjazah = async(req, res) => {
             return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
         }
         const data = req.body;
-        const idIjazah = data.idIjazah;
+        const lstIjazah = data.lstIjazah;
         const idApprover = data.idApprover
 
-        const args = [idIjazah, idApprover]
-        const result = await certificateService.approveIjazah(req.user.username, args)
+        await Promise.all(lstIjazah.map( async(item, index) => {
+            const args = [item, idApprover]
+            await certificateService.approveIjazah(req.user.username, args)
+        }))
+
         res.status(200).send({
+            success: true,
             message: `Ijazah disetujui oleh ${idApprover}`,
-            result
         })
     } catch(error){
         res.status(400).send({
@@ -313,14 +316,17 @@ exports.approveTranskrip = async(req, res) => {
             return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
         }
         const data = req.body;
-        const idTranskrip = data.idTranskrip;
+        const lstTranskrip = data.lstTranskrip;
         const idApprover = data.idApprover
 
-        const args = [idTranskrip, idApprover]
-        const result = await certificateService.approveTranskrip(req.user.username, args)
+        await Promise.all(lstTranskrip.map( async(item, index) => {
+            const args = [item, idApprover]
+            await certificateService.approveTranskrip(req.user.username, args)
+        }))
+
         res.status(200).send({
-            message: `Ijazah disetujui oleh ${idApprover}`,
-            result
+            success: true,
+            message: `Transkrip disetujui oleh ${idApprover}`,
         })
     } catch(error){
         res.status(400).send({
