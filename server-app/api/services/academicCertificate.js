@@ -223,11 +223,27 @@ exports.addApproverTranskrip = async(user, args) => {
     return result;
 }
 
-exports.getIdentifier = async(user, id) => {
-    const txIds = await getIjzTxIds(user, id)
+exports.generateIdentifier = async(user, idIjazah, idTranskrip) => {
+    const txIdsIjz = await getIjzTxIds(user, idIjazah)
+    const listTxIdIjz = JSON.parse(txIdsIjz)
 
-    var network = await fabric.connectToNetwork("Kemdikbud", "qscc", 'admin')
-    const block = await network.contract.evaluateTransaction('GetBlockBytxId', 'academicchannel', txIds[txIds.length - 1])
+    const txIdsTsk = await  getTskTxIds(user, idTranskrip)
+    const listTxIdTsk = JSON.parse(txIdsTsk)
+
+
+    // listTxIdIjzlength !== length dari signer ijazah
+    if (listTxIdIjz.length === 0) {
+        throw "Ijazah belum disetujui"
+    }
+
+      // listTxIdTsklength !== length dari signer Transkrip
+    if (listTxIdTsk.length === 0) {
+        throw "Transkrip belum disetujui"
+    }
+
+
+    const network = await fabric.connectToNetwork("Kemdikbud", "qscc", 'admin')
+    const block = await network.contract.evaluateTransaction('GetBlockByTxID', 'academicchannel', listTxIdIjz[listTxIdIjz.length - 1])
     network.gateway.disconnect()
 
     const blockDecode = BlockDecoder.decode(block)
@@ -239,6 +255,7 @@ exports.getIdentifier = async(user, id) => {
 exports.verify = async(identifier) => {
     try {
         // match identifier with block
+        console.log(identifier)
         const network = await fabric.connectToNetwork("Kemdikbud", "qscc", 'admin')
         const blockIjazah = await network.contract.evaluateTransaction('GetBlockByHash', 'academicchannel', Buffer.from(identifier, 'hex'))
         const blockIjazahDecode = BlockDecoder.decode(blockIjazah)
@@ -246,14 +263,15 @@ exports.verify = async(identifier) => {
         console.log("args", Buffer.from(args[1]).toString())
         const idIjazah = Buffer.from(args[1]).toString()
 
+        console.log("ID Ijazah",idIjazah)
         //query data ijazah, transkrip, nilai
-        const ijazah = await getIjazahById(idIjazah)
+        const ijazah = await this.getIjazahById("admin", idIjazah)
         const idMahasiswa = ijazah.pd.id 
-        const transkrip = await getTranskripByIdMahasiswa(idMahasiswa)
-        const nilai = await getAcademicRecordByIdMhsw(idMahasiswa)
+        const transkrip = await this.getTranskripByIdMahasiswa("admin",idMahasiswa)
+        const nilai = await getAcademicRecordByIdMhsw("admin",idMahasiswa)
         const data = {
             "ijazah": ijazah,
-            "transkrip": transkrip,
+            "transkrip": transkrip[0],
             "nilai": nilai
         }
     
@@ -265,6 +283,7 @@ exports.verify = async(identifier) => {
         }
         return result;
     } catch (error) {
+        console.log("ERROR", error)
         result = {
             "success": true,
             "message": "Ijazah palsu",

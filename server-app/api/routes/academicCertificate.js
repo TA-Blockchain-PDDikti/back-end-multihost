@@ -7,7 +7,7 @@ certificateRouter.use(auth)
 certificateRouter.post('/', certificateController.createAcademicCertificate)
 certificateRouter.post('/approve/ijazah/', certificateController.approveIjazah)
 certificateRouter.post('/approve/transkrip/', certificateController.approveTranskrip)
-certificateRouter.get('/identifier/', certificateController.getIdentifier)
+certificateRouter.post('/identifier/', certificateController.generateIdentifier)
 certificateRouter.post('/verify/', certificateController.verify)
 certificateRouter.post('/approver/', certificateController.addApprover)
 

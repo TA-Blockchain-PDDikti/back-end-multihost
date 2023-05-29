@@ -312,7 +312,7 @@ exports.approveIjazah = async(req, res) => {
 
 exports.approveTranskrip = async(req, res) => {
     try {
-        if (req.user.userType != "dosen") {
+        if (req.user.userType != "admin PT") {
             return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
         }
         const data = req.body;
@@ -336,18 +336,17 @@ exports.approveTranskrip = async(req, res) => {
     }
 }
 
-exports.getIdentifier = async(req, res) => {
+exports.generateIdentifier = async(req, res) => {
     try {
         if (req.user.userType != "mahasiswa") {
             return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
         }
         const data = req.body;
-        const name = data.nama;
+        const idIjazah = data.idIjazah
+        const idTranskrip = data.idTranskrip
 
-        const identifier = await certificateService.getIdentifier(req.user.username, name)
-        res.status(200).send({
-            identifier
-        })
+        const identifier = await certificateService.generateIdentifier(req.user.username, idIjazah, idTranskrip)
+        res.status(200).send({identifier})
     } catch(error){
         res.status(400).send({
             success: false,
@@ -362,22 +361,24 @@ exports.addApprover = async(req, res) => {
             return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
         }
         const data = req.body;
+        const idProdi = data.idSms;
         const transkrip = data.transkrip;
         const ijazah = data.ijazah;
 
-        const idIjazah = ijazah.id
-        await Promise.all(ijazah.approvers.map( async(item, index) => {
-            await certificateService.addApproverIjazah(req.user.username, idIjazah, item )
+        await Promise.all(ijazah.map( async(item, index) => {
+            args = [idProdi, item]
+            console.log(item)
+            await certificateService.addApproverIjazah(req.user.username, args)
         }))
 
-        const idTranskrip = transkrip.id
-        await Promise.all(transkrip.approvers.map( async(item, index) => {
-            await certificateService.addApproverTranskrip(req.user.username, idTranskrip, item)
+        await Promise.all(transkrip.map( async(item, index) => {
+            args = [idProdi, item]
+            await certificateService.addApproverTranskrip(req.user.username, args)
         }))
 
         res.status(201).send({
-            message: "Signer is added",
-            result
+            success: true,
+            message: "Approver ijazah dan transkrip ditambahkan is added",
         })
     } catch(error){
         res.status(400).send({
@@ -391,9 +392,9 @@ exports.addApprover = async(req, res) => {
 exports.verify = async(req, res) => {
     try {
         const data = req.body;
-        const name = data.nama;
+        const identifier = data.identifier;
 
-        const result = await certificateService.verify(req.user.username, name)
+        const result = await certificateService.verify(identifier)
         res.status(200).send(result)
     } catch(error){
         res.status(400).send({

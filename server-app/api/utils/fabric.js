@@ -90,36 +90,31 @@ const calculateBlockHash = function(header) {
   return hash;
 };
 
-
 const getSignature = async(txId) => {
-    console.log("TXID", txId)
     const network = await connectToNetwork("HE1", "qscc", 'admin')
     const transaction = await network.contract.evaluateTransaction('GetTransactionByID', 'academicchannel', txId)
     network.gateway.disconnect()
 
-    const trDecode = BlockDecoder.decodeTransaction(transaction)
-    const signature = Buffer.from(trDecode.transactionEnvelope.signature).toString('base64')
+    const trEnvelope = BlockDecoder.decodeTransaction(transaction).transactionEnvelope
+    const signature = Buffer.from(trEnvelope.signature).toString('base64')
 
-    const time = new Date(trDecode.transactionEnvelope.payload.header.channel_header.timestamp)
+    const time = new Date(trEnvelope.payload.header.channel_header.timestamp)
     const timeFormat =  date.format(time,'YYYY/MM/DD HH:mm:ss')
 
+    const pubKey = Buffer.from(trEnvelope.payload.data.actions[0].header.creator.id_bytes).toString()
     const result = {
         "signature": signature,
-        "signTime": timeFormat
+        "signTime": timeFormat,
+        "signerPubKey": pubKey
     }
-    console.log("RES",result)
     return result
 }
 
 const getAllSignature = async(txIds) => {
     const lstTxId = JSON.parse(txIds) 
-    console.log("get all signature", JSON.parse(txIds), typeof(txIds))
      await Promise.all(lstTxId.map( async(item, index) => {
-        console.log("halo")
-        console.log(item, typeof(item))
         lstTxId[index] = await getSignature(item)
      }))
-     console.log("TESS",JSON.parse(txIds))
     return lstTxId
 }
 
