@@ -8,9 +8,11 @@ exports.createAcademicCertificate = async(req, res) => {
 
         const data = req.body;
         const dataLulusan = data.dataLulusan;
+        console.log("dataLulusan", dataLulusan, typeof(dataLulusan))
 
         await Promise.all(dataLulusan.map( async(item, index) => {
 
+            const idPT = item.idSp;
             const idProdi = item.idSms;
             const idMahasiswa = item.idPd;
             const jenjangPendidikan = item.jenjangPendidikan;
@@ -90,86 +92,6 @@ exports.updateTranskrip = async(req, res) => {
             success : true,
             message: "Transkrip telah diubah",
         })
-    } catch(error){
-        res.status(400).send({
-            success: false,
-            error: error.toString(),
-        })      
-    }
-}
-
-exports.approveIjazah = async(req, res) => {
-    try {
-        if (req.user.userType != "dosen") {
-            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
-        }
-        const data = req.body;
-        const idIjazah = data.idIjazah;
-        const idSigner = data.idSigner
-
-        const args = [idIjazah, idSigner]
-        const result = await certificateService.approveIjazah(req.user.username, args)
-        res.status(200).send({
-            message: `Ijazah ditandatangani oleh ${idSigner}`,
-            result
-        })
-    } catch(error){
-        res.status(400).send({
-            success: false,
-            error: error.toString(),
-        })      
-    }
-}
-
-exports.getIdentifier = async(req, res) => {
-    try {
-        if (req.user.userType != "mahasiswa") {
-            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
-        }
-        const data = req.body;
-        const name = data.nama;
-
-        const identifier = await certificateService.getIdentifier(req.user.username, name)
-        res.status(200).send({
-            identifier
-        })
-    } catch(error){
-        res.status(400).send({
-            success: false,
-            error: error.toString(),
-        })      
-    }
-}
-
-exports.addApprover = async(req, res) => {
-    try {
-        if (req.user.userType != "admin PT") {
-            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
-        }
-        const data = req.body;
-        const name = data.nama;
-
-        const result = await certificateService.addApprover(req.user.username, name)
-        res.status(201).send({
-            message: "Signer is added",
-            result
-        })
-    } catch(error){
-        res.status(400).send({
-            success: false,
-            error: error.toString(),
-        })      
-    }
-}
-
-
-exports.verify = async(req, res) => {
-    try {
-        const data = req.body;
-        const name = data.nama;
-
-        const result = await certificateService.verify(req.user.username, name)
-        res.status(200).send(result)
     } catch(error){
         res.status(400).send({
             success: false,
@@ -361,4 +283,118 @@ exports.getTranskripByIdMahasiswa = async(req, res) => {
         
     }
 }
+
+exports.approveIjazah = async(req, res) => {
+    try {
+        if (req.user.userType != "dosen") {
+            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
+        }
+        const data = req.body;
+        const idIjazah = data.idIjazah;
+        const idApprover = data.idApprover
+
+        const args = [idIjazah, idApprover]
+        const result = await certificateService.approveIjazah(req.user.username, args)
+        res.status(200).send({
+            message: `Ijazah disetujui oleh ${idApprover}`,
+            result
+        })
+    } catch(error){
+        res.status(400).send({
+            success: false,
+            error: error.toString(),
+        })      
+    }
+}
+
+exports.approveTranskrip = async(req, res) => {
+    try {
+        if (req.user.userType != "dosen") {
+            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
+        }
+        const data = req.body;
+        const idTranskrip = data.idTranskrip;
+        const idApprover = data.idApprover
+
+        const args = [idTranskrip, idApprover]
+        const result = await certificateService.approveTranskrip(req.user.username, args)
+        res.status(200).send({
+            message: `Ijazah disetujui oleh ${idApprover}`,
+            result
+        })
+    } catch(error){
+        res.status(400).send({
+            success: false,
+            error: error.toString(),
+        })      
+    }
+}
+
+exports.getIdentifier = async(req, res) => {
+    try {
+        if (req.user.userType != "mahasiswa") {
+            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
+        }
+        const data = req.body;
+        const name = data.nama;
+
+        const identifier = await certificateService.getIdentifier(req.user.username, name)
+        res.status(200).send({
+            identifier
+        })
+    } catch(error){
+        res.status(400).send({
+            success: false,
+            error: error.toString(),
+        })      
+    }
+}
+
+exports.addApprover = async(req, res) => {
+    try {
+        if (req.user.userType != "admin PT") {
+            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
+        }
+        const data = req.body;
+        const transkrip = data.transkrip;
+        const ijazah = data.ijazah;
+
+        const idIjazah = ijazah.id
+        await Promise.all(ijazah.approvers.map( async(item, index) => {
+            await certificateService.addApproverIjazah(req.user.username, idIjazah, item )
+        }))
+
+        const idTranskrip = transkrip.id
+        await Promise.all(transkrip.approvers.map( async(item, index) => {
+            await certificateService.addApproverTranskrip(req.user.username, idTranskrip, item)
+        }))
+
+        res.status(201).send({
+            message: "Signer is added",
+            result
+        })
+    } catch(error){
+        res.status(400).send({
+            success: false,
+            error: error.toString(),
+        })      
+    }
+}
+
+
+exports.verify = async(req, res) => {
+    try {
+        const data = req.body;
+        const name = data.nama;
+
+        const result = await certificateService.verify(req.user.username, name)
+        res.status(200).send(result)
+    } catch(error){
+        res.status(400).send({
+            success: false,
+            error: error.toString(),
+        })      
+    }
+}
+
 
