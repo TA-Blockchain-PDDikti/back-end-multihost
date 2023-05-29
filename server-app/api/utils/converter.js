@@ -15,7 +15,6 @@ const parser = async(result) => {
     if (result.idSms){
         const id = result.idSms
         const data = await dataService.getProdiById('admin', id)
-        console.log("data", data)
         result.sms = {
             "id": id,
             "nama": data.namaSms,
@@ -77,11 +76,13 @@ const parser = async(result) => {
 
     if (result.listPtk) {
         const list = result.listPtk
+        const listIdPtk = []
         await Promise.all(list.map( async(item, index) => {
             const data = await dataService.getDosenById('admin', item)
+            listIdPtk[index] = item
             list[index] = data
         }))
-        result.listPtkDetail = list
+        result.listIdPtk = listIdPtk
     }
 
 
@@ -106,12 +107,15 @@ const parser = async(result) => {
 
 const getAllParser = async (queryData) => {
     try {
+        console.log(queryData)
         let result = JSON.parse(queryData)
+        console.log("data", result)
         await Promise.all(result.map( async(item, index) => {
             result[index] = await parser(item)
         }))
         return result;
     } catch(error) {
+        console.log("ERROR", error)
         return []
     }
 }

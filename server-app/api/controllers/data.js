@@ -767,13 +767,16 @@ exports.assignDosen = async(req, res) => {
         }
         const data = req.body;
         const idKelas = data.idKls;
-        const idDosen = data.idPtk;
+        const dosenLst = data.ptk;
 
-        const args = [idKelas, idDosen]
-        const result = await dataService.assignDosen(req.user.username, args)
+        await Promise.all(dosenLst.map( async(item, index) => {
+            const args = [idKelas, item]
+            await dataService.assignDosen(req.user.username, args)
+        }))
+        
         res.status(200).send({
             success: true,
-            message: `Dosen dengan id ${idDosen} is assign to class dengan id ${idKelas}`,
+            message: `Dosen  ditambahkan ke kelas dengan id ${idKelas}`,
         })
     }
     catch(error){
@@ -793,13 +796,16 @@ exports.assignMahasiswa = async(req, res) => {
         }
         const data = req.body;
         const idKelas = data.idKls;
-        const idMahasiswa = data.idPd;
+        const mahasiswaLst = data.pd;
 
-        const args = [idKelas, idMahasiswa]
-        const result = await dataService.assignMahasiswa(req.user.username, args)
+        await Promise.all(mahasiswaLst.map( async(item, index) => {
+            const args = [idKelas, item]
+            await dataService.assignMahasiswa(req.user.username, args)
+        }))
+
         res.status(200).send({
             success: true,
-            message: `Mahasiswa dengan id ${idMahasiswa} is assign to class dengan id ${idKelas}`,
+            message: `Mahasiswa ditambahkan ke kelas dengan id ${idKelas}`,
         })
     }
     catch(error){
@@ -866,7 +872,7 @@ exports.getKelasByIdDosen = async(req, res) => {
         const idDosen = req.params.id
 
         const allKelas = await dataService.getAllKelas(req.user.username) 
-        const result = allKelas.filter(x => x.listPtk.includes(idDosen))
+        const result = allKelas.filter(x => x.listIdPtk.includes(idDosen))
         res.status(200).send(result);
     } catch(error){
         res.status(400).send({

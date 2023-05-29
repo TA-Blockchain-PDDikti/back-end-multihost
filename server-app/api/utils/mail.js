@@ -10,15 +10,13 @@ const sendEmail = async(email, password) => {
             }
         });
 
-        console.log("Haloo")
-        var text = `Berikut ini adalah akun untuk website gradechain\n email: ${email}\n Password: ${password}`
+        var text = `Berikut ini adalah akun untuk website Gradechain\n email: ${email}\n Password: ${password}`
         var mailOptions = {
         from: 'gradechain@gmail.com',
         to: 'hadifafarzana@gmail.com',
         subject: 'Password Akun Gradechain',
         text: text
         };
-        console.log("send")
         transporter.sendMail(mailOptions, function(error, info){
         if (error) {
             console.log("gagal");
