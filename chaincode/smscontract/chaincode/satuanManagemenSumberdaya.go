@@ -186,7 +186,7 @@ func (s *SMSContract) UpdateSmsSignersTsk(ctx contractapi.TransactionContextInte
 
 	signersTskStr = strings.Replace(signersTskStr, "[", "", -1)
 	signersTskStr = strings.Replace(signersTskStr, "]", "", -1)
-	splitter := regexp.MustCompile(`, `)
+	splitter := regexp.MustCompile(` *, *`)
 	signersTsk :=  splitter.Split(signersTskStr, -1)
 
 	sms.SignersTSK = signersTsk
@@ -239,7 +239,7 @@ func (s *SMSContract) UpdateSmsSignersIjz(ctx contractapi.TransactionContextInte
 
 	signersIjzStr = strings.Replace(signersIjzStr, "[", "", -1)
 	signersIjzStr = strings.Replace(signersIjzStr, "]", "", -1)
-	splitter := regexp.MustCompile(`, `)
+	splitter := regexp.MustCompile(` *, *`)
 	signersIjz :=  splitter.Split(signersIjzStr, -1)
 
 	sms.SignersIJZ = signersIjz
