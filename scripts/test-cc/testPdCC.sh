@@ -87,6 +87,10 @@ echo "========= Set Pd Graduated"
 chaincodeInvoke -f "SetPdGraduated" -args "\"7\""  -peer "he1"
 echo ""
 
+echo "========= Set Pd GraduatedBatch"
+chaincodeInvoke -f "SetPdGraduatedBatch" -args "\"[1, 2,4]\""  -peer "he1"
+echo ""
+
 echo "========= Get PD By Id"
 chaincodeQuery -f "GetPdById" -args "\"1\"" -peer "he1"
 chaincodeQuery -f "GetPdById" -args "\"7\"" -peer "he1"
