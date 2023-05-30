@@ -5,8 +5,9 @@ const auth = require('../middleware/auth.js')
 certificateRouter.use(auth)
 
 certificateRouter.post('/', certificateController.createAcademicCertificate)
-certificateRouter.post('/approve/:id', certificateController.approveIjazah)
-certificateRouter.get('/identifier/', certificateController.getIdentifier)
+certificateRouter.post('/approve/ijazah/', certificateController.approveIjazah)
+certificateRouter.post('/approve/transkrip/', certificateController.approveTranskrip)
+certificateRouter.post('/identifier/', certificateController.generateIdentifier)
 certificateRouter.post('/verify/', certificateController.verify)
 certificateRouter.post('/approver/', certificateController.addApprover)
 

@@ -6,6 +6,7 @@ const fs = require('fs');
 const sha = require('js-sha256');
 const asn = require('asn1.js');
 const { BlockDecoder } = require('fabric-common');
+const date = require('date-and-time');
 
 const getCcp = (organizationName) =>{
     // load the network configuration
@@ -89,31 +90,32 @@ const calculateBlockHash = function(header) {
   return hash;
 };
 
-
 const getSignature = async(txId) => {
-    const network = await fabric.connectToNetwork("HE1", "qscc", 'admin')
+    const network = await connectToNetwork("HE1", "qscc", 'admin')
     const transaction = await network.contract.evaluateTransaction('GetTransactionByID', 'academicchannel', txId)
     network.gateway.disconnect()
 
-    const trDecode = BlockDecoder.decodeTransaction(transaction)
-    const signature = Buffer.from(trDecode.transactionEnvelope.signature).toString('base64')
-    console.log("SIGNATURE", signature)
+    const trEnvelope = BlockDecoder.decodeTransaction(transaction).transactionEnvelope
+    const signature = Buffer.from(trEnvelope.signature).toString('base64')
 
-    const time = new Date(trDecode.transactionEnvelope.payload.header.channel_header.timestamp)
+    const time = new Date(trEnvelope.payload.header.channel_header.timestamp)
     const timeFormat =  date.format(time,'YYYY/MM/DD HH:mm:ss')
 
+    const pubKey = Buffer.from(trEnvelope.payload.data.actions[0].header.creator.id_bytes).toString()
     const result = {
         "signature": signature,
-        "signTime": timeFormat
+        "signTime": timeFormat,
+        "signerPubKey": pubKey
     }
     return result
 }
 
 const getAllSignature = async(txIds) => {
-    await Promise.all(txIds.map( async(item, index) => {
-        txIds[index] = await getSignature(item)
-    }))
-    return txIds
+    const lstTxId = JSON.parse(txIds) 
+     await Promise.all(lstTxId.map( async(item, index) => {
+        lstTxId[index] = await getSignature(item)
+     }))
+    return lstTxId
 }
 
 module.exports = {getCcp, getWallet, connectToNetwork, getUserAttrs, calculateBlockHash, getSignature, getAllSignature}
