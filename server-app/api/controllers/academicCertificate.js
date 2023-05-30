@@ -42,6 +42,27 @@ exports.createAcademicCertificate = async(req, res) => {
     }
 }
 
+exports.setGraduated = async(req, res) => {
+    try {
+        if (req.user.userType != "admin PT") {
+            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
+        }
+
+        const data = req.body;
+        const lstMahasiswa = data.idPd;
+
+        const result = await certificateService.setGraduated(req.user.username, lstMahasiswa)
+        res.status(200).send({
+            success: true,
+            message: "Status mahasiswa berhasil diubah",
+        })
+    } catch(error){
+        res.status(400).send({
+            success: false,
+            error: error.toString(),
+        })      
+    }
+}
 exports.updateIjazah = async(req, res) => {
     try {
         if (req.user.userType != "admin PT") {
@@ -102,8 +123,6 @@ exports.updateTranskrip = async(req, res) => {
 
 exports.getAllIjazah = async(req, res) => {
     try {
-        const idIjazah = req.params.id
-
         const result = await certificateService.getAllIjazah(req.user.username)
         res.status(200).send({
             result
@@ -312,7 +331,7 @@ exports.approveIjazah = async(req, res) => {
 
 exports.approveTranskrip = async(req, res) => {
     try {
-        if (req.user.userType != "admin PT") {
+        if (req.user.userType != "dosen") {
             return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
         }
         const data = req.body;
@@ -365,20 +384,15 @@ exports.addApprover = async(req, res) => {
         const transkrip = data.transkrip;
         const ijazah = data.ijazah;
 
-        await Promise.all(ijazah.map( async(item, index) => {
-            args = [idProdi, item]
-            console.log(item)
-            await certificateService.addApproverIjazah(req.user.username, args)
-        }))
-
-        await Promise.all(transkrip.map( async(item, index) => {
-            args = [idProdi, item]
-            await certificateService.addApproverTranskrip(req.user.username, args)
-        }))
-
+        args = [idProdi, ijazah]          
+        await certificateService.addApproverIjazah(req.user.username, args)
+      
+        args = [idProdi, transkrip]
+        await certificateService.addApproverTranskrip(req.user.username, args)
+       
         res.status(201).send({
             success: true,
-            message: "Approver ijazah dan transkrip ditambahkan is added",
+            message: "Approver ijazah dan transkrip ditambahkan",
         })
     } catch(error){
         res.status(400).send({

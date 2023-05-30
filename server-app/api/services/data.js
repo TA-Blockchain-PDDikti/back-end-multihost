@@ -240,14 +240,14 @@ exports.deleteKelas = async(user, idKelas) => {
     network.gateway.disconnect()
     return result;}
 
-exports.assignDosen = async(user, args) => {
+exports.updateDosenKelas = async(user, args) => {
     const network = await fabric.connectToNetwork("HE1", "klscontract", user)
     const result = await network.contract.submitTransaction("UpdateKlsListPtk", ...args)
     network.gateway.disconnect()
 
 }
 
-exports.assignMahasiswa = async(user, args) => {
+exports.updateMahasiswaKelas = async(user, args) => {
     const network = await fabric.connectToNetwork("HE1", "klscontract", user)
     const result = await network.contract.submitTransaction("UpdateKlsListPd", ...args)
     network.gateway.disconnect()

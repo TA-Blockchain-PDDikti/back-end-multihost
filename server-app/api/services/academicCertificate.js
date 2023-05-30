@@ -189,9 +189,9 @@ exports.getTranskripByIdMahasiswa = async(user, idTsk) => {
 
 
 // Sign and Verify----------------------------------------------------------
-exports.setGraduated = async(user, idMahasiswa) => {
+exports.setGraduated = async(user, lstMahasiswa) => {
     const network = await fabric.connectToNetwork("HE1", "pdcontract", user)
-    await network.contract.submitTransaction("SetPdGraduated", idMahasiswa)
+    await network.contract.submitTransaction("SetPdGraduatedBatch", lstMahasiswa)
     network.gateway.disconnect()
 }
 

@@ -2,13 +2,14 @@ const certificateRouter = require('express').Router()
 const certificateController = require('../controllers/academicCertificate.js')
 const auth = require('../middleware/auth.js')
 
-certificateRouter.use(auth)
+certificateRouter.post('/verify/', certificateController.verify)
 
+certificateRouter.use(auth)
 certificateRouter.post('/', certificateController.createAcademicCertificate)
+certificateRouter.post('/graduated', certificateController.setGraduated)
 certificateRouter.post('/approve/ijazah/', certificateController.approveIjazah)
 certificateRouter.post('/approve/transkrip/', certificateController.approveTranskrip)
 certificateRouter.post('/identifier/', certificateController.generateIdentifier)
-certificateRouter.post('/verify/', certificateController.verify)
 certificateRouter.post('/approver/', certificateController.addApprover)
 
 // Ijazah
