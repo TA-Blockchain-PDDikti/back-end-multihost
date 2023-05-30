@@ -352,8 +352,8 @@ exports.getApprovalByPT = async(req, res) => {
         }
         const idPT  = req.params.id;
         data = await dataService.getDosenByPT(req.user.username, idPT) 
-        signers = data.data.filter( x => x.jabatan != "")
-        res.status(200).send({signers});
+        approver = data.filter( x => x.jabatan != "")
+        res.status(200).send({approver});
     } catch(error){
         res.status(400).send({
             success: false,
@@ -521,22 +521,6 @@ exports.getMahasiswaById = async(req, res) => {
         const idMahasiswa = req.params.id
         data = await dataService.getMahasiswaById(req.user.username, idMahasiswa) 
         res.status(200).send(data);
-    } catch(error){
-        res.status(400).send({
-            success: false,
-            error: error.toString(),
-        })    
-    }
-}
-
-exports.getMahasiswaByKelas = async(req, res) => {
-    try {
-        if (req.user.userType != "admin PT" && req.user.userType != "dosen") {
-            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
-        }
-        const idKelas = req.params.id 
-        data = await dataService.getMahasiswaByKelas(req.user.username, idKelas) 
-        res.status(200).send({data});
     } catch(error){
         res.status(400).send({
             success: false,
@@ -762,7 +746,7 @@ exports.deleteKelas = async(req, res) => {
     }
 }
 
-exports.assignDosen = async(req, res) => {
+exports.updateDosenKelas = async(req, res) => {
     try{
         if (req.user.userType != "admin PT") {
             return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
@@ -771,10 +755,8 @@ exports.assignDosen = async(req, res) => {
         const idKelas = data.idKls;
         const dosenLst = data.ptk;
 
-        await Promise.all(dosenLst.map( async(item, index) => {
-            const args = [idKelas, item]
-            await dataService.assignDosen(req.user.username, args)
-        }))
+        const args = [idKelas, dosenLst]
+        await dataService.updateDosenKelas(req.user.username, args)
         
         res.status(200).send({
             success: true,
@@ -791,7 +773,7 @@ exports.assignDosen = async(req, res) => {
 
 }
 
-exports.assignMahasiswa = async(req, res) => {
+exports.updateMahasiswaKelas = async(req, res) => {
     try{
         if (req.user.userType != "admin PT") {
             return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
@@ -800,10 +782,8 @@ exports.assignMahasiswa = async(req, res) => {
         const idKelas = data.idKls;
         const mahasiswaLst = data.pd;
 
-        await Promise.all(mahasiswaLst.map( async(item, index) => {
-            const args = [idKelas, item]
-            await dataService.assignMahasiswa(req.user.username, args)
-        }))
+        const args = [idKelas, mahasiswaLst]
+        await dataService.updateMahasiswaKelas(req.user.username, args)
 
         res.status(200).send({
             success: true,
@@ -833,7 +813,7 @@ exports.getAllKelas = async(req, res) => {
 
 exports.getKelasById = async(req, res) => {
     try {
-        if (req.user.userType != "admin PT") {
+        if (req.user.userType != "admin PT" && req.user.userType != "dosen") {
             return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
         }
         const idKelas = req.params.id

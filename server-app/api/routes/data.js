@@ -24,7 +24,7 @@ dataRouter.post('/dosen', dataController.createDosen)
 dataRouter.get('/dosen', dataController.getAllDosen)
 dataRouter.get('/dosen/:id', dataController.getDosenById)
 dataRouter.get('/dosen/pt/:id', dataController.getDosenByPT)
-dataRouter.get('/dosen/approval', dataController.getApprovalByPT)
+dataRouter.get('/dosen/approval/:id', dataController.getApprovalByPT)
 dataRouter.put('/dosen/:id', dataController.updateDosen)
 dataRouter.delete('/dosen/:id', dataController.deleteDosen)
 
@@ -33,7 +33,6 @@ dataRouter.post('/mahasiswa', dataController.createMahasiswa)
 dataRouter.get('/mahasiswa', dataController.getAllMahasiswa)
 dataRouter.get('/mahasiswa/pt/:id', dataController.getMahasiswaByPT)
 dataRouter.get('/mahasiswa/:id', dataController.getMahasiswaById)
-dataRouter.get('/mahasiswa/kelas/:idKelas', dataController.getMahasiswaByKelas)
 dataRouter.put('/mahasiswa/:id', dataController.updateMahasiswa)
 dataRouter.delete('/mahasiswa/:id', dataController.deleteMahasiswa)
 
@@ -53,8 +52,8 @@ dataRouter.get('/kelas/mk/:id', dataController.getKelasByIdMk)
 dataRouter.get('/kelas/dosen/:id', dataController.getKelasByIdDosen)
 dataRouter.put('/kelas/:id', dataController.updateKelas)
 dataRouter.delete('/kelas/:id', dataController.deleteKelas)
-dataRouter.post('/kelas/dosen', dataController.assignDosen)
-dataRouter.post('/kelas/mahasiswa', dataController.assignMahasiswa)
+dataRouter.post('/kelas/dosen', dataController.updateDosenKelas)
+dataRouter.post('/kelas/mahasiswa', dataController.updateMahasiswaKelas)
 
 
 
