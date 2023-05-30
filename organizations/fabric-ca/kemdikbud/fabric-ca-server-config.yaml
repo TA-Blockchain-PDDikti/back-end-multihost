@@ -303,9 +303,9 @@ signing:
 csr:
    cn: ca.kemdikbud.example.com
    names:
-      - C: US
-        ST: "North Carolina"
-        L: "Durham"
+      - C: ID
+        ST:
+        L: "Jakarta"
         O: kemdikbud.example.com
         OU:
    hosts:
