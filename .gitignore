@@ -20,3 +20,4 @@ organizations/ordererOrganizations
 chaincode/*/vendor
 chaincode/*/go.mod
 chaincode/*/go.sum
+*.tar.gz
