@@ -50,6 +50,7 @@ const (
 	ER11 string = "ER11-Incorrect number of arguments. Required %d arguments, but you have %d arguments."
 	ER12        = "ER12-Ijazah with id '%s' already exists."
 	ER13        = "ER13-Ijazah with id '%s' doesn't exist."
+	ER14        = "ER14-Ijazah with id '%s' already approved by PTK with id '%s'."
 	ER31        = "ER31-Failed to change to world state: %v."
 	ER32        = "ER32-Failed to read from world state: %v."
 	ER33        = "ER33-Failed to get result from iterator: %v."
@@ -176,7 +177,7 @@ func (s *IJZContract) UpdateIjz (ctx contractapi.TransactionContextInterface) er
 }
 
 // ============================================================================================================================
-// AddIjzApproval - Add Signature for an existing Ijazah Mahasiswa (IJZ) in the world state.
+// AddIjzApproval - Add Approval for an existing Ijazah Mahasiswa (IJZ) in the world state.
 // Arguments - ID, Approver Id
 // ============================================================================================================================
 
@@ -204,6 +205,10 @@ func (s *IJZContract) AddIjzApproval (ctx contractapi.TransactionContextInterfac
 	ijz, err := getIjzStateById(ctx, id)
 	if err != nil {
 		return err
+	}
+
+	if contains(ijz.Approvers, approver) {
+		return fmt.Errorf(ER14, id, approver)
 	}
 
 	ijz.Approvers = append(ijz.Approvers, approver)
@@ -504,4 +509,18 @@ func getQueryResultForQueryString(ctx contractapi.TransactionContextInterface, q
 	defer resultsIterator.Close()
 
 	return constructQueryResponseFromIterator(resultsIterator)
+}
+
+
+// ============================================================================================================================
+// contains - Check if the slice contains the given value
+// ============================================================================================================================
+
+func contains(elems []string, v string) bool {
+    for _, s := range elems {
+        if v == s {
+            return true
+        }
+    }
+    return false
 }
