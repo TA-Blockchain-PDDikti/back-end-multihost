@@ -176,13 +176,6 @@ exports.getMahasiswaByPT = async(user, idPt) => {
     return getAllParser(queryData)
 }
 
-exports.getMahasiswaByKelas = async(user, idKelas) => {
-    const network = await fabric.connectToNetwork("HE1", "pdcontract", user)
-    const queryData = await network.contract.evaluateTransaction("GetPdByIdKls", idKelas)
-    network.gateway.disconnect()
-    return getAllParser(queryData)
-}
-
 //mata kuliah
 exports.createMataKuliah = async(user, args) => {
     const network = await fabric.connectToNetwork("HE1", "mkcontract", user)

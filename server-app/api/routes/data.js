@@ -33,7 +33,6 @@ dataRouter.post('/mahasiswa', dataController.createMahasiswa)
 dataRouter.get('/mahasiswa', dataController.getAllMahasiswa)
 dataRouter.get('/mahasiswa/pt/:id', dataController.getMahasiswaByPT)
 dataRouter.get('/mahasiswa/:id', dataController.getMahasiswaById)
-dataRouter.get('/mahasiswa/kelas/:idKelas', dataController.getMahasiswaByKelas)
 dataRouter.put('/mahasiswa/:id', dataController.updateMahasiswa)
 dataRouter.delete('/mahasiswa/:id', dataController.deleteMahasiswa)
 

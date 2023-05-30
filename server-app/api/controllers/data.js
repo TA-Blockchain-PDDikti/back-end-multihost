@@ -529,22 +529,6 @@ exports.getMahasiswaById = async(req, res) => {
     }
 }
 
-exports.getMahasiswaByKelas = async(req, res) => {
-    try {
-        if (req.user.userType != "admin PT" && req.user.userType != "dosen") {
-            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
-        }
-        const idKelas = req.params.id 
-        data = await dataService.getMahasiswaByKelas(req.user.username, idKelas) 
-        res.status(200).send({data});
-    } catch(error){
-        res.status(400).send({
-            success: false,
-            error: error.toString(),
-        })    
-    }
-}
-
 //Mata KUliah
 exports.createMataKuliah = async(req, res) => {
     try{
@@ -833,7 +817,7 @@ exports.getAllKelas = async(req, res) => {
 
 exports.getKelasById = async(req, res) => {
     try {
-        if (req.user.userType != "admin PT") {
+        if (req.user.userType != "admin PT" && req.user.userType != "dosen") {
             return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
         }
         const idKelas = req.params.id
