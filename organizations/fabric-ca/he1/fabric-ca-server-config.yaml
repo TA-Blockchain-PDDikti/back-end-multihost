@@ -303,9 +303,9 @@ signing:
 csr:
    cn: ca.he1.example.com
    names:
-      - C: UK
-        ST: "Hampshire"
-        L: "Hursley"
+      - C: ID
+        ST:
+        L: "Depok"
         O: he1.example.com
         OU:
    hosts:
