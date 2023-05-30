@@ -38,7 +38,7 @@ scripts/test-cc/testPdCC.sh $CHANNEL_NAME "pdcontract" 2 3 $VERBOSE
 scripts/test-cc/testMkCC.sh $CHANNEL_NAME "mkcontract" 2 3 $VERBOSE
 scripts/test-cc/testKlsCC.sh $CHANNEL_NAME "klscontract" 2 3 $VERBOSE
 scripts/test-cc/testNpdCC.sh $CHANNEL_NAME "npdcontract" 2 3 $VERBOSE
-scripts/test-cc/testIjzCC.sh $CHANNEL_NAME "ijzcontract" 2 3 $VERBOSE
 scripts/test-cc/testTskCC.sh $CHANNEL_NAME "tskcontract" 2 3 $VERBOSE
+scripts/test-cc/testIjzCC.sh $CHANNEL_NAME "ijzcontract" 2 3 $VERBOSE
 
 exit 0

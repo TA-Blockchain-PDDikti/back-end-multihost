@@ -52,6 +52,7 @@ const (
 	ER11 string = "ER11-Incorrect number of arguments. Required %d arguments, but you have %d arguments."
 	ER12        = "ER12-Transkrip with id '%s' already exists."
 	ER13        = "ER13-Transkrip with id '%s' doesn't exist."
+	ER14        = "ER14-Transkrip with id '%s' already approved by PTK with id '%s'."
 	ER31        = "ER31-Failed to change to world state: %v."
 	ER32        = "ER32-Failed to read from world state: %v."
 	ER33        = "ER33-Failed to get result from iterator: %v."
@@ -218,7 +219,7 @@ func (s *TSKContract) UpdateTsk (ctx contractapi.TransactionContextInterface) er
 }
 
 // ============================================================================================================================
-// AddTskApproval - Add Signature for an existing Transkrip Mahasiswa (TSK) in the world state.
+// AddTskApproval - Add Approval for an existing Transkrip Mahasiswa (TSK) in the world state.
 // Arguments - ID, Approver Id
 // ============================================================================================================================
 
@@ -246,6 +247,10 @@ func (s *TSKContract) AddTskApproval (ctx contractapi.TransactionContextInterfac
 	tsk, err := getTskStateById(ctx, id)
 	if err != nil {
 		return err
+	}
+
+	if contains(tsk.Approvers, approver) {
+		return fmt.Errorf(ER14, id, approver)
 	}
 
 	tsk.Approvers = append(tsk.Approvers, approver)
@@ -548,3 +553,18 @@ func getQueryResultForQueryString(ctx contractapi.TransactionContextInterface, q
 
 	return constructQueryResponseFromIterator(resultsIterator)
 }
+
+
+// ============================================================================================================================
+// contains - Check if the slice contains the given value
+// ============================================================================================================================
+
+func contains(elems []string, v string) bool {
+    for _, s := range elems {
+        if v == s {
+            return true
+        }
+    }
+    return false
+}
+

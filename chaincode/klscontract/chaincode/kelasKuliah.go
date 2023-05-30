@@ -246,7 +246,7 @@ func (s *KLSContract) UpdateKlsListPd(ctx contractapi.TransactionContextInterfac
 
 	listPdStr = strings.Replace(listPdStr, "[", "", -1)
 	listPdStr = strings.Replace(listPdStr, "]", "", -1)
-	splitter := regexp.MustCompile(`, `)
+	splitter := regexp.MustCompile(` *, *`)
 	listPd :=  splitter.Split(listPdStr, -1)
 
 	kls.ListPD = listPd
