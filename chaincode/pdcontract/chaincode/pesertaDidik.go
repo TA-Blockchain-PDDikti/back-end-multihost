@@ -3,6 +3,8 @@ package chaincode
 import (
 	"encoding/json"
 	"fmt"
+	"regexp"
+	"strings"
 	"strconv"
 
 	"github.com/hyperledger/fabric/common/flogging"
@@ -272,6 +274,52 @@ func (s *PDContract) SetPdGraduated(ctx contractapi.TransactionContextInterface)
 	}
 
 	return err
+}
+
+
+// ============================================================================================================================
+// SetPdGraduatedBatch - Set status of an existing Peserta Didik (PD) in the world state to 'LULUS' in batch.
+// Arguments - List ID PD
+// ============================================================================================================================
+
+func (s *PDContract) SetPdGraduatedBatch(ctx contractapi.TransactionContextInterface) error {
+	args := ctx.GetStub().GetStringArgs()[1:]
+
+	logger.Infof("Run SetPdGraduatedBatch function with args: %+q.", args)
+
+	if len(args) != 1 {
+		logger.Errorf(ER11, 1, len(args))
+		return fmt.Errorf(ER11, 1, len(args))
+	}
+
+	listPdStr:= args[0]
+
+	listPdStr = strings.Replace(listPdStr, "[", "", -1)
+	listPdStr = strings.Replace(listPdStr, "]", "", -1)
+	splitter := regexp.MustCompile(` *, *`)
+	listPd :=  splitter.Split(listPdStr, -1)
+
+	for _, id := range listPd {
+		pd, err := getPdStateById(ctx, id)
+		if err != nil {
+			return err
+		}
+
+		pd.Status = LULUS
+
+		pdJSON, err := json.Marshal(pd)
+		if err != nil {
+			return err
+		}
+
+		err = ctx.GetStub().PutState(id, pdJSON)
+		if err != nil {
+			logger.Errorf(ER31, err)
+			return err
+		}
+	}
+
+	return nil
 }
 
 
