@@ -39,8 +39,8 @@ const parser = async(result) => {
         const dataMatkul = await dataService.getMataKuliahById('admin', data.mk.id)
         result.kls = {
             "id": id,
-            "namaKls": data.namaKls,
             "sks": data.sks,
+            "namaKls": data.namaKls,
             "namaMk": dataMatkul.namaMk,
             "kodeMk": dataMatkul.kodeMk,
         }
