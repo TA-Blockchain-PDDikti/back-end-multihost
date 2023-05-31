@@ -55,7 +55,7 @@ exports.getIjazahByIdPt = async(user, idPt) => {
     
     const allData =  await getAllParser(queryData)
     await Promise.all(allData.map( async(item, index) => {
-        const txIds = getIjzTxIds(user, item.id)
+        const txIds = await getIjzTxIds(user, item.id)
         const signatures = await fabric.getAllSignature(txIds)
         allData[index].signatures = signatures
     }))
@@ -69,7 +69,7 @@ exports.getIjazahByIdProdi = async(user, idProdi) => {
     
     const allData =  await getAllParser(queryData)
     await Promise.all(allData.map( async(item, index) => {
-        const txIds = getIjzTxIds(user, item.id)
+        const txIds = await getIjzTxIds(user, item.id)
         const signatures = await fabric.getAllSignature(txIds)
         allData[index].signatures = signatures
     }))

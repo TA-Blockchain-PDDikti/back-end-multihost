@@ -1,4 +1,5 @@
 const certificateService = require('../services/academicCertificate.js')
+const dataService = require('../services/data.js')
 
 exports.createAcademicCertificate = async(req, res) => {
     try {
@@ -24,7 +25,6 @@ exports.createAcademicCertificate = async(req, res) => {
 
             argsIjazah = [idPT, idProdi, idMahasiswa, jenjangPendidikan, nomorIjazah, tanggalLulus]
             argsTranskrip = [idPT, idProdi, idMahasiswa, jenjangPendidikan, totalMutu, totalSks, ipk] 
-            await certificateService.setGraduated(req.user.username, idMahasiswa)
             await certificateService.createIjazah(req.user.username, argsIjazah)
             await certificateService.createTranskrip(req.user.username, argsTranskrip)
         }))
@@ -302,6 +302,68 @@ exports.getTranskripByIdMahasiswa = async(req, res) => {
         
     }
 }
+
+exports.getIjazahByIdApprover = async(req, res) => {
+    try {
+        if (req.user.userType != "dosen" ) {
+            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
+        }
+        const idApprover = req.params.id
+        const approver = await dataService.getDosenById(req.user.username, idApprover) 
+        var lstProdi = await dataService.getProdiByPT(req.user.username, approver.sp.id)
+        lstProdi = lstProdi.filter(x => x.signersIjz.includes(idApprover))
+
+        var listIjazah = []
+        await Promise.all(lstProdi.map( async(item, index) => {
+            var idProdi = item.id
+            var step = item.signersIjz.indexOf(idApprover)
+            const result = await certificateService.getIjazahByIdProdi(req.user.username, idProdi)
+            const filterIjazahStep = result.filter(x => x.approvalStep == step)
+            listIjazah.push(...filterIjazahStep)
+            console.log(idProdi, step, listIjazah)
+            
+        }))
+        res.status(200).send({
+            listIjazah
+        })
+    } catch(error){
+        res.status(400).send({
+            success: false,
+            error: error.toString(),
+        })      
+    }
+}
+
+exports.getTranskripByIdApprover = async(req, res) => {
+    try {
+        if (req.user.userType != "dosen" ) {
+            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
+        }
+
+        const idApprover = req.params.id
+        const approver = await dataService.getDosenById(req.user.username, idApprover) 
+        var prodi = await dataService.getProdiById(req.user.username, approver.sms.id)
+        
+        var listTranskrip = []
+        if (prodi.signersTsk.includes(idApprover)){
+            var step = prodi.signersIjz.indexOf(idApprover)
+            const result = await certificateService.getTranskripByIdProdi(req.user.username, approver.sms.id)
+            listTranskrip = result.filter(x => x.approvalStep == step)
+        }
+
+        res.status(200).send({
+            listTranskrip
+        })
+
+    } catch(error){
+        res.status(400).send({
+            success: false,
+            error: error.toString(),
+        })  
+        
+    }
+}
+
 
 exports.approveIjazah = async(req, res) => {
     try {

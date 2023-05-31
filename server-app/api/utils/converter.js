@@ -112,7 +112,6 @@ const getAllParser = async (queryData) => {
         }))
         return result;
     } catch(error) {
-        console.log("ERROR", error)
         return []
     }
 }
