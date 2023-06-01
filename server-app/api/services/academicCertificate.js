@@ -128,7 +128,7 @@ exports.getAllTranskrip = async(user) => {
     
     const allData =  await getAllParser(queryData)
     await Promise.all(allData.map( async(item, index) => {
-        const nilai = await  academicRecordService.getAcademicRecordByIdMhsw(item.pd.id) 
+        const nilai = await  academicRecordService.getAcademicRecordByIdMhsw(user, item.pd.id) 
         allData[index].nilai = nilai
         
         const txIds = await getTskTxIds(user, item.id)
@@ -160,7 +160,7 @@ exports.getTranskripByIdPt = async(user, idTsk) => {
     
     const allData =  await getAllParser(queryData)
     await Promise.all(allData.map( async(item, index) => {
-        const nilai = await  academicRecordService.getAcademicRecordByIdMhsw(item.pd.id) 
+        const nilai = await  academicRecordService.getAcademicRecordByIdMhsw(user, item.pd.id) 
         allData[index].nilai = nilai
 
         const txIds = await getTskTxIds(user, item.id)
@@ -177,7 +177,7 @@ exports.getTranskripByIdProdi = async(user, idTsk) => {
     
     const allData =  await getAllParser(queryData)
     await Promise.all(allData.map( async(item, index) => {
-        const nilai = await  academicRecordService.getAcademicRecordByIdMhsw(item.pd.id) 
+        const nilai = await  academicRecordService.getAcademicRecordByIdMhsw(user, item.pd.id) 
         allData[index].nilai = nilai
 
         const txIds = await getTskTxIds(user, item.id)
@@ -194,7 +194,7 @@ exports.getTranskripByIdMahasiswa = async(user, idTsk) => {
     
     const allData =  await getAllParser(queryData)
     await Promise.all(allData.map( async(item, index) => {
-        const nilai = await  academicRecordService.getAcademicRecordByIdMhsw(item.pd.id) 
+        const nilai = await  academicRecordService.getAcademicRecordByIdMhsw(user, item.pd.id) 
         allData[index].nilai = nilai
 
         const txIds = await getTskTxIds(user, item.id)
