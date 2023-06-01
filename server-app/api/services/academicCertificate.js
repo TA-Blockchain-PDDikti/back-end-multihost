@@ -294,11 +294,9 @@ exports.verify = async(identifier) => {
             throw "Data ijazah dan transkrip tidak cocok"
         }
 
-        const nilai = await getAcademicRecordByIdMhsw("admin", ijazah.pd.id)
         const data = {
             "ijazah": ijazah,
             "transkrip": transkrip[0],
-            "nilai": nilai
         }
     
         network.gateway.disconnect()
