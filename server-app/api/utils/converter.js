@@ -36,9 +36,13 @@ const parser = async(result) => {
     if (result.idKls){
         const id = result.idKls
         const data = await dataService.getKelasById('admin', id)
+        const dataMatkul = await dataService.getMataKuliahById('admin', data.mk.id)
         result.kls = {
             "id": id,
-            "nama": data.namaKls
+            "sks": data.sks,
+            "namaKls": data.namaKls,
+            "namaMk": dataMatkul.namaMk,
+            "kodeMk": dataMatkul.kodeMk,
         }
         delete result.idKls
     }
@@ -112,7 +116,6 @@ const getAllParser = async (queryData) => {
         }))
         return result;
     } catch(error) {
-        console.log("ERROR", error)
         return []
     }
 }

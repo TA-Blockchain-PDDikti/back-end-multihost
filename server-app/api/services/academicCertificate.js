@@ -55,7 +55,7 @@ exports.getIjazahByIdPt = async(user, idPt) => {
     
     const allData =  await getAllParser(queryData)
     await Promise.all(allData.map( async(item, index) => {
-        const txIds = getIjzTxIds(user, item.id)
+        const txIds = await getIjzTxIds(user, item.id)
         const signatures = await fabric.getAllSignature(txIds)
         allData[index].signatures = signatures
     }))
@@ -69,7 +69,7 @@ exports.getIjazahByIdProdi = async(user, idProdi) => {
     
     const allData =  await getAllParser(queryData)
     await Promise.all(allData.map( async(item, index) => {
-        const txIds = getIjzTxIds(user, item.id)
+        const txIds = await getIjzTxIds(user, item.id)
         const signatures = await fabric.getAllSignature(txIds)
         allData[index].signatures = signatures
     }))
@@ -227,48 +227,57 @@ exports.generateIdentifier = async(user, idIjazah, idTranskrip) => {
     const txIdsIjz = await getIjzTxIds(user, idIjazah)
     const listTxIdIjz = JSON.parse(txIdsIjz)
 
-    const txIdsTsk = await  getTskTxIds(user, idTranskrip)
-    const listTxIdTsk = JSON.parse(txIdsTsk)
-
-
     // listTxIdIjzlength !== length dari signer ijazah
     if (listTxIdIjz.length === 0) {
         throw "Ijazah belum disetujui"
     }
+
+    const txIdsTsk = await  getTskTxIds(user, idTranskrip)
+    const listTxIdTsk = JSON.parse(txIdsTsk)
 
       // listTxIdTsklength !== length dari signer Transkrip
     if (listTxIdTsk.length === 0) {
         throw "Transkrip belum disetujui"
     }
 
+    const identifier = {}
 
     const network = await fabric.connectToNetwork("Kemdikbud", "qscc", 'admin')
-    const block = await network.contract.evaluateTransaction('GetBlockByTxID', 'academicchannel', listTxIdIjz[listTxIdIjz.length - 1])
-    network.gateway.disconnect()
+    const blockIjazah = await network.contract.evaluateTransaction('GetBlockByTxID', 'academicchannel', listTxIdIjz[listTxIdIjz.length - 1])
+    const blockTranskrip = await network.contract.evaluateTransaction('GetBlockByTxID', 'academicchannel', listTxIdTsk[listTxIdTsk.length - 1])
 
-    const blockDecode = BlockDecoder.decode(block)
-    const identifier = fabric.calculateBlockHash(blockDecode.header)
+    identifier.ijazah = fabric.calculateBlockHash(BlockDecoder.decode(blockIjazah).header)
+    identifier.transkrip = fabric.calculateBlockHash(BlockDecoder.decode(blockTranskrip).header)
     
+    network.gateway.disconnect()
     return identifier;
 }
 
 exports.verify = async(identifier) => {
     try {
-        // match identifier with block
+        // find block that block hash == identifier
         console.log(identifier)
         const network = await fabric.connectToNetwork("Kemdikbud", "qscc", 'admin')
-        const blockIjazah = await network.contract.evaluateTransaction('GetBlockByHash', 'academicchannel', Buffer.from(identifier, 'hex'))
-        const blockIjazahDecode = BlockDecoder.decode(blockIjazah)
-        const args = blockIjazahDecode.data.data[0].payload.data.actions[0].payload.chaincode_proposal_payload.input.chaincode_spec.input.args
-        console.log("args", Buffer.from(args[1]).toString())
-        const idIjazah = Buffer.from(args[1]).toString()
+        const blockIjazah = await network.contract.evaluateTransaction('GetBlockByHash', 'academicchannel', Buffer.from(identifier.ijazah, 'hex'))
+        const blockTranskrip = await network.contract.evaluateTransaction('GetBlockByHash', 'academicchannel', Buffer.from(identifier.transkrip, 'hex'))
+
+        // Get data from block
+        const argsIjz = BlockDecoder.decode(blockIjazah).data.data[0].payload.data.actions[0].payload.chaincode_proposal_payload.input.chaincode_spec.input.args
+        const idIjazah = Buffer.from(argsIjz[1]).toString()
+        const argsTsk = BlockDecoder.decode(blockTranskrip).data.data[0].payload.data.actions[0].payload.chaincode_proposal_payload.input.chaincode_spec.input.args
+        const idTranskrip = Buffer.from(argsTsk[1]).toString()
+
 
         console.log("ID Ijazah",idIjazah)
         //query data ijazah, transkrip, nilai
         const ijazah = await this.getIjazahById("admin", idIjazah)
-        const idMahasiswa = ijazah.pd.id 
-        const transkrip = await this.getTranskripByIdMahasiswa("admin",idMahasiswa)
-        const nilai = await getAcademicRecordByIdMhsw("admin",idMahasiswa)
+        const transkrip = await this.getTranskripById("admin", idTranskrip)
+
+        if (ijazah.pd.id  !== transkrip.pd.id){
+            throw "Data ijazah dan transkrip tidak cocok"
+        }
+
+        const nilai = await getAcademicRecordByIdMhsw("admin", ijazah.pd.id)
         const data = {
             "ijazah": ijazah,
             "transkrip": transkrip[0],
