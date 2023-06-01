@@ -2,7 +2,8 @@ const fabric = require("../utils/fabric.js")
 const { v4: uuidv4 } = require('uuid')
 const { getAllParser, getParser } = require('../utils/converter.js')
 const { BlockDecoder } = require('fabric-common');
-const { getAcademicRecordByIdMhsw } = require('./academicRecord.js')
+const { getAcademicRecordByIdMhsw } = require('./academicRecord.js');
+const academicRecordService = require('../services/academicRecord.js')
 
 const getIjzTxIds = async(user, id) => {
     const network = await fabric.connectToNetwork("HE1", "ijzcontract", user)
@@ -127,6 +128,9 @@ exports.getAllTranskrip = async(user) => {
     
     const allData =  await getAllParser(queryData)
     await Promise.all(allData.map( async(item, index) => {
+        const nilai = await  academicRecordService.getAcademicRecordByIdMhsw(item.pd.id) 
+        allData[index].nilai = nilai
+        
         const txIds = await getTskTxIds(user, item.id)
         const signature = await fabric.getAllSignature(txIds)
         allData[index].signature = signature
@@ -140,6 +144,10 @@ exports.getTranskripById = async(user, idTsk) => {
     network.gateway.disconnect()
 
     const data =  await getParser(result)
+
+    const nilai = await  academicRecordService.getAcademicRecordByIdMhsw(data.pd.id) 
+    data.nilai = nilai
+
     const txIds = await getTskTxIds(user, data.id)
     data.signatures =  await fabric.getAllSignature(txIds)
     return data
@@ -152,6 +160,9 @@ exports.getTranskripByIdPt = async(user, idTsk) => {
     
     const allData =  await getAllParser(queryData)
     await Promise.all(allData.map( async(item, index) => {
+        const nilai = await  academicRecordService.getAcademicRecordByIdMhsw(item.pd.id) 
+        allData[index].nilai = nilai
+
         const txIds = await getTskTxIds(user, item.id)
         const signatures = await fabric.getAllSignature(txIds)
         allData[index].signatures = signatures
@@ -166,6 +177,9 @@ exports.getTranskripByIdProdi = async(user, idTsk) => {
     
     const allData =  await getAllParser(queryData)
     await Promise.all(allData.map( async(item, index) => {
+        const nilai = await  academicRecordService.getAcademicRecordByIdMhsw(item.pd.id) 
+        allData[index].nilai = nilai
+
         const txIds = await getTskTxIds(user, item.id)
         const signatures = await fabric.getAllSignature(txIds)
         allData[index].signatures = signatures
@@ -180,6 +194,9 @@ exports.getTranskripByIdMahasiswa = async(user, idTsk) => {
     
     const allData =  await getAllParser(queryData)
     await Promise.all(allData.map( async(item, index) => {
+        const nilai = await  academicRecordService.getAcademicRecordByIdMhsw(item.pd.id) 
+        allData[index].nilai = nilai
+
         const txIds = await getTskTxIds(user, item.id)
         const signatures = await fabric.getAllSignature(txIds)
         allData[index].signatures = signatures
