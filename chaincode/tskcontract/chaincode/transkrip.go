@@ -39,8 +39,18 @@ type Transkrip struct {
 	TotalMutu			int 			`json:"totalMutu"`
 	TotalSKS			int 			`json:"totalSks"`
 	IPK					float64			`json:"ipk"`
-	ApprovalStep		int 			`json:"approvalStep"`
+	RemainingApprover	int 			`json:"remainingApprover"`
 	Approvers			[]string 		`json:"Approvers"`
+}
+
+
+// ============================================================================================================================
+// Struct Definitions - SatuanManagemenSumberdaya (SMS)
+// ============================================================================================================================
+
+type SatuanManagemenSumberdaya struct {
+	ApproversTSK			[]string 	`json:"approversTsk"`
+	ApproversIJZ			[]string 	`json:"approversIjz"`
 }
 
 
@@ -52,15 +62,28 @@ const (
 	ER11 string = "ER11-Incorrect number of arguments. Required %d arguments, but you have %d arguments."
 	ER12        = "ER12-Transkrip with id '%s' already exists."
 	ER13        = "ER13-Transkrip with id '%s' doesn't exist."
-	ER14        = "ER14-Transkrip with id '%s' already approved by PTK with id '%s'."
+	ER14        = "ER14-Transkrip with id '%s' no longer require approval."
+	ER15        = "ER15-Transkrip with id '%s' already approved by PTK with id '%s'."
+	ER16        = "ER16-Transkrip with id '%s' cannot be approved by PTK with id '%s' in this step."
 	ER31        = "ER31-Failed to change to world state: %v."
 	ER32        = "ER32-Failed to read from world state: %v."
 	ER33        = "ER33-Failed to get result from iterator: %v."
 	ER34        = "ER34-Failed unmarshaling JSON: %v."
 	ER35        = "ER35-Failed parsing string to integer: %v."
 	ER36        = "ER36-Failed parsing string to float: %v."
+	ER37        = "ER37-Failed to query another chaincode (%s): %v."
 	ER41        = "ER41-Access is not permitted with MSDPID '%s'."
 	ER42        = "ER42-Unknown MSPID: '%s'."
+)
+
+
+// ============================================================================================================================
+// Channel Name & Contract Name In The Channel
+// ============================================================================================================================
+
+const (
+	AcademicChannel	string = "academicchannel"
+	SMSContract 	string = "smscontract"
 )
 
 
@@ -115,6 +138,11 @@ func (s *TSKContract) CreateTsk (ctx contractapi.TransactionContextInterface) er
 		return fmt.Errorf(ER35, id)
 	}
 
+	smsApproverTsk, err := getSmsApproverTsk(ctx, idSms)
+	if err != nil {
+		return err
+	}
+
 	tsk := Transkrip{
 		ID:      			id,
 		IdSP:				idSp,
@@ -124,7 +152,7 @@ func (s *TSKContract) CreateTsk (ctx contractapi.TransactionContextInterface) er
 		TotalMutu:			totalMutu,
 		TotalSKS:			totalSks,
 		IPK:				ipk,
-		ApprovalStep:		0,
+		RemainingApprover:	len(smsApproverTsk),
 		Approvers:			[]string{},
 	}
 
@@ -192,6 +220,11 @@ func (s *TSKContract) UpdateTsk (ctx contractapi.TransactionContextInterface) er
 		return fmt.Errorf(ER35, id)
 	}
 
+	smsApproverTsk, err := getSmsApproverTsk(ctx, idSms)
+	if err != nil {
+		return err
+	}
+
 	tsk := Transkrip{
 		ID:      			id,
 		IdSP:				idSp,
@@ -201,7 +234,7 @@ func (s *TSKContract) UpdateTsk (ctx contractapi.TransactionContextInterface) er
 		TotalMutu:			totalMutu,
 		TotalSKS:			totalSks,
 		IPK:				ipk,
-		ApprovalStep:		0,
+		RemainingApprover:	len(smsApproverTsk),
 		Approvers:			[]string{},
 	}
 
@@ -249,12 +282,26 @@ func (s *TSKContract) AddTskApproval (ctx contractapi.TransactionContextInterfac
 		return err
 	}
 
+	if tsk.RemainingApprover == 0 {
+		return fmt.Errorf(ER14, id)
+	}
+
 	if contains(tsk.Approvers, approver) {
-		return fmt.Errorf(ER14, id, approver)
+		return fmt.Errorf(ER15, id, approver)
+	}
+
+	smsApproverTsk, err := getSmsApproverTsk(ctx, tsk.IdSMS)
+	if err != nil {
+		return err
+	}
+
+	approvalStep := len(tsk.Approvers)
+	if smsApproverTsk[approvalStep] != approver {
+		return fmt.Errorf(ER16, id, approver)
 	}
 
 	tsk.Approvers = append(tsk.Approvers, approver)
-	tsk.ApprovalStep = tsk.ApprovalStep + 1
+	tsk.RemainingApprover = tsk.RemainingApprover - 1
 
 	tskJSON, err := json.Marshal(tsk)
 	if err != nil {
@@ -458,7 +505,7 @@ func (t *TSKContract) GetTskAddApprovalTxIdById(ctx contractapi.TransactionConte
 			return nil, fmt.Errorf(ER34, err)
 		}
 
-		if (tsk.ApprovalStep == 0) {
+		if (len(tsk.Approvers) == 0) {
 			break
 		}
 
@@ -508,6 +555,34 @@ func getTskStateById(ctx contractapi.TransactionContextInterface, id string) (*T
 	}
 
 	return &tsk, nil
+}
+
+
+// ============================================================================================================================
+// getSmsApproverTsk - Get SMS Approver TSK with given idSms.
+// ============================================================================================================================
+
+func getSmsApproverTsk(ctx contractapi.TransactionContextInterface, idSms string) ([]string, error) {
+	logger.Infof("Run getSmsApproverTsk function with idSms: '%s'.", idSms)
+
+	params := []string{"GetSmsById", idSms}
+	queryArgs := make([][]byte, len(params))
+	for i, arg := range params {
+		queryArgs[i] = []byte(arg)
+	}
+
+	response := ctx.GetStub().InvokeChaincode(SMSContract, queryArgs, AcademicChannel)
+	if response.Status != shim.OK {
+		return nil, fmt.Errorf(ER37, SMSContract, response.Payload)
+	}
+
+	var sms SatuanManagemenSumberdaya
+	err := json.Unmarshal([]byte(response.Payload), &sms)
+	if err != nil {
+		return nil, fmt.Errorf(ER34, err)
+	}
+
+	return sms.ApproversTSK, nil
 }
 
 
