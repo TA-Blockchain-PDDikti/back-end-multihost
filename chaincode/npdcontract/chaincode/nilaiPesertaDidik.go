@@ -3,6 +3,7 @@ package chaincode
 import (
 	"encoding/json"
 	"fmt"
+	"math"
 	"strconv"
 
 	"github.com/hyperledger/fabric/common/flogging"
@@ -42,6 +43,28 @@ type NilaiPesertaDidik struct {
 
 
 // ============================================================================================================================
+// Struct Definitions - PesertaDidik (PD)
+// ============================================================================================================================
+
+type PesertaDidik struct {
+	ID      			string 	`json:"id"`
+	TotalMutu			float64	`json:"totalMutu"`
+	TotalSKS			int 	`json:"totalSks"`
+	IPK					float64	`json:"ipk"`
+}
+
+
+// ============================================================================================================================
+// Struct Definitions - KelasKuliah (KLS)
+// ============================================================================================================================
+
+type KelasKuliah struct {
+	ID      			string 		`json:"id"`
+	SKS					int 		`json:"sks"`
+}
+
+
+// ============================================================================================================================
 // Error Messages
 // ============================================================================================================================
 
@@ -55,8 +78,20 @@ const (
 	ER34        = "ER34-Failed unmarshaling JSON: %v."
 	ER35        = "ER35-Failed parsing string to integer: %v."
 	ER36        = "ER36-Failed parsing string to float: %v."
+	ER37        = "ER37-Failed to query another chaincode (%s): %v."
 	ER41        = "ER41-Access is not permitted with MSDPID '%s'."
 	ER42        = "ER42-Unknown MSPID: '%s'."
+)
+
+
+// ============================================================================================================================
+// Channel Name & Contract Name In The Channel
+// ============================================================================================================================
+
+const (
+	AcademicChannel	string = "academicchannel"
+	PDContract 		string = "pdcontract"
+	KLSContract 	string = "klscontract"
 )
 
 
@@ -102,6 +137,25 @@ func (s *NPDContract) CreateNpd(ctx contractapi.TransactionContextInterface) err
 	if err != nil {
 		logger.Errorf(ER36, id)
 		return fmt.Errorf(ER36, id)
+	}
+
+	pd, err := getPdById(ctx, idPd)
+	if err != nil {
+		return err
+	}
+
+	kls, err := getKlsById(ctx, idKls)
+	if err != nil {
+		return err
+	}
+
+	totalMutu := pd.TotalMutu + (float64(kls.SKS) * nilaiIndex)
+	totalSks := pd.TotalSKS + kls.SKS
+	ipk := math.Round((totalMutu / float64(totalSks)) * 100) / 100
+
+	err = updatePdRecord(ctx, idPd, fmt.Sprintf("%v", totalMutu), fmt.Sprintf("%v", totalSks), fmt.Sprintf("%v", ipk))
+	if err != nil {
+		return err
 	}
 
 	npd := NilaiPesertaDidik{
@@ -168,6 +222,25 @@ func (s *NPDContract) UpdateNpd(ctx contractapi.TransactionContextInterface) err
 		return fmt.Errorf(ER36, id)
 	}
 
+	pd, err := getPdById(ctx, idPd)
+	if err != nil {
+		return err
+	}
+
+	kls, err := getKlsById(ctx, idKls)
+	if err != nil {
+		return err
+	}
+
+	totalMutu := pd.TotalMutu + (float64(kls.SKS) * nilaiIndex) - (float64(kls.SKS) * npd.NilaiIndex)
+	totalSks := pd.TotalSKS
+	ipk := math.Round((totalMutu / float64(totalSks)) * 100) / 100
+
+	err = updatePdRecord(ctx, idPd, fmt.Sprintf("%v", totalMutu), fmt.Sprintf("%v", totalSks), fmt.Sprintf("%v", ipk))
+	if err != nil {
+		return err
+	}
+
 	npd.IdKLS = idKls
 	npd.IdPTK = idPtk
 	npd.IdPD = idPd
@@ -205,12 +278,28 @@ func (s *NPDContract) DeleteNpd(ctx contractapi.TransactionContextInterface) err
 
 	id:= args[0]
 
-	exists, err := isNpdExists(ctx, id)
+	npd, err := getNpdStateById(ctx, id)
 	if err != nil {
 		return err
 	}
-	if !exists {
-		return fmt.Errorf(ER13, id)
+
+	pd, err := getPdById(ctx, npd.IdPD)
+	if err != nil {
+		return err
+	}
+
+	kls, err := getKlsById(ctx, npd.IdKLS)
+	if err != nil {
+		return err
+	}
+
+	totalMutu := pd.TotalMutu - (float64(kls.SKS) * npd.NilaiIndex)
+	totalSks := pd.TotalSKS - kls.SKS
+	ipk := math.Round((totalMutu / float64(totalSks)) * 100) / 100
+
+	err = updatePdRecord(ctx, npd.IdPD, fmt.Sprintf("%v", totalMutu), fmt.Sprintf("%v", totalSks), fmt.Sprintf("%v", ipk))
+	if err != nil {
+		return err
 	}
 
 	err = ctx.GetStub().DelState(id)
@@ -388,6 +477,84 @@ func getNpdStateById(ctx contractapi.TransactionContextInterface, id string) (*N
 	}
 
 	return &npd, nil
+}
+
+
+// ============================================================================================================================
+// getKlsById - Get KLS with given idKls.
+// ============================================================================================================================
+
+func getKlsById(ctx contractapi.TransactionContextInterface, idKls string) (*KelasKuliah, error) {
+	logger.Infof("Run getKlsById function with idKls: '%s'.", idKls)
+
+	params := []string{"GetKlsById", idKls}
+	queryArgs := make([][]byte, len(params))
+	for i, arg := range params {
+		queryArgs[i] = []byte(arg)
+	}
+
+	response := ctx.GetStub().InvokeChaincode(KLSContract, queryArgs, AcademicChannel)
+	if response.Status != shim.OK {
+		return nil, fmt.Errorf(ER37, KLSContract, response.Payload)
+	}
+
+	var kls KelasKuliah
+	err := json.Unmarshal([]byte(response.Payload), &kls)
+	if err != nil {
+		return nil, fmt.Errorf(ER34, err)
+	}
+
+	return &kls, nil
+}
+
+
+// ============================================================================================================================
+// getPdById - Get PD with given idPd.
+// ============================================================================================================================
+
+func getPdById(ctx contractapi.TransactionContextInterface, idPd string) (*PesertaDidik, error) {
+	logger.Infof("Run getPdById function with idPd: '%s'.", idPd)
+
+	params := []string{"GetPdById", idPd}
+	queryArgs := make([][]byte, len(params))
+	for i, arg := range params {
+		queryArgs[i] = []byte(arg)
+	}
+
+	response := ctx.GetStub().InvokeChaincode(PDContract, queryArgs, AcademicChannel)
+	if response.Status != shim.OK {
+		return nil, fmt.Errorf(ER37, PDContract, response.Payload)
+	}
+
+	var pd PesertaDidik
+	err := json.Unmarshal([]byte(response.Payload), &pd)
+	if err != nil {
+		return nil, fmt.Errorf(ER34, err)
+	}
+
+	return &pd, nil
+}
+
+
+// ============================================================================================================================
+// updatePdRecord - Update PD Record with given.
+// ============================================================================================================================
+
+func updatePdRecord(ctx contractapi.TransactionContextInterface, idPd string, totalMutu string, totalSks string, ipk string) (error) {
+	logger.Infof("Run updatePdRecord function with idPd: '%s'.", idPd)
+
+	params := []string{"UpdatePdRecord", idPd, totalMutu, totalSks, ipk}
+	invokeArgs := make([][]byte, len(params))
+	for i, arg := range params {
+		invokeArgs[i] = []byte(arg)
+	}
+
+	response := ctx.GetStub().InvokeChaincode(PDContract, invokeArgs, AcademicChannel)
+	if response.Status != shim.OK {
+		return fmt.Errorf(ER37, PDContract, response.Payload)
+	}
+
+	return nil
 }
 
 
