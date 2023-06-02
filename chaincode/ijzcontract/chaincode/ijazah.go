@@ -37,8 +37,18 @@ type Ijazah struct {
 	JenjangPendidikan	string 			`json:"jenjangPendidikan"`
 	NomorIjazah			string 			`json:"nomorIjazah"`
 	TanggalLulus		string 			`json:"tanggalLulus"`
-	ApprovalStep		int 			`json:"approvalStep"`
+	RemainingApprover	int 			`json:"remainingApprover"`
 	Approvers			[]string 		`json:"Approvers"`
+}
+
+
+// ============================================================================================================================
+// Struct Definitions - SatuanManagemenSumberdaya (SMS)
+// ============================================================================================================================
+
+type SatuanManagemenSumberdaya struct {
+	ApproversTSK			[]string 	`json:"approversTsk"`
+	ApproversIJZ			[]string 	`json:"approversIjz"`
 }
 
 
@@ -50,15 +60,28 @@ const (
 	ER11 string = "ER11-Incorrect number of arguments. Required %d arguments, but you have %d arguments."
 	ER12        = "ER12-Ijazah with id '%s' already exists."
 	ER13        = "ER13-Ijazah with id '%s' doesn't exist."
-	ER14        = "ER14-Ijazah with id '%s' already approved by PTK with id '%s'."
+	ER14        = "ER14-Ijazah with id '%s' no longer require approval."
+	ER15        = "ER15-Ijazah with id '%s' already approved by PTK with id '%s'."
+	ER16        = "ER16-Ijazah with id '%s' cannot be approved by PTK with id '%s' in this step."
 	ER31        = "ER31-Failed to change to world state: %v."
 	ER32        = "ER32-Failed to read from world state: %v."
 	ER33        = "ER33-Failed to get result from iterator: %v."
 	ER34        = "ER34-Failed unmarshaling JSON: %v."
 	ER35        = "ER35-Failed parsing string to integer: %v."
 	ER36        = "ER36-Failed parsing string to float: %v."
+	ER37        = "ER37-Failed to query another chaincode (%s): %v."
 	ER41        = "ER41-Access is not permitted with MSDPID '%s'."
 	ER42        = "ER42-Unknown MSPID: '%s'."
+)
+
+
+// ============================================================================================================================
+// Channel Name & Contract Name In The Channel
+// ============================================================================================================================
+
+const (
+	AcademicChannel	string = "academicchannel"
+	SMSContract 	string = "smscontract"
 )
 
 
@@ -94,6 +117,11 @@ func (s *IJZContract) CreateIjz (ctx contractapi.TransactionContextInterface) er
 		return fmt.Errorf(ER12, id)
 	}
 
+	smsApproverIjz, err := getSmsApproverIjz(ctx, idSms)
+	if err != nil {
+		return err
+	}
+
 	ijz := Ijazah{
 		ID:      			id,
 		IdSP:				idSp,
@@ -102,7 +130,7 @@ func (s *IJZContract) CreateIjz (ctx contractapi.TransactionContextInterface) er
 		JenjangPendidikan:	jenjangPendidikan,
 		NomorIjazah:		nomorIjazah,
 		TanggalLulus:		tanggalLulus,
-		ApprovalStep:		0,
+		RemainingApprover:	len(smsApproverIjz),
 		Approvers:			[]string{},
 	}
 
@@ -151,6 +179,11 @@ func (s *IJZContract) UpdateIjz (ctx contractapi.TransactionContextInterface) er
 		return fmt.Errorf(ER13, id)
 	}
 
+	smsApproverIjz, err := getSmsApproverIjz(ctx, idSms)
+	if err != nil {
+		return err
+	}
+
 	ijz := Ijazah{
 		ID:      			id,
 		IdSP:				idSp,
@@ -159,7 +192,7 @@ func (s *IJZContract) UpdateIjz (ctx contractapi.TransactionContextInterface) er
 		JenjangPendidikan:	jenjangPendidikan,
 		NomorIjazah:		nomorIjazah,
 		TanggalLulus:		tanggalLulus,
-		ApprovalStep:		0,
+		RemainingApprover:	len(smsApproverIjz),
 		Approvers:			[]string{},
 	}
 
@@ -207,12 +240,26 @@ func (s *IJZContract) AddIjzApproval (ctx contractapi.TransactionContextInterfac
 		return err
 	}
 
+	if ijz.RemainingApprover == 0 {
+		return fmt.Errorf(ER14, id)
+	}
+
 	if contains(ijz.Approvers, approver) {
-		return fmt.Errorf(ER14, id, approver)
+		return fmt.Errorf(ER15, id, approver)
+	}
+
+	smsApproverIjz, err := getSmsApproverIjz(ctx, ijz.IdSMS)
+	if err != nil {
+		return err
+	}
+
+	approvalStep := len(ijz.Approvers)
+	if smsApproverIjz[approvalStep] != approver {
+		return fmt.Errorf(ER16, id, approver)
 	}
 
 	ijz.Approvers = append(ijz.Approvers, approver)
-	ijz.ApprovalStep = ijz.ApprovalStep + 1
+	ijz.RemainingApprover = ijz.RemainingApprover - 1
 
 	ijzJSON, err := json.Marshal(ijz)
 	if err != nil {
@@ -415,7 +462,7 @@ func (t *IJZContract) GetIjzAddApprovalTxIdById(ctx contractapi.TransactionConte
 			return nil, fmt.Errorf(ER34, err)
 		}
 
-		if (ijz.ApprovalStep == 0) {
+		if (len(ijz.Approvers) == 0) {
 			break
 		}
 
@@ -465,6 +512,34 @@ func getIjzStateById(ctx contractapi.TransactionContextInterface, id string) (*I
 	}
 
 	return &ijz, nil
+}
+
+
+// ============================================================================================================================
+// getSmsApproverIjz - Get SMS Approver IJZ with given idSms.
+// ============================================================================================================================
+
+func getSmsApproverIjz(ctx contractapi.TransactionContextInterface, idSms string) ([]string, error) {
+	logger.Infof("Run getSmsApproverIjz function with idSms: '%s'.", idSms)
+
+	params := []string{"GetSmsById", idSms}
+	queryArgs := make([][]byte, len(params))
+	for i, arg := range params {
+		queryArgs[i] = []byte(arg)
+	}
+
+	response := ctx.GetStub().InvokeChaincode(SMSContract, queryArgs, AcademicChannel)
+	if response.Status != shim.OK {
+		return nil, fmt.Errorf(ER37, SMSContract, response.Payload)
+	}
+
+	var sms SatuanManagemenSumberdaya
+	err := json.Unmarshal([]byte(response.Payload), &sms)
+	if err != nil {
+		return nil, fmt.Errorf(ER34, err)
+	}
+
+	return sms.ApproversIJZ, nil
 }
 
 
