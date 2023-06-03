@@ -97,7 +97,7 @@ const parser = async(result) => {
             item = {
                 "id": id,
                 "nama": data.namaPtk,
-                "nipd": data.nipd,
+                "nidn": data.nidn,
                 "jabatan": data.jabatan
             }
            

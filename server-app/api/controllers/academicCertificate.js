@@ -12,7 +12,7 @@ exports.createAcademicCertificate = async(req, res) => {
         console.log("dataLulusan", dataLulusan, typeof(dataLulusan))
 
         await Promise.all(dataLulusan.map( async(item, index) => {
-
+            console.log(item)
             const idPT = item.idSp;
             const idProdi = item.idSms;
             const idMahasiswa = item.idPd;
@@ -123,6 +123,9 @@ exports.updateTranskrip = async(req, res) => {
 
 exports.getAllIjazah = async(req, res) => {
     try {
+        if (req.user.userType != "admin pddikti") {
+            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
+        }
         const result = await certificateService.getAllIjazah(req.user.username)
         res.status(200).send({
             result
@@ -137,6 +140,9 @@ exports.getAllIjazah = async(req, res) => {
 
 exports.getAllTranskrip = async(req, res) => {
     try {
+        if (req.user.userType != "admin pddikti") {
+            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
+        }
         const result = await certificateService.getAllTranskrip(req.user.username)
         res.status(200).send({
             result
@@ -311,16 +317,13 @@ exports.getIjazahByIdApprover = async(req, res) => {
         const idApprover = req.params.id
         const approver = await dataService.getDosenById(req.user.username, idApprover) 
         var lstProdi = await dataService.getProdiByPT(req.user.username, approver.sp.id)
-        lstProdi = lstProdi.filter(x => x.signersIjz.includes(idApprover))
+        lstProdi = lstProdi.filter(x => x.approversIjz.includes(idApprover))
 
         var listIjazah = []
         await Promise.all(lstProdi.map( async(item, index) => {
-            var idProdi = item.id
-            var step = item.signersIjz.indexOf(idApprover)
-            const result = await certificateService.getIjazahByIdProdi(req.user.username, idProdi)
-            const filterIjazahStep = result.filter(x => x.approvalStep == step)
-            listIjazah.push(...filterIjazahStep)
-            console.log(idProdi, step, listIjazah)
+            const result = await certificateService.getIjazahByIdProdi(req.user.username, item.id)
+            listIjazah.push(...result)
+            console.log(item.id, listIjazah)
             
         }))
         res.status(200).send({
@@ -345,10 +348,8 @@ exports.getTranskripByIdApprover = async(req, res) => {
         var prodi = await dataService.getProdiById(req.user.username, approver.sms.id)
         
         var listTranskrip = []
-        if (prodi.signersTsk.includes(idApprover)){
-            var step = prodi.signersIjz.indexOf(idApprover)
-            const result = await certificateService.getTranskripByIdProdi(req.user.username, approver.sms.id)
-            listTranskrip = result.filter(x => x.approvalStep == step)
+        if (prodi.approversTsk.includes(idApprover)){
+            listTranskrip = await certificateService.getTranskripByIdProdi(req.user.username, approver.sms.id)
         }
 
         res.status(200).send({
