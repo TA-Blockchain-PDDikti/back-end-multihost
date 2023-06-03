@@ -240,33 +240,31 @@ exports.addApproverTranskrip = async(user, args) => {
 }
 
 exports.generateIdentifier = async(user, idIjazah, idTranskrip) => {
-    const txIdsIjz = await getIjzTxIds(user, idIjazah)
-    const listTxIdIjz = JSON.parse(txIdsIjz)
 
-    // listTxIdIjzlength !== length dari signer ijazah
-    if (listTxIdIjz.length === 0) {
-        throw "Ijazah belum disetujui"
+    const ijazah = await this.getIjazahById(user, idIjazah)
+    const transkrip = await this.getTranskripById(user, idTranskrip)
+  
+    console.log(ijazah, transkrip)
+    if (ijazah.remainingApprover == 0 && transkrip.remainingApprover == 0 ) {
+        const identifier = {}
+
+        const txIdsIjz = await getIjzTxIds(user, idIjazah)
+        const listTxIdIjz = JSON.parse(txIdsIjz)
+        const txIdsTsk = await  getTskTxIds(user, idTranskrip)
+        const listTxIdTsk = JSON.parse(txIdsTsk)
+
+        const network = await fabric.connectToNetwork("Kemdikbud", "qscc", 'admin')
+        const blockIjazah = await network.contract.evaluateTransaction('GetBlockByTxID', 'academicchannel', listTxIdIjz[listTxIdIjz.length - 1])
+        const blockTranskrip = await network.contract.evaluateTransaction('GetBlockByTxID', 'academicchannel', listTxIdTsk[listTxIdTsk.length - 1])
+
+        identifier.ijazah = fabric.calculateBlockHash(BlockDecoder.decode(blockIjazah).header)
+        identifier.transkrip = fabric.calculateBlockHash(BlockDecoder.decode(blockTranskrip).header)
+        
+        network.gateway.disconnect()
+        return identifier;
+    } else {
+        throw "Ijazah atau transkrip belum selesai disetujui"
     }
-
-    const txIdsTsk = await  getTskTxIds(user, idTranskrip)
-    const listTxIdTsk = JSON.parse(txIdsTsk)
-
-      // listTxIdTsklength !== length dari signer Transkrip
-    if (listTxIdTsk.length === 0) {
-        throw "Transkrip belum disetujui"
-    }
-
-    const identifier = {}
-
-    const network = await fabric.connectToNetwork("Kemdikbud", "qscc", 'admin')
-    const blockIjazah = await network.contract.evaluateTransaction('GetBlockByTxID', 'academicchannel', listTxIdIjz[listTxIdIjz.length - 1])
-    const blockTranskrip = await network.contract.evaluateTransaction('GetBlockByTxID', 'academicchannel', listTxIdTsk[listTxIdTsk.length - 1])
-
-    identifier.ijazah = fabric.calculateBlockHash(BlockDecoder.decode(blockIjazah).header)
-    identifier.transkrip = fabric.calculateBlockHash(BlockDecoder.decode(blockTranskrip).header)
-    
-    network.gateway.disconnect()
-    return identifier;
 }
 
 exports.verify = async(identifier) => {

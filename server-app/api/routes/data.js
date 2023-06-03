@@ -55,6 +55,4 @@ dataRouter.delete('/kelas/:id', dataController.deleteKelas)
 dataRouter.post('/kelas/dosen', dataController.updateDosenKelas)
 dataRouter.post('/kelas/mahasiswa', dataController.updateMahasiswaKelas)
 
-
-
 module.exports = dataRouter;

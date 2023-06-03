@@ -123,9 +123,6 @@ exports.updateTranskrip = async(req, res) => {
 
 exports.getAllIjazah = async(req, res) => {
     try {
-        if (req.user.userType != "admin pddikti") {
-            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
-        }
         const result = await certificateService.getAllIjazah(req.user.username)
         res.status(200).send({
             result
@@ -140,9 +137,6 @@ exports.getAllIjazah = async(req, res) => {
 
 exports.getAllTranskrip = async(req, res) => {
     try {
-        if (req.user.userType != "admin pddikti") {
-            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
-        }
         const result = await certificateService.getAllTranskrip(req.user.username)
         res.status(200).send({
             result
