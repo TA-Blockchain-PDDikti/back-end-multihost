@@ -39,7 +39,7 @@ type PesertaDidik struct {
 	NamaPD				string 	`json:"namaPd"`
 	NIPD				string 	`json:"nipd"`
 	Username			string 	`json:"username"`
-	TotalMutu			int 	`json:"totalMutu"`
+	TotalMutu			float64	`json:"totalMutu"`
 	TotalSKS			int 	`json:"totalSks"`
 	IPK					float64	`json:"ipk"`
 	Status				int		`json:"status"`
@@ -113,7 +113,7 @@ func (s *PDContract) CreatePd(ctx contractapi.TransactionContextInterface) error
 		NamaPD:				namaPd,
 		NIPD:				nipd,
 		Username:			username,
-		TotalMutu:			0,
+		TotalMutu:			0.00,
 		TotalSKS:			0,
 		IPK:				0.00,
 		Status:				BELUMLULUS,
@@ -203,7 +203,7 @@ func (s *PDContract) UpdatePdRecord(ctx contractapi.TransactionContextInterface)
 		return err
 	}
 
-	totalMutu, err := strconv.Atoi(totalMutuStr)
+	totalMutu, err := strconv.ParseFloat(totalMutuStr, 64)
 	if err != nil {
 		logger.Errorf(ER35, id)
 		return fmt.Errorf(ER35, id)

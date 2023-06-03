@@ -36,8 +36,8 @@ type SatuanManagemenSumberdaya struct {
 	IdSP				string 		`json:"idSp"`
 	NamaSMS				string 		`json:"namaSms"`
 	JenjangPendidikan	string 		`json:"jenjangPendidikan"`
-	SignersTSK			[]string 	`json:"signersTsk"`
-	SignersIJZ			[]string 	`json:"signersIjz"`
+	ApproversTSK			[]string 	`json:"approversTsk"`
+	ApproversIJZ			[]string 	`json:"approversIjz"`
 }
 
 
@@ -92,8 +92,8 @@ func (s *SMSContract) CreateSms(ctx contractapi.TransactionContextInterface) err
 		IdSP:				idSp,
 		NamaSMS:			namaSms,
 		JenjangPendidikan:	jenjangPendidikan,
-		SignersTSK:			[]string{},
-		SignersIJZ:			[]string{},
+		ApproversTSK:			[]string{},
+		ApproversIJZ:			[]string{},
 	}
 
 	smsJSON, err := json.Marshal(sms)
@@ -154,14 +154,14 @@ func (s *SMSContract) UpdateSms(ctx contractapi.TransactionContextInterface) err
 
 
 // ============================================================================================================================
-// UpdateSmsSignersTsk - Updates an existing Satuan Managemen Sumberdaya (SMS) in the world state with provided parameters.
-// Arguments - ID, Signers TSK
+// UpdateSmsApproversTsk - Updates an existing Satuan Managemen Sumberdaya (SMS) in the world state with provided parameters.
+// Arguments - ID, Approvers TSK
 // ============================================================================================================================
 
-func (s *SMSContract) UpdateSmsSignersTsk(ctx contractapi.TransactionContextInterface) error {
+func (s *SMSContract) UpdateSmsApproversTsk(ctx contractapi.TransactionContextInterface) error {
 	args := ctx.GetStub().GetStringArgs()[1:]
 
-	logger.Infof("Run UpdateSmsSignersTsk function with args: %+q.", args)
+	logger.Infof("Run UpdateSmsApproversTsk function with args: %+q.", args)
 
 	if len(args) != 2 {
 		logger.Errorf(ER11, 2, len(args))
@@ -169,7 +169,7 @@ func (s *SMSContract) UpdateSmsSignersTsk(ctx contractapi.TransactionContextInte
 	}
 
 	id:= args[0]
-	signersTskStr:= args[1]
+	approversTskStr:= args[1]
 
 	exists, err := isSmsExists(ctx, id)
 	if err != nil {
@@ -184,12 +184,12 @@ func (s *SMSContract) UpdateSmsSignersTsk(ctx contractapi.TransactionContextInte
 		return err
 	}
 
-	signersTskStr = strings.Replace(signersTskStr, "[", "", -1)
-	signersTskStr = strings.Replace(signersTskStr, "]", "", -1)
+	approversTskStr = strings.Replace(approversTskStr, "[", "", -1)
+	approversTskStr = strings.Replace(approversTskStr, "]", "", -1)
 	splitter := regexp.MustCompile(` *, *`)
-	signersTsk :=  splitter.Split(signersTskStr, -1)
+	approversTsk :=  splitter.Split(approversTskStr, -1)
 
-	sms.SignersTSK = signersTsk
+	sms.ApproversTSK = approversTsk
 
 	smsJSON, err := json.Marshal(sms)
 	if err != nil {
@@ -207,14 +207,14 @@ func (s *SMSContract) UpdateSmsSignersTsk(ctx contractapi.TransactionContextInte
 
 
 // ============================================================================================================================
-// UpdateSmsSignersIjz - Updates an existing Satuan Managemen Sumberdaya (SMS) in the world state with provided parameters.
-// Arguments - ID, Signers IJZ
+// UpdateSmsApproversIjz - Updates an existing Satuan Managemen Sumberdaya (SMS) in the world state with provided parameters.
+// Arguments - ID, Approvers IJZ
 // ============================================================================================================================
 
-func (s *SMSContract) UpdateSmsSignersIjz(ctx contractapi.TransactionContextInterface) error {
+func (s *SMSContract) UpdateSmsApproversIjz(ctx contractapi.TransactionContextInterface) error {
 	args := ctx.GetStub().GetStringArgs()[1:]
 
-	logger.Infof("Run UpdateSmsSignersIjz function with args: %+q.", args)
+	logger.Infof("Run UpdateSmsApproversIjz function with args: %+q.", args)
 
 	if len(args) != 2 {
 		logger.Errorf(ER11, 2, len(args))
@@ -222,7 +222,7 @@ func (s *SMSContract) UpdateSmsSignersIjz(ctx contractapi.TransactionContextInte
 	}
 
 	id:= args[0]
-	signersIjzStr:= args[1]
+	approversIjzStr:= args[1]
 
 	exists, err := isSmsExists(ctx, id)
 	if err != nil {
@@ -237,12 +237,12 @@ func (s *SMSContract) UpdateSmsSignersIjz(ctx contractapi.TransactionContextInte
 		return err
 	}
 
-	signersIjzStr = strings.Replace(signersIjzStr, "[", "", -1)
-	signersIjzStr = strings.Replace(signersIjzStr, "]", "", -1)
+	approversIjzStr = strings.Replace(approversIjzStr, "[", "", -1)
+	approversIjzStr = strings.Replace(approversIjzStr, "]", "", -1)
 	splitter := regexp.MustCompile(` *, *`)
-	signersIjz :=  splitter.Split(signersIjzStr, -1)
+	approversIjz :=  splitter.Split(approversIjzStr, -1)
 
-	sms.SignersIJZ = signersIjz
+	sms.ApproversIJZ = approversIjz
 
 	smsJSON, err := json.Marshal(sms)
 	if err != nil {
