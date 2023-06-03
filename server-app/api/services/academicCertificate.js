@@ -3,7 +3,6 @@ const { v4: uuidv4 } = require('uuid')
 const { getAllParser, getParser } = require('../utils/converter.js')
 const { BlockDecoder } = require('fabric-common');
 const { getAcademicRecordByIdMhsw } = require('./academicRecord.js');
-const academicRecordService = require('../services/academicRecord.js')
 
 const getIjzTxIds = async(user, id) => {
     const network = await fabric.connectToNetwork("HE1", "ijzcontract", user)
@@ -128,7 +127,7 @@ exports.getAllTranskrip = async(user) => {
     
     const allData =  await getAllParser(queryData)
     await Promise.all(allData.map( async(item, index) => {
-        const nilai = await  academicRecordService.getAcademicRecordByIdMhsw(user, item.pd.id) 
+        const nilai = await getAcademicRecordByIdMhsw(user, item.pd.id) 
         allData[index].nilai = nilai
         
         const txIds = await getTskTxIds(user, item.id)
@@ -145,7 +144,7 @@ exports.getTranskripById = async(user, idTsk) => {
 
     const data =  await getParser(result)
 
-    const nilai = await  academicRecordService.getAcademicRecordByIdMhsw(data.pd.id) 
+    const nilai = await getAcademicRecordByIdMhsw(data.pd.id) 
     data.nilai = nilai
 
     const txIds = await getTskTxIds(user, data.id)
@@ -153,14 +152,14 @@ exports.getTranskripById = async(user, idTsk) => {
     return data
 }
 
-exports.getTranskripByIdPt = async(user, idTsk) => {
+exports.getTranskripByIdPt = async(user, idPt) => {
     const network = await fabric.connectToNetwork("HE1", "tskcontract", user)
-    const queryData = await network.contract.evaluateTransaction( "GetTskByIdSp", idTsk)
+    const queryData = await network.contract.evaluateTransaction( "GetTskByIdSp", idPt)
     network.gateway.disconnect()
     
     const allData =  await getAllParser(queryData)
     await Promise.all(allData.map( async(item, index) => {
-        const nilai = await  academicRecordService.getAcademicRecordByIdMhsw(user, item.pd.id) 
+        const nilai = await getAcademicRecordByIdMhsw(user, item.pd.id) 
         allData[index].nilai = nilai
 
         const txIds = await getTskTxIds(user, item.id)
@@ -177,7 +176,7 @@ exports.getTranskripByIdProdi = async(user, idTsk) => {
     
     const allData =  await getAllParser(queryData)
     await Promise.all(allData.map( async(item, index) => {
-        const nilai = await  academicRecordService.getAcademicRecordByIdMhsw(user, item.pd.id) 
+        const nilai = await getAcademicRecordByIdMhsw(user, item.pd.id) 
         allData[index].nilai = nilai
 
         const txIds = await getTskTxIds(user, item.id)
@@ -194,7 +193,7 @@ exports.getTranskripByIdMahasiswa = async(user, idTsk) => {
     
     const allData =  await getAllParser(queryData)
     await Promise.all(allData.map( async(item, index) => {
-        const nilai = await  academicRecordService.getAcademicRecordByIdMhsw(user, item.pd.id) 
+        const nilai = await getAcademicRecordByIdMhsw(user, item.pd.id) 
         allData[index].nilai = nilai
 
         const txIds = await getTskTxIds(user, item.id)
@@ -228,14 +227,14 @@ exports.approveTranskrip = async(user, args) => {
 
 exports.addApproverIjazah = async(user, args) => {
     const network = await fabric.connectToNetwork("HE1", "smscontract", user)
-    const result = await network.contract.submitTransaction( "UpdateSmsSignersIjz", ...args)
+    const result = await network.contract.submitTransaction( "UpdateSmsApproversIjz", ...args)
     network.gateway.disconnect()
     return result;
 }
 
 exports.addApproverTranskrip = async(user, args) => {
     const network = await fabric.connectToNetwork("HE1", "smscontract", user)
-    const result = await network.contract.submitTransaction( "UpdateSmsSignersTsk", ...args)
+    const result = await network.contract.submitTransaction( "UpdateSmsApproversTsk", ...args)
     network.gateway.disconnect()
     return result;
 }

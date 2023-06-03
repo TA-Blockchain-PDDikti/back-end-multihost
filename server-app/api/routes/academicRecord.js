@@ -10,7 +10,6 @@ academicRecordRouter.get('/:id', academicRecordController.getAcademicRecordById)
 academicRecordRouter.get('/mahasiswa/:id', academicRecordController.getAcademicRecordByIdMhsw)
 academicRecordRouter.get('/kelas/:id', academicRecordController.getAcademicRecordByIdKls)
 academicRecordRouter.put('/:id', academicRecordController.updateAcademicRecord)
-academicRecordRouter.patch('/grade/:id', academicRecordController.setGrade)
 academicRecordRouter.delete('/:id', academicRecordController.deleteAcademicRecord)
 
 module.exports = academicRecordRouter;
