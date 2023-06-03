@@ -30,8 +30,13 @@ exports.getAllPT = async(user) => {
     return  getAllParser(queryData)
 }
 
-exports.getPTById = async(user, idPT) => {
-    const network = await fabric.connectToNetwork("Kemdikbud", "spcontract", user)
+exports.getPTById = async(user, idPT, isAdminPt) => {
+    if (isAdminPt) {
+        var network = await fabric.connectToNetwork("HE1", "spcontract", user)
+    } else {
+        var network = await fabric.connectToNetwork("Kemdikbud", "spcontract", user)
+    }
+    
     const queryData = await network.contract.evaluateTransaction("GetSpById", idPT)
     network.gateway.disconnect()
     return getParser(queryData)
