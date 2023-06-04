@@ -208,7 +208,7 @@ func (s *TSKContract) UpdateTsk (ctx contractapi.TransactionContextInterface) er
 		return fmt.Errorf(ER36, id)
 	}
 
-	totalMutu, err := strconv.Atoi(totalMutuStr)
+	totalMutu, err := strconv.ParseFloat(totalMutuStr, 64)
 	if err != nil {
 		logger.Errorf(ER35, id)
 		return fmt.Errorf(ER35, id)
