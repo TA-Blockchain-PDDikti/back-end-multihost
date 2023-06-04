@@ -144,7 +144,7 @@ exports.getTranskripById = async(user, idTsk) => {
 
     const data =  await getParser(result)
 
-    const nilai = await getAcademicRecordByIdMhsw(data.pd.id) 
+    const nilai = await getAcademicRecordByIdMhsw(user, data.pd.id) 
     data.nilai = nilai
 
     const txIds = await getTskTxIds(user, data.id)
@@ -241,11 +241,14 @@ exports.addApproverTranskrip = async(user, args) => {
 
 exports.generateIdentifier = async(user, idIjazah, idTranskrip) => {
 
-    const ijazah = await this.getIjazahById(user, idIjazah)
-    const transkrip = await this.getTranskripById(user, idTranskrip)
+    var network = await fabric.connectToNetwork("HE1", "ijzcontract", user)
+    const ijazah = await network.contract.evaluateTransaction( "GetIjzById", idIjazah)
+
+    network = await fabric.connectToNetwork("HE1", "tskcontract", user)
+    const transkrip = await network.contract.evaluateTransaction( "GetTskById", idTranskrip)
   
-    console.log(ijazah, transkrip)
-    if (ijazah.remainingApprover == 0 && transkrip.remainingApprover == 0 ) {
+    console.log(JSON.parse(ijazah), JSON.parse(transkrip))
+    if (JSON.parse(ijazah).remainingApprover == 0 && JSON.parse(transkrip).remainingApprover == 0 ) {
         const identifier = {}
 
         const txIdsIjz = await getIjzTxIds(user, idIjazah)
@@ -253,7 +256,7 @@ exports.generateIdentifier = async(user, idIjazah, idTranskrip) => {
         const txIdsTsk = await  getTskTxIds(user, idTranskrip)
         const listTxIdTsk = JSON.parse(txIdsTsk)
 
-        const network = await fabric.connectToNetwork("Kemdikbud", "qscc", 'admin')
+        network = await fabric.connectToNetwork("Kemdikbud", "qscc", 'admin')
         const blockIjazah = await network.contract.evaluateTransaction('GetBlockByTxID', 'academicchannel', listTxIdIjz[listTxIdIjz.length - 1])
         const blockTranskrip = await network.contract.evaluateTransaction('GetBlockByTxID', 'academicchannel', listTxIdTsk[listTxIdTsk.length - 1])
 
@@ -293,7 +296,7 @@ exports.verify = async(identifier) => {
 
         const data = {
             "ijazah": ijazah,
-            "transkrip": transkrip[0],
+            "transkrip": transkrip,
         }
     
         network.gateway.disconnect()

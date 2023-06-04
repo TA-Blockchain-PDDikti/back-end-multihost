@@ -207,7 +207,7 @@ exports.getIjazahByIdPt = async(req, res) => {
 
 exports.getTranskripByIdPt = async(req, res) => {
     try {
-        if (req.user.userType != "admin PT" && req.user.userType != "dosen") {
+        if (req.user.userType != "admin PT") {
             return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
         }
         const idPt = req.params.id
