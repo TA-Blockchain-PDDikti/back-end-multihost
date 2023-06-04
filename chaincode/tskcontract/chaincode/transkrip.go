@@ -36,7 +36,7 @@ type Transkrip struct {
 	IdSMS				string 			`json:"idSms"`
 	IdPD				string 			`json:"idPd"`
 	JenjangPendidikan	string 			`json:"jenjangPendidikan"`
-	TotalMutu			int 			`json:"totalMutu"`
+	TotalMutu			float64			`json:"totalMutu"`
 	TotalSKS			int 			`json:"totalSks"`
 	IPK					float64			`json:"ipk"`
 	RemainingApprover	int 			`json:"remainingApprover"`
