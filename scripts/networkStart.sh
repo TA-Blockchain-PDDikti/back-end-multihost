@@ -14,11 +14,61 @@ function runCaContainer() {
   println ""
 }
 
+function runHost1CaContainer() {
+  infoln "Starting docker container for Certificate Authority"
+  println ""
+
+  CA_COMPOSE_FILES="-f compose/docker-compose-host1-ca.yaml"
+  docker-compose ${CA_COMPOSE_FILES} up -d 2>&1
+
+  println ""
+}
+
+function runHost2CaContainer() {
+  infoln "Starting docker container for Certificate Authority"
+  println ""
+
+  CA_COMPOSE_FILES="-f compose/docker-compose-host2-ca.yaml"
+  docker-compose ${CA_COMPOSE_FILES} up -d 2>&1
+
+  println ""
+}
+
 function runOrgContainer() {
   infoln "Starting docker container for All Organizations"
   println ""
 
   COMPOSE_FILES="-f compose/docker-compose-orderer.yaml -f compose/docker-compose-kemdikbud.yaml -f compose/docker-compose-he1.yaml"
+  docker-compose ${COMPOSE_FILES} up -d 2>&1
+
+  println ""
+}
+
+function runHost1OrgContainer() {
+  infoln "Starting docker container for All Organizations"
+  println ""
+
+  COMPOSE_FILES="-f compose/docker-compose-host1-orderer.yaml -f compose/docker-compose-host1-kemdikbud.yaml"
+  docker-compose ${COMPOSE_FILES} up -d 2>&1
+
+  println ""
+}
+
+function runHost2OrgContainer() {
+  infoln "Starting docker container for All Organizations"
+  println ""
+
+  COMPOSE_FILES="-f compose/docker-compose-host2-he1.yaml"
+  docker-compose ${COMPOSE_FILES} up -d 2>&1
+
+  println ""
+}
+
+function runHost3OrgContainer() {
+  infoln "Starting docker container for All Organizations"
+  println ""
+
+  COMPOSE_FILES="-f compose/docker-compose-host3-he1.yaml"
   docker-compose ${COMPOSE_FILES} up -d 2>&1
 
   println ""
@@ -378,11 +428,6 @@ function createChannelArtifact() {
   generateGenesisBlock
   generateChannelConfigTx
 
-  # # Generate anchor peer
-
-  # generateAnchorPeerKemdikbud
-  # generateAnchorPeerHE1
-
   println ""
 }
 
@@ -413,6 +458,92 @@ function startNetwork() {
 
   println "###########################################################################"
   runOrgContainer
+
+  println ""
+}
+
+function startNetworkHost1() {
+  # Start the network
+
+  CHANNEL_NAME=$1
+
+  infoln "Start the network"
+
+  println "###########################################################################"
+  runHost1CaContainer
+
+  while :
+    do
+      if [ ! -f "organizations/fabric-ca/kemdikbud/tls-cert.pem" ]; then
+        sleep 1
+      else
+        break
+      fi
+    done
+
+  println "###########################################################################"
+  infoln "Creating Kemdikbud Certificates"
+  createAllCertificatesForKemdikbud
+  println ""
+
+  infoln "Creating Orderer Certificates"
+  createAllCertificatesForOrderer
+  println ""
+
+  println "###########################################################################"
+  createChannelArtifact
+
+  println "###########################################################################"
+  runHost1CaContainer
+
+  println ""
+}
+
+function startNetworkHost2() {
+  # Start the network
+
+  CHANNEL_NAME=$1
+
+  infoln "Start the network"
+
+  println "###########################################################################"
+  runHost2CaContainer
+
+  while :
+    do
+      if [ ! -f "organizations/fabric-ca/he1/tls-cert.pem" ]; then
+        sleep 1
+      else
+        break
+      fi
+    done
+
+  println "###########################################################################"
+  infoln "Creating HE1 Certificates"
+  createAllCertificatesForHE1
+  println ""
+
+  println "###########################################################################"
+  createChannelArtifact
+
+  println "###########################################################################"
+  runHost2CaContainer
+
+  println ""
+}
+
+function startNetworkHost3() {
+  # Start the network
+
+  CHANNEL_NAME=$1
+
+  infoln "Start the network"
+
+  println "###########################################################################"
+  createChannelArtifact
+
+  println "###########################################################################"
+  runHost3CaContainer
 
   println ""
 }

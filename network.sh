@@ -125,6 +125,58 @@ function networkUp() {
   fi
 }
 
+function networkUpHost1() {
+  checkPrereqs
+
+  . scripts/networkStart.sh
+
+  startNetworkHost1 "syschannel"
+  println ""
+
+  println "###########################################################################"
+  infoln "Generating CCP files for Kemdikbud"
+  ./organizations/ccp-generate-kemdikbud.sh
+  println ""
+
+  $CONTAINER_CLI ps -a
+  if [ $? -ne 0 ]; then
+    fatalln "Unable to start network"
+  fi
+}
+
+function networkUpHost2() {
+  checkPrereqs
+
+  . scripts/networkStart.sh
+
+  startNetworkHost2 "syschannel"
+  println ""
+
+  println "###########################################################################"
+  infoln "Generating CCP files for HE1"
+  ./organizations/ccp-generate-he1.sh
+  println ""
+
+  $CONTAINER_CLI ps -a
+  if [ $? -ne 0 ]; then
+    fatalln "Unable to start network"
+  fi
+}
+
+function networkUpHost3() {
+  checkPrereqs
+
+  . scripts/networkStart.sh
+
+  startNetworkHost3 "syschannel"
+  println ""
+
+  $CONTAINER_CLI ps -a
+  if [ $? -ne 0 ]; then
+    fatalln "Unable to start network"
+  fi
+}
+
 
 # Tear down running network
 function networkDown() {
@@ -380,6 +432,10 @@ while [[ $# -ge 1 ]] ; do
     printHelp $MODE
     exit 0
     ;;
+  -host )
+    HOST="$2"
+    shift
+    ;;
   -c )
     CHANNEL_NAME="$2"
     shift
@@ -457,7 +513,15 @@ fi
 # Determine mode of operation and printing out what we asked for
 if [ "$MODE" == "up" ]; then
   infoln "Starting nodes with CLI timeout of '${MAX_RETRY}' tries and CLI delay of '${CLI_DELAY}' seconds and using database '${DATABASE}' ${CRYPTO_MODE}"
-  networkUp
+  if [ "$HOST" == "1" ]; then
+    networkUpHost1
+  elif [ "$HOST" == "2" ]; then
+    networkUpHost2
+  elif [ "$HOST" == "3" ]; then
+    networkUpHost3
+  else
+    networkUp
+  fi
 elif [ "$MODE" == "createChannel" ]; then
   infoln "Creating channel '${CHANNEL_NAME}'."
   infoln "If network is not up, starting nodes with CLI timeout of '${MAX_RETRY}' tries and CLI delay of '${CLI_DELAY}' seconds and using database '${DATABASE} ${CRYPTO_MODE}"
