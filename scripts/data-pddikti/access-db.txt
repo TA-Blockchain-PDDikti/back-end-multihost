@@ -1,0 +1,21 @@
+13:32:44 INFO    ========== SSH Tunnelling To Kawung =========
+13:32:44 INFO    Server: 0.0.0.0, port: 40995
+13:32:46 INFO    ======== Connect To Database PDDIKTI jdbc:sqlserver://0.0.0.0:40995;databaseName=pddikti;queryTimeout=600;encrypt=true;trustServerCertificate=true; =========
+13:32:46 INFO    =============== Query SQL ==========
+13:32:46 INFO    =============== Pendidikan Tinggi ==========
+13:32:46 INFO    Export 1 data to csv
+13:32:46 INFO    =============== Prodi ==========
+13:32:46 INFO    Export 65 data to csv
+13:32:46 INFO    =============== Dosen ==========
+13:32:47 INFO    Export 1603 data to csv
+13:32:47 INFO    =============== Mahasiswa ==========
+13:32:47 INFO    Export 1 data to csv
+13:32:47 INFO    =============== Matkul ==========
+13:32:47 INFO    Export 1 data to csv
+13:32:47 INFO    =============== Kelas ==========
+13:32:47 INFO    Export 1 data to csv
+13:32:47 INFO    =============== Nilai ==========
+13:32:47 INFO    Export 1 data to csv
+13:32:47 INFO    =============== Ijazah ==========
+13:32:47 INFO    Export 1 data to csv
+13:32:47 INFO    =============== Finish Query SQL ==========
