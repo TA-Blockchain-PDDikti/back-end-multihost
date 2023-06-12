@@ -153,10 +153,10 @@ for row in read_data:
     data = {
         "id": row[0],
         "idSms": row[1],
-        "idSp": row[2],
-        "nama": row[3],
-        "sks": row[4],
-        "kodeMk":row[5],
+        "idSp": '0D1E63E9-CBFB-4546-A242-875C310083A5',
+        "nama": row[2],
+        "sks": row[3],
+        "kodeMk":row[4],
         "jenjangPendidikan": "S1"  
     }
     skenario("POST", "data/matkul", data, tokenAdminPddikti)

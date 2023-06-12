@@ -88,19 +88,19 @@ with sshtunnel.SSHTunnelForwarder((JS_HOST, Js_PORT), **conn_inputs) as tunnel:
         logging.info(f"Export {len(result)} data to csv")
 
         logging.info("=============== Mahasiswa ==========")
-        query = "SELECT id_sp as id, nm_lemb as 'nama', email as 'usernameAdmin' FROM dbo.satuan_pendidikan WHERE nm_lemb='Universitas Indonesia'"
+        query = "SELECT reg.id_reg_pd, reg.id_sp, reg.id_sms, pd.nm_pd , reg.nipd, pd.email, reg.mulai_smt  FROM dbo.reg_pd as reg  INNER JOIN dbo.peserta_didik  as pd ON reg.id_pd = pd.id_pd  WHERE reg.mulai_smt in('20161', '20171') and reg.id_sms in (SELECT id_sms FROM dbo.sms where id_sp = '0D1E63E9-CBFB-4546-A242-875C310083A5' and id_jns_sms = '3' and id_jenj_didik = '30')"
         result = execute_query(conn, query)
         write_to_csv("mahasiswa", result)
         logging.info(f"Export {len(result)} data to csv")
 
         logging.info("=============== Matkul ==========")
-        query = "SELECT id_sp as id, nm_lemb as 'nama', email as 'usernameAdmin' FROM dbo.satuan_pendidikan WHERE nm_lemb='Universitas Indonesia'"
+        query = "SELECT id_mk, id_sms, nm_mk, sks_mk, kode_mk  FROM dbo.matkul  WHERE id_sms in (SELECT id_sms FROM dbo.sms where id_sp = '0D1E63E9-CBFB-4546-A242-875C310083A5' and id_jns_sms = '3' and id_jenj_didik = '30')"
         result = execute_query(conn, query)
         write_to_csv("matkul", result)
         logging.info(f"Export {len(result)} data to csv")
         
         logging.info("=============== Kelas ==========")
-        query = "SELECT id_sp as id, nm_lemb as 'nama', email as 'usernameAdmin' FROM dbo.satuan_pendidikan WHERE nm_lemb='Universitas Indonesia'"
+        query = "SELECT  id_kls, id_mk, id_sms, nm_kls, sks_mk, id_smt FROM dbo.kelas_kuliah WHERE id_smt in ('20161', '20162', '20171', '20172', '20181', '20182', '20191', '20192', '20201', '20202', '20211','20212') and id_sms in (SELECT id_sms FROM dbo.sms where id_sp = '0D1E63E9-CBFB-4546-A242-875C310083A5' and id_jns_sms = '3' and id_jenj_didik = '30')"
         result = execute_query(conn, query)
         write_to_csv("kelas", result)
         logging.info(f"Export {len(result)} data to csv")
