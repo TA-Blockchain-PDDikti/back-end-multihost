@@ -129,7 +129,7 @@ setAnchorPeerH1() {
   successln "Success Set Anchor Peer"
 }
 
-setAnchorPeerH1() {
+setAnchorPeerH2() {
   infoln "Setting anchor peer"
   setAnchorPeer 'he1p0'
 

@@ -282,11 +282,11 @@ function createChannel() {
     initChannelH1 $CHANNEL_NAME $CLI_DELAY $MAX_RETRY $VERBOSE
     println ""
   elif [ "$CHANNELSTEP" == "joinh1" ]; then
-    joinChannelH1 $CHANNEL_NAME $CLI_DELAY $MAX_RETRY $VERBOSE
+    # joinChannelH1 $CHANNEL_NAME $CLI_DELAY $MAX_RETRY $VERBOSE
     setAnchorPeerH1 $CHANNEL_NAME $CLI_DELAY $MAX_RETRY $VERBOSE
     println ""
   elif [ "$CHANNELSTEP" == "joinh2" ]; then
-    joinChannelH2 $CHANNEL_NAME $CLI_DELAY $MAX_RETRY $VERBOSE
+    # joinChannelH2 $CHANNEL_NAME $CLI_DELAY $MAX_RETRY $VERBOSE
     setAnchorPeerH2 $CHANNEL_NAME $CLI_DELAY $MAX_RETRY $VERBOSE
     println ""
   elif [ "$CHANNELSTEP" == "joinh3" ]; then
