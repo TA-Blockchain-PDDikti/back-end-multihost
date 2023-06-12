@@ -521,7 +521,7 @@ function startNetworkHost1() {
   println ""
 
   println "###########################################################################"
-  runHost3OrgContainer
+  runHost1OrgContainer
   println ""
 
   println ""
