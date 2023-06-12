@@ -14,7 +14,7 @@ function json_ccp {
         -e "s/\${CAPORT}/$5/" \
         -e "s#\${PEERPEM}#$PP#" \
         -e "s#\${CAPEM}#$CP#" \
-        organizations/ccp-template.json
+        organizations/ccp-template-he1.json
 }
 
 function yaml_ccp {
@@ -26,7 +26,7 @@ function yaml_ccp {
         -e "s/\${CAPORT}/$4/" \
         -e "s#\${PEERPEM}#$PP#" \
         -e "s#\${CAPEM}#$CP#" \
-        organizations/ccp-template.yaml | sed -e $'s/\\\\n/\\\n          /g'
+        organizations/ccp-template-he1.yaml | sed -e $'s/\\\\n/\\\n          /g'
 }
 
 ORG=he1
