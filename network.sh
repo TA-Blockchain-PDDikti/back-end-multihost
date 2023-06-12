@@ -181,6 +181,9 @@ function networkUpHost3() {
 # Tear down running network
 function networkDown() {
   COMPOSE_FILES="-f compose/docker-compose-orderer.yaml -f compose/docker-compose-kemdikbud.yaml -f compose/docker-compose-he1.yaml -f compose/docker-compose-ca.yaml"
+  COMPOSE_FILES=" $COMPOSE_FILES -f compose/docker-compose-host1-ca.yaml -f compose/docker-compose-host1-kemdikbud.yaml -f compose/docker-compose-host1-orderer.yaml"
+  COMPOSE_FILES=" $COMPOSE_FILES -f compose/docker-compose-host2-ca.yaml -f compose/docker-compose-host2-he1.yaml"
+  COMPOSE_FILES=" $COMPOSE_FILES -f compose/docker-compose-host3-he1.yaml"
 
   if [ "${CONTAINER_CLI}" == "docker" ]; then
     DOCKER_SOCK=$DOCKER_SOCK ${CONTAINER_CLI_COMPOSE} ${COMPOSE_FILES} down --volumes --remove-orphans
@@ -194,20 +197,21 @@ function networkDown() {
   # Don't remove the generated artifacts -- note, the ledgers are always removed
   if [ "$MODE" != "restart" ]; then
     # Bring down the network, deleting the volumes
-    ${CONTAINER_CLI} volume rm docker_orderer.example.com docker_peer0.kemdikbud.example.com docker_peer0.he1.example.com
+    ${CONTAINER_CLI} volume rm compose_orderer.example.com compose_peer0.kemdikbud.example.com compose_peer0.he1.example.com
     #Cleanup the chaincode containers
     clearContainers
     #Cleanup images
     removeUnwantedImages
-    #
     ${CONTAINER_CLI} kill $(${CONTAINER_CLI} ps -q --filter name=ccaas) || true
+
     # remove orderer block and other channel configuration transactions and certs
     ${CONTAINER_CLI} run --rm -v "$(pwd):/data" busybox sh -c 'cd /data && rm -rf system-genesis-block/*.block organizations/peerOrganizations organizations/ordererOrganizations'
+
     ## remove fabric ca artifacts
     ${CONTAINER_CLI} run --rm -v "$(pwd):/data" busybox sh -c 'cd /data && rm -rf organizations/fabric-ca/kemdikbud/msp organizations/fabric-ca/kemdikbud/tls-cert.pem organizations/fabric-ca/kemdikbud/ca-cert.pem organizations/fabric-ca/kemdikbud/IssuerPublicKey organizations/fabric-ca/kemdikbud/IssuerRevocationPublicKey organizations/fabric-ca/kemdikbud/fabric-ca-server.db'
     ${CONTAINER_CLI} run --rm -v "$(pwd):/data" busybox sh -c 'cd /data && rm -rf organizations/fabric-ca/he1/msp organizations/fabric-ca/he1/tls-cert.pem organizations/fabric-ca/he1/ca-cert.pem organizations/fabric-ca/he1/IssuerPublicKey organizations/fabric-ca/he1/IssuerRevocationPublicKey organizations/fabric-ca/he1/fabric-ca-server.db'
     ${CONTAINER_CLI} run --rm -v "$(pwd):/data" busybox sh -c 'cd /data && rm -rf organizations/fabric-ca/ordererOrg/msp organizations/fabric-ca/ordererOrg/tls-cert.pem organizations/fabric-ca/ordererOrg/ca-cert.pem organizations/fabric-ca/ordererOrg/IssuerPublicKey organizations/fabric-ca/ordererOrg/IssuerRevocationPublicKey organizations/fabric-ca/ordererOrg/fabric-ca-server.db'
-    ${CONTAINER_CLI} run --rm -v "$(pwd):/data" busybox sh -c 'cd /data && rm -rf addOrg3/fabric-ca/org3/msp addOrg3/fabric-ca/org3/tls-cert.pem addOrg3/fabric-ca/org3/ca-cert.pem addOrg3/fabric-ca/org3/IssuerPublicKey addOrg3/fabric-ca/org3/IssuerRevocationPublicKey addOrg3/fabric-ca/org3/fabric-ca-server.db'
+
     # remove channel and script artifacts
     ${CONTAINER_CLI} run --rm -v "$(pwd):/data" busybox sh -c 'cd /data && rm -rf channel-artifacts log.txt *.tar.gz'
   fi
@@ -432,10 +436,6 @@ while [[ $# -ge 1 ]] ; do
     printHelp $MODE
     exit 0
     ;;
-  -host )
-    HOST="$2"
-    shift
-    ;;
   -c )
     CHANNEL_NAME="$2"
     shift
@@ -491,6 +491,10 @@ while [[ $# -ge 1 ]] ; do
     CCAAS_DOCKER_RUN="$2"
     shift
     ;;
+  -host )
+    HOST="$2"
+    shift
+    ;;
   -verbose )
     VERBOSE=true
     ;;
@@ -519,8 +523,8 @@ if [ "$MODE" == "up" ]; then
     networkUpHost2
   elif [ "$HOST" == "3" ]; then
     networkUpHost3
-  else
-    networkUp
+  # else
+    # networkUp
   fi
 elif [ "$MODE" == "createChannel" ]; then
   infoln "Creating channel '${CHANNEL_NAME}'."
