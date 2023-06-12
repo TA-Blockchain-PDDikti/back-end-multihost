@@ -546,14 +546,18 @@ fi
 # Determine mode of operation and printing out what we asked for
 if [ "$MODE" == "up" ]; then
   infoln "Starting nodes with CLI timeout of '${MAX_RETRY}' tries and CLI delay of '${CLI_DELAY}' seconds and using database '${DATABASE}' ${CRYPTO_MODE}"
-  if [ "$HOST" == "1" ]; then
+  if [ "$HOST" == "h1" ]; then
     networkUpHost1
-  elif [ "$HOST" == "2" ]; then
+  elif [ "$HOST" == "h2" ]; then
     networkUpHost2
-  elif [ "$HOST" == "3" ]; then
+  elif [ "$HOST" == "h3" ]; then
     networkUpHost3
-  # else
-    # networkUp
+  elif [ "$HOST" == "ca1" ]; then
+    networkCAUpHost1
+  elif [ "$HOST" == "ca2" ]; then
+    networkCAUpHost2
+  else
+    networkUp
   fi
 elif [ "$MODE" == "createChannel" ]; then
   infoln "Creating channel '${CHANNEL_NAME}'."
