@@ -31,12 +31,12 @@ setGlobals() {
     export CORE_PEER_LOCALMSPID="KemdikbudMSP"
     export CORE_PEER_TLS_ROOTCERT_FILE=$PEER0_KEMDIKBUD_CA
     export CORE_PEER_MSPCONFIGPATH=${PWD}/organizations/peerOrganizations/kemdikbud.example.com/users/Admin@kemdikbud.example.com/msp
-    export CORE_PEER_ADDRESS=localhost:7051
+    export CORE_PEER_ADDRESS="10.128.0.4:7051"
   elif [ $USING_ORG = 'he1' ]; then
     export CORE_PEER_LOCALMSPID="HE1MSP"
     export CORE_PEER_TLS_ROOTCERT_FILE=$PEER0_HE1_CA
     export CORE_PEER_MSPCONFIGPATH=${PWD}/organizations/peerOrganizations/he1.example.com/users/Admin@he1.example.com/msp
-    export CORE_PEER_ADDRESS=localhost:9051
+    export CORE_PEER_ADDRESS="10.128.0.5:9051"
   elif [ $USING_ORG = 'he2' ]; then
     export CORE_PEER_LOCALMSPID="HE2MSP"
     export CORE_PEER_TLS_ROOTCERT_FILE=$PEER0_HE2_CA

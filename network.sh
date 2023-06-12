@@ -125,17 +125,51 @@ function networkUp() {
   fi
 }
 
+function networkCAUpHost1() {
+  checkPrereqs
+
+  . scripts/networkStart.sh
+
+  startCAHost1 "syschannel"
+  println ""
+
+  println "###########################################################################"
+  infoln "Generating CCP files for Kemdikbud"
+  ./organizations/ccp-generate-kemdikbud.sh
+  println ""
+
+  $CONTAINER_CLI ps -a
+  if [ $? -ne 0 ]; then
+    fatalln "Unable to start network"
+  fi
+}
+
+function networkCAUpHost2() {
+  checkPrereqs
+
+  . scripts/networkStart.sh
+
+  startCAHost2 "syschannel"
+  println ""
+
+  println "###########################################################################"
+  infoln "Generating CCP files for HE1"
+  ./organizations/ccp-generate-he1.sh
+  println ""
+
+  $CONTAINER_CLI ps -a
+  if [ $? -ne 0 ]; then
+    fatalln "Unable to start network"
+  fi
+}
+
+
 function networkUpHost1() {
   checkPrereqs
 
   . scripts/networkStart.sh
 
   startNetworkHost1 "syschannel"
-  println ""
-
-  println "###########################################################################"
-  infoln "Generating CCP files for Kemdikbud"
-  ./organizations/ccp-generate-kemdikbud.sh
   println ""
 
   $CONTAINER_CLI ps -a
@@ -150,11 +184,6 @@ function networkUpHost2() {
   . scripts/networkStart.sh
 
   startNetworkHost2 "syschannel"
-  println ""
-
-  println "###########################################################################"
-  infoln "Generating CCP files for HE1"
-  ./organizations/ccp-generate-he1.sh
   println ""
 
   $CONTAINER_CLI ps -a
