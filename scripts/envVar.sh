@@ -83,11 +83,11 @@ setGlobalsCLI() {
   elif [ $USING_ORG = 'he2' ]; then
     export CORE_PEER_ADDRESS=peer0.he2.example.com:11051
   elif [ $USING_ORG = 'kemdikbudp0' ]; then
-    export CORE_PEER_ADDRESS=peer0.kemdikbud.example.com:7051
+    export CORE_PEER_ADDRESS="10.128.0.4:7051"
   elif [ $USING_ORG = 'he1p0' ]; then
-    export CORE_PEER_ADDRESS=peer0.he1.example.com:9051
+    export CORE_PEER_ADDRESS="10.128.0.5:9051"
   elif [ $USING_ORG = 'he1p1' ]; then
-    export CORE_PEER_ADDRESS=peer1.he1.example.com:9051
+    export CORE_PEER_ADDRESS="10.128.0.6:9051"
   else
     errorln "ORG Unknown"
   fi
