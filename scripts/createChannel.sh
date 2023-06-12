@@ -34,7 +34,8 @@ createChannelGenesisBlock() {
 }
 
 createChannel() {
-	setGlobals 'kemdikbud'
+  ORG=$1
+	setGlobals $ORG
 	# Poll in case the raft leader is not set yet
 	local rc=1
 	local COUNTER=1
@@ -83,25 +84,61 @@ FABRIC_CFG_PATH=./configtx/
 
 BLOCKFILE="./channel-artifacts/${CHANNEL_NAME}.block"
 
-# Create channel genesis block
-infoln "Generating channel genesis block '${CHANNEL_NAME}.block'"
-createChannelGenesisBlock
+initChannelH1() {
+  # Create channel genesis block
+  infoln "Generating channel genesis block '${CHANNEL_NAME}.block'"
+  createChannelGenesisBlock
 
-# Create channel
-infoln "Creating channel ${CHANNEL_NAME}"
-createChannel
-successln "Channel '$CHANNEL_NAME' created"
+  successln "Genesis block created"
 
-# Join all the peers to the channel
-infoln "Joining kemdikbud peer to the channel..."
-joinChannel 'kemdikbud'
-infoln "Joining he1 peer to the channel..."
-joinChannel 'he1'
+  # Create channel
+  infoln "Creating channel ${CHANNEL_NAME}"
+  createChannel 'kemdikbudp0'
 
-# Set the anchor peers for each org in the channel
-infoln "Setting anchor peer for kemdikbud..."
-setAnchorPeer 'kemdikbud'
-infoln "Setting anchor peer for he1..."
-setAnchorPeer 'he1'
+  successln "Channel '$CHANNEL_NAME' created"
+}
 
-successln "Channel '$CHANNEL_NAME' joined"
+joinChannelH1() {
+  # Join the peers to the channel
+  infoln "Joining kemdikbud peer to the channel..."
+  joinChannel 'kemdikbudp0'
+
+  successln "Success Join Channel '$CHANNEL_NAME'"
+}
+
+joinChannelH2() {
+  # Join the peers to the channel
+  infoln "Joining kemdikbud peer to the channel..."
+  joinChannel 'he1p0'
+
+  successln "Success Join Channel '$CHANNEL_NAME'"
+}
+
+joinChannelH3() {
+  # Join the peers to the channel
+  infoln "Joining kemdikbud peer to the channel..."
+  joinChannel 'he1p1'
+
+  successln "Success Join Channel '$CHANNEL_NAME'"
+}
+
+setAnchorPeerH1() {
+  infoln "Setting anchor peer"
+  setAnchorPeer 'kemdikbudp0'
+
+  successln "Success Set Anchor Peer"
+}
+
+setAnchorPeerH1() {
+  infoln "Setting anchor peer"
+  setAnchorPeer 'he1p0'
+
+  successln "Success Set Anchor Peer"
+}
+
+setAnchorPeerH3() {
+  infoln "Setting anchor peer"
+  setAnchorPeer 'he1p1'
+
+  successln "Success Set Anchor Peer"
+}

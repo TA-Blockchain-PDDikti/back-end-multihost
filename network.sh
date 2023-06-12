@@ -250,31 +250,51 @@ function networkDown() {
 # and then update the anchor peers for each organization
 function createChannel() {
   # Bring up the network if it is not already up.
-  bringUpNetwork="false"
+  # bringUpNetwork="false"
 
-  if ! $CONTAINER_CLI info > /dev/null 2>&1 ; then
-    fatalln "$CONTAINER_CLI network is required to be running to create a channel"
-  fi
+  # if ! $CONTAINER_CLI info > /dev/null 2>&1 ; then
+  #   fatalln "$CONTAINER_CLI network is required to be running to create a channel"
+  # fi
 
-  # check if all containers are present
-  CONTAINERS=($($CONTAINER_CLI ps | grep hyperledger/ | awk '{print $2}'))
-  len=$(echo ${#CONTAINERS[@]})
+  # # check if all containers are present
+  # CONTAINERS=($($CONTAINER_CLI ps | grep hyperledger/ | awk '{print $2}'))
+  # len=$(echo ${#CONTAINERS[@]})
 
-  if [[ $len -ge 4 ]] && [[ ! -d "organizations/peerOrganizations" ]]; then
-    echo "Bringing network down to sync certs with containers"
-    networkDown
-  fi
+  # if [[ $len -ge 4 ]] && [[ ! -d "organizations/peerOrganizations" ]]; then
+  #   echo "Bringing network down to sync certs with containers"
+  #   networkDown
+  # fi
 
-  [[ $len -lt 4 ]] || [[ ! -d "organizations/peerOrganizations" ]] && bringUpNetwork="true" || echo "Network Running Already"
+  # [[ $len -lt 4 ]] || [[ ! -d "organizations/peerOrganizations" ]] && bringUpNetwork="true" || echo "Network Running Already"
 
-  if [ $bringUpNetwork == "true"  ]; then
-    infoln "Bringing up network"
-    networkUp
-  fi
+  # if [ $bringUpNetwork == "true"  ]; then
+  #   infoln "Bringing up network"
+  #   networkUp
+  # fi
 
   # now run the script that creates a channel. This script uses configtxgen once
   # to create the channel creation transaction and the anchor peer updates.
-  scripts/createChannel.sh $CHANNEL_NAME $CLI_DELAY $MAX_RETRY $VERBOSE
+  # scripts/createChannel.sh $CHANNEL_NAME $CLI_DELAY $MAX_RETRY $VERBOSE
+
+  . scripts/createChannel.sh
+
+  if [ "$CHANNELSTEP" == "inith1" ]; then
+    initChannelH1 $CHANNEL_NAME $CLI_DELAY $MAX_RETRY $VERBOSE
+    println ""
+  elif [ "$CHANNELSTEP" == "joinh1" ]; then
+    joinChannelH1 $CHANNEL_NAME $CLI_DELAY $MAX_RETRY $VERBOSE
+    setAnchorPeerH1 $CHANNEL_NAME $CLI_DELAY $MAX_RETRY $VERBOSE
+    println ""
+  elif [ "$CHANNELSTEP" == "joinh2" ]; then
+    joinChannelH2 $CHANNEL_NAME $CLI_DELAY $MAX_RETRY $VERBOSE
+    setAnchorPeerH2 $CHANNEL_NAME $CLI_DELAY $MAX_RETRY $VERBOSE
+    println ""
+  elif [ "$CHANNELSTEP" == "joinh3" ]; then
+    joinChannelH3 $CHANNEL_NAME $CLI_DELAY $MAX_RETRY $VERBOSE
+    setAnchorPeerH3 $CHANNEL_NAME $CLI_DELAY $MAX_RETRY $VERBOSE
+    println ""
+  fi
+
 }
 
 ## Call the script to deploy a chaincode to the channel
@@ -524,6 +544,10 @@ while [[ $# -ge 1 ]] ; do
     HOST="$2"
     shift
     ;;
+  -chstep )
+    CHANNELSTEP="$2"
+    shift
+    ;;
   -verbose )
     VERBOSE=true
     ;;
@@ -561,7 +585,7 @@ if [ "$MODE" == "up" ]; then
   fi
 elif [ "$MODE" == "createChannel" ]; then
   infoln "Creating channel '${CHANNEL_NAME}'."
-  infoln "If network is not up, starting nodes with CLI timeout of '${MAX_RETRY}' tries and CLI delay of '${CLI_DELAY}' seconds and using database '${DATABASE} ${CRYPTO_MODE}"
+  # infoln "If network is not up, starting nodes with CLI timeout of '${MAX_RETRY}' tries and CLI delay of '${CLI_DELAY}' seconds and using database '${DATABASE} ${CRYPTO_MODE}"
   createChannel
 elif [ "$MODE" == "down" ]; then
   infoln "Stopping network"
