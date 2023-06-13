@@ -1,4 +1,4 @@
-const certificateService = require('../services/academicCertificate.js')
+const certificateService = require('../services/sertifikatAkademik.js')
 const dataService = require('../services/data.js')
 
 exports.createAcademicCertificate = async(req, res) => {
