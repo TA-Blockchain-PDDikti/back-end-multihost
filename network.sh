@@ -106,22 +106,35 @@ function checkPrereqs() {
 
 # Bring up the peer and orderer nodes using docker compose.
 function networkUp() {
-  checkPrereqs
+  if [ "$HOST" == "h1" ]; then
+    networkUpHost1
+  elif [ "$HOST" == "h2" ]; then
+    networkUpHost2
+  elif [ "$HOST" == "h3" ]; then
+    networkUpHost3
+  elif [ "$HOST" == "ca1" ]; then
+    networkCAUpHost1
+  elif [ "$HOST" == "ca2" ]; then
+    networkCAUpHost2
+  else
+    checkPrereqs
 
-  . scripts/networkStart.sh
+    . scripts/networkStart.sh
 
-  # startNetwork $CHANNEL_NAME
-  startNetwork "syschannel"
-  println ""
+    # startNetwork $CHANNEL_NAME
+    startNetwork "syschannel"
+    println ""
 
-  println "###########################################################################"
-  infoln "Generating CCP files for Org1:Kemdikbud and Org2:HigherEducation"
-  ./organizations/ccp-generate.sh
-  println ""
+    println "###########################################################################"
+    infoln "Generating CCP files for Org1:Kemdikbud and Org2:HigherEducation"
+    ./organizations/ccp-generate.sh
+    println ""
 
-  $CONTAINER_CLI ps -a
-  if [ $? -ne 0 ]; then
-    fatalln "Unable to start network"
+    $CONTAINER_CLI ps -a
+    if [ $? -ne 0 ]; then
+      fatalln "Unable to start network"
+    fi
+
   fi
 }
 
@@ -574,19 +587,7 @@ fi
 # Determine mode of operation and printing out what we asked for
 if [ "$MODE" == "up" ]; then
   infoln "Starting nodes with CLI timeout of '${MAX_RETRY}' tries and CLI delay of '${CLI_DELAY}' seconds and using database '${DATABASE}' ${CRYPTO_MODE}"
-  if [ "$HOST" == "h1" ]; then
-    networkUpHost1
-  elif [ "$HOST" == "h2" ]; then
-    networkUpHost2
-  elif [ "$HOST" == "h3" ]; then
-    networkUpHost3
-  elif [ "$HOST" == "ca1" ]; then
-    networkCAUpHost1
-  elif [ "$HOST" == "ca2" ]; then
-    networkCAUpHost2
-  else
-    networkUp
-  fi
+  networkUp
 elif [ "$MODE" == "createChannel" ]; then
   infoln "Creating channel '${CHANNEL_NAME}'."
   # infoln "If network is not up, starting nodes with CLI timeout of '${MAX_RETRY}' tries and CLI delay of '${CLI_DELAY}' seconds and using database '${DATABASE} ${CRYPTO_MODE}"
