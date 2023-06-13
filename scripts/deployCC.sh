@@ -14,6 +14,7 @@ CC_COLL_CONFIG=${9:-"NA"}
 DELAY=${10:-"3"}
 MAX_RETRY=${11:-"5"}
 VERBOSE=${12:-"false"}
+DEPLOYCCSTEP=${13:-"1"}
 
 println "executing with the following"
 println "- CHANNEL_NAME: ${C_GREEN}${CHANNEL_NAME}${C_RESET}"
@@ -28,6 +29,7 @@ println "- CC_INIT_FCN: ${C_GREEN}${CC_INIT_FCN}${C_RESET}"
 println "- DELAY: ${C_GREEN}${DELAY}${C_RESET}"
 println "- MAX_RETRY: ${C_GREEN}${MAX_RETRY}${C_RESET}"
 println "- VERBOSE: ${C_GREEN}${VERBOSE}${C_RESET}"
+println "- DEPLOYCCSTEP: ${C_GREEN}${DEPLOYCCSTEP}${C_RESET}"
 
 FABRIC_CFG_PATH=$PWD/configtx/
 
@@ -116,50 +118,119 @@ function checkPrereqs() {
   fi
 }
 
-#check for prerequisites
-checkPrereqs
+if [ "$DEPLOYCCSTEP" == "h11" ]; then
+  #check for prerequisites
+  checkPrereqs
 
-## package the chaincode
-packageChaincode
+  # package the chaincode
+  packageChaincode
 
-## Install chaincode on peer0.kemdikbud and peer0.he1
-infoln "Installing chaincode on peer0.kemdikbud..."
-installChaincode "kemdikbud"
-infoln "Install chaincode on peer0.he1..."
-installChaincode "he1"
+  ## Install chaincode on peer0.kemdikbud
+  infoln "Installing chaincode on peer0.kemdikbud..."
+  installChaincode "kemdikbudp0"
 
-## query whether the chaincode is installed
-queryInstalled "kemdikbud"
+  ## query whether the chaincode is installed
+  queryInstalled "kemdikbudp0"
 
-## approve the definition for kemdikbud
-approveForMyOrg "kemdikbud"
+  ## approve the definition for peer0.kemdikbud
+  approveForMyOrg "kemdikbudp0"
 
-## check whether the chaincode definition is ready to be committed
-## expect kemdikbud to have approved and he1 not to
-checkCommitReadiness "kemdikbud" "\"HE1MSP\": false" "\"KemdikbudMSP\": true"
-checkCommitReadiness "he1" "\"HE1MSP\": false" "\"KemdikbudMSP\": true"
+elif [ "$DEPLOYCCSTEP" == "h21" ]; then
+  #check for prerequisites
+  checkPrereqs
 
-## now approve also for he1
-approveForMyOrg "he1"
+  # package the chaincode
+  packageChaincode
 
-## check whether the chaincode definition is ready to be committed
-## expect them both to have approved
-checkCommitReadiness "kemdikbud" "\"HE1MSP\": true" "\"KemdikbudMSP\": true"
-checkCommitReadiness "he1" "\"HE1MSP\": true" "\"KemdikbudMSP\": true"
+  ## Install chaincode on peer0.he1
+  infoln "Install chaincode on peer0.he1..."
+  installChaincode "he1p0"
 
-## now that we know for sure both orgs have approved, commit the definition
-commitChaincodeDefinition "kemdikbud" "he1"
+  ## query whether the chaincode is installed
+  queryInstalled "he1p0"
 
-## query on both orgs to see that the definition committed successfully
-queryCommitted "kemdikbud"
-queryCommitted "he1"
+  ## approve the definition for peer0.he1
+  approveForMyOrg "he1p0"
 
-## Invoke the chaincode - this does require that the chaincode have the 'initLedger'
-## method defined
-if [ "$CC_INIT_FCN" = "NA" ]; then
-  infoln "Chaincode initialization is not required"
-else
-  chaincodeInvokeInit "kemdikbud" "he1"
+elif [ "$DEPLOYCCSTEP" == "h31" ]; then
+  #check for prerequisites
+  checkPrereqs
+
+  # package the chaincode
+  packageChaincode
+
+  ## Install chaincode on peer0.he1
+  infoln "Install chaincode on peer1.he1..."
+  installChaincode "he1p1"
+
+  ## query whether the chaincode is installed
+  queryInstalled "he1p1"
+
+  ## approve the definition for peer1.he1
+  approveForMyOrg "he1p1"
+
+elif [ "$DEPLOYCCSTEP" == "h12" ]; then
+  ## now that we know for sure both orgs have approved, commit the definition
+  commitChaincodeDefinition "kemdikbudp0" "he1p0" "he1p1"
+
+  ## query on both orgs to see that the definition committed successfully
+  queryCommitted "kemdikbudp0"
+
+elif [ "$DEPLOYCCSTEP" == "h22" ]; then
+  ## query on both orgs to see that the definition committed successfully
+  queryCommitted "he1p0"
+
+elif [ "$DEPLOYCCSTEP" == "h32" ]; then
+  ## query on both orgs to see that the definition committed successfully
+  queryCommitted "he1p1"
+
+
 fi
+
+# #check for prerequisites
+# checkPrereqs
+
+# ## package the chaincode
+# packageChaincode
+
+# ## Install chaincode on peer0.kemdikbud and peer0.he1
+# infoln "Installing chaincode on peer0.kemdikbud..."
+# installChaincode "kemdikbud"
+# infoln "Install chaincode on peer0.he1..."
+# installChaincode "he1"
+
+# ## query whether the chaincode is installed
+# queryInstalled "kemdikbud"
+
+# ## approve the definition for kemdikbud
+# approveForMyOrg "kemdikbud"
+
+# ## check whether the chaincode definition is ready to be committed
+# ## expect kemdikbud to have approved and he1 not to
+# checkCommitReadiness "kemdikbud" "\"HE1MSP\": false" "\"KemdikbudMSP\": true"
+# checkCommitReadiness "he1" "\"HE1MSP\": false" "\"KemdikbudMSP\": true"
+
+# ## now approve also for he1
+# approveForMyOrg "he1"
+
+# ## check whether the chaincode definition is ready to be committed
+# ## expect them both to have approved
+# checkCommitReadiness "kemdikbud" "\"HE1MSP\": true" "\"KemdikbudMSP\": true"
+# checkCommitReadiness "he1" "\"HE1MSP\": true" "\"KemdikbudMSP\": true"
+
+# ## now that we know for sure both orgs have approved, commit the definition
+# commitChaincodeDefinition "kemdikbud" "he1"
+
+# ## query on both orgs to see that the definition committed successfully
+# queryCommitted "kemdikbud"
+# queryCommitted "he1"
+
+# ## Invoke the chaincode - this does require that the chaincode have the 'initLedger'
+# ## method defined
+# if [ "$CC_INIT_FCN" = "NA" ]; then
+#   infoln "Chaincode initialization is not required"
+# else
+#   chaincodeInvokeInit "kemdikbud" "he1"
+# fi
 
 exit 0

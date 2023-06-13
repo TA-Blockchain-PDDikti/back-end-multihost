@@ -14,6 +14,7 @@ export CORE_PEER_TLS_ENABLED=true
 export ORDERER_CA=${PWD}/organizations/ordererOrganizations/example.com/tlsca/tlsca.example.com-cert.pem
 export PEER0_KEMDIKBUD_CA=${PWD}/organizations/peerOrganizations/kemdikbud.example.com/tlsca/tlsca.kemdikbud.example.com-cert.pem
 export PEER0_HE1_CA=${PWD}/organizations/peerOrganizations/he1.example.com/tlsca/tlsca.he1.example.com-cert.pem
+export PEER1_HE1_CA=${PWD}/organizations/peerOrganizations/he1.example.com/tlsca/tlsca.he1.example.com-cert.pem
 export PEER0_HE2_CA=${PWD}/organizations/peerOrganizations/he2.example.com/tlsca/tlsca.he2.example.com-cert.pem
 export ORDERER_ADMIN_TLS_SIGN_CERT=${PWD}/organizations/ordererOrganizations/example.com/orderers/orderer.example.com/tls/server.crt
 export ORDERER_ADMIN_TLS_PRIVATE_KEY=${PWD}/organizations/ordererOrganizations/example.com/orderers/orderer.example.com/tls/server.key
@@ -32,26 +33,36 @@ setGlobals() {
     export CORE_PEER_TLS_ROOTCERT_FILE=$PEER0_KEMDIKBUD_CA
     export CORE_PEER_MSPCONFIGPATH=${PWD}/organizations/peerOrganizations/kemdikbud.example.com/users/Admin@kemdikbud.example.com/msp
     export CORE_PEER_ADDRESS="10.128.0.4:7051"
+    export PEER_NUMBER="0"
+    export PEER_NAME="peer0.kemdikbud"
   elif [ $USING_ORG = 'kemdikbudp0' ]; then
     export CORE_PEER_LOCALMSPID="KemdikbudMSP"
     export CORE_PEER_TLS_ROOTCERT_FILE=$PEER0_KEMDIKBUD_CA
     export CORE_PEER_MSPCONFIGPATH=${PWD}/organizations/peerOrganizations/kemdikbud.example.com/users/Admin@kemdikbud.example.com/msp
     export CORE_PEER_ADDRESS="10.128.0.4:7051"
+    export PEER_NUMBER="0"
+    export PEER_NAME="peer0.kemdikbud"
   elif [ $USING_ORG = 'he1' ]; then
     export CORE_PEER_LOCALMSPID="HE1MSP"
     export CORE_PEER_TLS_ROOTCERT_FILE=$PEER0_HE1_CA
     export CORE_PEER_MSPCONFIGPATH=${PWD}/organizations/peerOrganizations/he1.example.com/users/Admin@he1.example.com/msp
     export CORE_PEER_ADDRESS="10.128.0.5:9051"
+    export PEER_NUMBER="0"
+    export PEER_NAME="peer0.he1"
   elif [ $USING_ORG = 'he1p0' ]; then
     export CORE_PEER_LOCALMSPID="HE1MSP"
     export CORE_PEER_TLS_ROOTCERT_FILE=$PEER0_HE1_CA
     export CORE_PEER_MSPCONFIGPATH=${PWD}/organizations/peerOrganizations/he1.example.com/users/Admin@he1.example.com/msp
     export CORE_PEER_ADDRESS="10.128.0.5:9051"
+    export PEER_NUMBER="0"
+    export PEER_NAME="peer0.he1"
   elif [ $USING_ORG = 'he1p1' ]; then
     export CORE_PEER_LOCALMSPID="HE1MSP"
-    export CORE_PEER_TLS_ROOTCERT_FILE=$PEER0_HE1_CA
+    export CORE_PEER_TLS_ROOTCERT_FILE=$PEER1_HE1_CA
     export CORE_PEER_MSPCONFIGPATH=${PWD}/organizations/peerOrganizations/he1.example.com/users/Admin@he1.example.com/msp
     export CORE_PEER_ADDRESS="10.128.0.6:9051"
+    export PEER_NUMBER="1"
+    export PEER_NAME="peer1.he1"
   elif [ $USING_ORG = 'he2' ]; then
     export CORE_PEER_LOCALMSPID="HE2MSP"
     export CORE_PEER_TLS_ROOTCERT_FILE=$PEER0_HE2_CA
@@ -101,19 +112,18 @@ parsePeerConnectionParameters() {
   PEERS=""
   while [ "$#" -gt 0 ]; do
     setGlobals $1
-    PEER="peer0.$1"
     ## Set peer addresses
     if [ -z "$PEERS" ]
     then
-	PEERS="$PEER"
+	    PEERS="$PEER_NAME"
     else
-	PEERS="$PEERS $PEER"
+	    PEERS="$PEERS $PEER_NAME"
     fi
     PEER_CONN_PARMS=("${PEER_CONN_PARMS[@]}" --peerAddresses $CORE_PEER_ADDRESS)
     ## Set path to TLS certificate
     # CA="organizations/peerOrganizations/$1.example.com/peers/peer0.$1.example.com/tls/ca.crt"
     ORG_CAPITAL=${1^^}
-    CA=PEER0_${ORG_CAPITAL}_CA
+    CA=PEER${PEER_NUMBER}_${ORG_CAPITAL}_CA
     TLSINFO=(--tlsRootCertFiles "${!CA}")
     PEER_CONN_PARMS=("${PEER_CONN_PARMS[@]}" "${TLSINFO[@]}")
     # shift by one to get to the next organization
