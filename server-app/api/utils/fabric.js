@@ -73,7 +73,7 @@ const getUserAttrs = async(username, organizationName) => {
 }
 
 const calculateBlockHash = function(header) {
-    let headerAsn = asn.define('headerAsn', function() {
+    var headerAsn = asn.define('headerAsn', function() {
         this.seq().obj(
             this.key('Number').int(),
             this.key('PreviousHash').octstr(),
@@ -81,13 +81,13 @@ const calculateBlockHash = function(header) {
         );
     });
 
-    let output = headerAsn.encode({
+    var encodeHeader = headerAsn.encode({
         Number: parseInt(header.number),
         PreviousHash: Buffer.from(header.previous_hash, 'hex'),
         DataHash: Buffer.from(header.data_hash, 'hex')
     }, 'der');
-    let hash = sha.sha256(output);
-  return hash;
+    var blockHash = sha.sha256(encodeHeader);
+  return blockHash;
 };
 
 const getSignature = async(txId) => {
