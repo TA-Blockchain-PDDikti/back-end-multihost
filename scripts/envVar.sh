@@ -123,8 +123,8 @@ parsePeerConnectionParameters() {
     ## Set path to TLS certificate
     # CA="organizations/peerOrganizations/$1.example.com/peers/peer0.$1.example.com/tls/ca.crt"
     ORG_CAPITAL=${1^^}
-    CA=PEER${PEER_NUMBER}_${ORG_CAPITAL}_CA
-    TLSINFO=(--tlsRootCertFiles "${!CA}")
+    # CA=PEER${PEER_NUMBER}_${ORG_CAPITAL}_CA
+    TLSINFO=(--tlsRootCertFiles "$CORE_PEER_TLS_ROOTCERT_FILE")
     PEER_CONN_PARMS=("${PEER_CONN_PARMS[@]}" "${TLSINFO[@]}")
     # shift by one to get to the next organization
     shift
