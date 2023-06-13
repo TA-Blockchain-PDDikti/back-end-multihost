@@ -1,5 +1,5 @@
 const certificateRouter = require('express').Router()
-const certificateController = require('../controllers/academicCertificate.js')
+const certificateController = require('../controllers/sertifikatAkademik.js')
 const auth = require('../middleware/auth.js')
 
 certificateRouter.post('/verify/', certificateController.verify)

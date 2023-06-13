@@ -1,5 +1,5 @@
 const academicRecordRouter = require('express').Router()
-const academicRecordController = require('../controllers/academicRecord.js')
+const academicRecordController = require('../controllers/administrasiNilai.js')
 const auth = require('../middleware/auth.js')
 
 academicRecordRouter.use(auth)
