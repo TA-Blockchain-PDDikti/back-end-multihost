@@ -166,8 +166,8 @@ elif [ "$DEPLOYCCSTEP" == "h31" ]; then
   ## query whether the chaincode is installed
   queryInstalled "he1p1"
 
-  ## approve the definition for peer1.he1
-  approveForMyOrg "he1p1"
+  # ## approve the definition for peer1.he1
+  # approveForMyOrg "he1p1"
 
 elif [ "$DEPLOYCCSTEP" == "h12" ]; then
   ## now that we know for sure both orgs have approved, commit the definition
