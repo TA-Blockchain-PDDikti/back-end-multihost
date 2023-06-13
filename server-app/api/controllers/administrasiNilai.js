@@ -1,4 +1,4 @@
-const academicRecordService = require('../services/academicRecord.js')
+const academicRecordService = require('../services/administrasiNilai.js')
 const { v4: uuidv4 } = require('uuid')
 
 exports.createAcademicRecord = async(req, res) => {
