@@ -1,8 +1,8 @@
 const router = require('express').Router()
 const dataRouter = require('./data.js')
 const userRouter = require('./user.js')
-const certificateRouter = require('./administrasiNilai.js')
-const academicRecordRouter = require('./sertifikatAkademik.js')
+const certificateRouter = require('./sertifikatAkademik.js')
+const academicRecordRouter = require('./administrasiNilai.js')
 
 router.use('/data', dataRouter);
 router.use('/academicRecords', academicRecordRouter)
