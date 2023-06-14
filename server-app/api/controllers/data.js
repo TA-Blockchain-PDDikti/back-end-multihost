@@ -383,6 +383,22 @@ exports.getDosenByPT = async(req, res) => {
     }
 }
 
+exports.getDosenByProdi = async(req, res) => {
+    try {
+        if (req.user.userType != "admin PT") {
+            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
+        }
+        const idProdi  = req.params.id;
+        data = await dataService.getDosenByProdi(req.user.username, idProdi) 
+        res.status(200).send({data});
+    } catch(error){
+        res.status(400).send({
+            success: false,
+            error: error.toString(),
+        })    
+    }
+}
+
 exports.getDosenById = async(req, res) => {
     try {
         if (req.user.userType != "admin PT" && req.user.userType != "dosen" ) {
@@ -518,6 +534,22 @@ exports.getMahasiswaByPT = async(req, res) => {
     }
 }
 
+exports.getMahasiswaByProdi = async(req, res) => {
+    try {
+        if (req.user.userType != "admin PT") {
+            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
+        }
+        const idProdi = req.params.id
+        data = await dataService.getMahasiswaByProdi(req.user.username, idProdi) 
+        res.status(200).send({data});
+    } catch(error){
+        res.status(400).send({
+            success: false,
+            error: error.toString(),
+        })    
+    }
+}
+
 exports.getMahasiswaById = async(req, res) => {
     try {
         if (req.user.userType != "admin PT" && req.user.userType != "mahasiswa") {
@@ -534,7 +566,7 @@ exports.getMahasiswaById = async(req, res) => {
     }
 }
 
-//Mata KUliah
+//Mata Kuliah
 exports.createMataKuliah = async(req, res) => {
     try{
         if (req.user.userType != "admin PT") {
@@ -665,6 +697,21 @@ exports.getMataKuliahByIdPt = async(req, res) => {
     }
 }
 
+exports.getMataKuliahByIdProdi = async(req, res) => {
+    try {
+        if (req.user.userType != "admin PT") {
+            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
+        }
+        const idProdi = req.params.id
+        data = await dataService.getMataKuliahByIdProdi(req.user.username, idProdi) 
+        res.status(200).send({data});
+    } catch(error){
+        res.status(400).send({
+            success: false,
+            error: error.toString(),
+        })    
+    }
+}
 
 //Kelas
 exports.createKelas = async(req, res) => {
