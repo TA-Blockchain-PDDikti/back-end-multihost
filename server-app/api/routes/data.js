@@ -43,6 +43,7 @@ dataRouter.post('/matkul', dataController.createMataKuliah)
 dataRouter.get('/matkul', dataController.getAllMataKuliah)
 dataRouter.get('/matkul/:id', dataController.getMataKuliahById)
 dataRouter.get('/matkul/pt/:id', dataController.getMataKuliahByIdPt)
+dataRouter.get('/matkul/prodi/:id', dataController.getMataKuliahByIdProdi)
 dataRouter.put('/matkul/:id', dataController.updateMataKuliah)
 dataRouter.delete('/matkul/:id', dataController.deleteMataKuliah)
 
