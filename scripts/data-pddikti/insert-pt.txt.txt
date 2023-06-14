@@ -1,0 +1,6 @@
+11:18:37 INFO    =============== Enroll Admin Network ==========
+11:18:37 INFO    =============== Login Admin PDDIKTI ==========
+11:18:38 INFO    {"success":true,"message":"Successfully Login","user":{"username":"admin.pddikti@gmail.com","userType":"admin pddikti","dataUser":"{}"},"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluLnBkZGlrdGlAZ21haWwuY29tIiwidXNlclR5cGUiOiJhZG1pbiBwZGRpa3RpIiwiZGF0YVVzZXIiOiJ7fSIsImlhdCI6MTY4NjcxNjMxOCwiZXhwIjoxNjg2NzIzNTE4fQ.iijFMz1al6Z7yHgz2l58bQBeuS-SsxGJ2crhpCT7hyM"}
+11:18:38 INFO    =============== Skenario 2 : Create Pendidikan Tinggi, Prodi, Dosen, Mahasiswa, Matkul, Kelas  ==========
+11:18:38 INFO    =============== Create PT ==========
+11:18:38 INFO    {'success': False, 'error': 'An identity for the user humas-ui@ui.ac.id already exists in the wallet'}

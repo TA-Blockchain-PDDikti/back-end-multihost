@@ -52,7 +52,7 @@ def write_to_csv(filename, data):
     fp.close()
 
 with sshtunnel.SSHTunnelForwarder((JS_HOST, Js_PORT), **conn_inputs) as tunnel:
-    logging_file("access-db")
+    logging_file("access-db-2")
     logging.info('========== SSH Tunnelling To Kawung =========')
     # Set the server and port to be the local SSH tunnel values
     server = tunnel.local_bind_address[0]
@@ -69,41 +69,41 @@ with sshtunnel.SSHTunnelForwarder((JS_HOST, Js_PORT), **conn_inputs) as tunnel:
         logging.info(f'======== Connect To Database PDDIKTI {conn_string} =========')
 
         logging.info("=============== Query SQL ==========")
-        logging.info("=============== Pendidikan Tinggi ==========")
-        query = "SELECT id_sp as id, nm_lemb, email as 'usernameAdmin' FROM dbo.satuan_pendidikan WHERE nm_lemb='Universitas Indonesia'"
-        result = execute_query(conn, query)
-        write_to_csv("pendidikan-tinggi", result)
-        logging.info(f"Export {len(result)} data to csv")
+        # logging.info("=============== Pendidikan Tinggi ==========")
+        # query = "SELECT id_sp as id, nm_lemb, email as 'usernameAdmin' FROM dbo.satuan_pendidikan WHERE nm_lemb='Universitas Indonesia'"
+        # result = execute_query(conn, query)
+        # write_to_csv("pendidikan-tinggi", result)
+        # logging.info(f"Export {len(result)} data to csv")
 
-        logging.info("=============== Prodi ==========")
-        query = "SELECT id_sms, id_sp, nm_lemb FROM dbo.sms where id_sp = '0D1E63E9-CBFB-4546-A242-875C310083A5' and id_jns_sms = '3' and id_jenj_didik = '30'"
-        result = execute_query(conn, query)
-        write_to_csv("prodi", result)
-        logging.info(f"Export {len(result)} data to csv")
+        # logging.info("=============== Prodi ==========")
+        # query = "SELECT id_sms, id_sp, nm_lemb FROM dbo.sms where id_sp = '0D1E63E9-CBFB-4546-A242-875C310083A5' and id_jns_sms = '3' and id_jenj_didik = '30'"
+        # result = execute_query(conn, query)
+        # write_to_csv("prodi", result)
+        # logging.info(f"Export {len(result)} data to csv")
 
         logging.info("=============== Dosen ==========")
-        query = "SELECT dbo.reg_ptk.id_reg_ptk, dbo.reg_ptk.id_sp, dbo.reg_ptk.id_sms, dbo.sdm.nm_sdm, dbo.sdm.nidn FROM dbo.reg_ptk INNER JOIN dbo.sdm ON dbo.sdm.id_sdm = dbo.reg_ptk.id_sdm WHERE dbo.sdm.id_jns_sdm = '12' and dbo.reg_ptk.id_sms in (SELECT id_sms FROM dbo.sms where id_sp = '0D1E63E9-CBFB-4546-A242-875C310083A5' and id_jns_sms = '3' and id_jenj_didik = '30')"
+        query = "SELECT dbo.reg_ptk.id_reg_ptk, dbo.reg_ptk.id_sp, dbo.reg_ptk.id_sms, dbo.sdm.nm_sdm, dbo.sdm.nidn, dbo.sdm.email FROM dbo.reg_ptk INNER JOIN dbo.sdm ON dbo.sdm.id_sdm = dbo.reg_ptk.id_sdm WHERE dbo.sdm.id_jns_sdm = '12' and dbo.reg_ptk.id_sms in ('5028F1E9-E954-4F62-9244-BAB2C3E3A475', '91FAA6C6-376B-4125-A6D1-A1E6FF1EE485','D5D36093-9656-43FE-BFCC-C1ED1873EECB','2D4B55AE-7813-4682-B2E2-88D98EF74369','B48C0C75-A475-49FA-B69C-9B2731FDF272')"
         result = execute_query(conn, query)
         write_to_csv("dosen", result)
         logging.info(f"Export {len(result)} data to csv")
 
         logging.info("=============== Mahasiswa ==========")
-        query = "SELECT id_sp as id, nm_lemb as 'nama', email as 'usernameAdmin' FROM dbo.satuan_pendidikan WHERE nm_lemb='Universitas Indonesia'"
+        query = "SELECT reg.id_reg_pd, reg.id_sp, reg.id_sms, pd.nm_pd , reg.nipd, pd.email, reg.mulai_smt  FROM dbo.reg_pd as reg  INNER JOIN dbo.peserta_didik  as pd ON reg.id_pd = pd.id_pd  WHERE reg.mulai_smt in('20161') and reg.id_sms in ('5028F1E9-E954-4F62-9244-BAB2C3E3A475', '91FAA6C6-376B-4125-A6D1-A1E6FF1EE485','D5D36093-9656-43FE-BFCC-C1ED1873EECB','2D4B55AE-7813-4682-B2E2-88D98EF74369','B48C0C75-A475-49FA-B69C-9B2731FDF272')"
         result = execute_query(conn, query)
         write_to_csv("mahasiswa", result)
         logging.info(f"Export {len(result)} data to csv")
 
-        logging.info("=============== Matkul ==========")
-        query = "SELECT id_sp as id, nm_lemb as 'nama', email as 'usernameAdmin' FROM dbo.satuan_pendidikan WHERE nm_lemb='Universitas Indonesia'"
-        result = execute_query(conn, query)
-        write_to_csv("matkul", result)
-        logging.info(f"Export {len(result)} data to csv")
+        # logging.info("=============== Matkul ==========")
+        # query = "SELECT id_mk, id_sms, nm_mk, sks_mk, kode_mk  FROM dbo.matkul  WHERE id_sms in (SELECT id_sms FROM dbo.sms where id_sp = '0D1E63E9-CBFB-4546-A242-875C310083A5' and id_jns_sms = '3' and id_jenj_didik = '30')"
+        # result = execute_query(conn, query)
+        # write_to_csv("matkul", result)
+        # logging.info(f"Export {len(result)} data to csv")
         
-        logging.info("=============== Kelas ==========")
-        query = "SELECT id_sp as id, nm_lemb as 'nama', email as 'usernameAdmin' FROM dbo.satuan_pendidikan WHERE nm_lemb='Universitas Indonesia'"
-        result = execute_query(conn, query)
-        write_to_csv("kelas", result)
-        logging.info(f"Export {len(result)} data to csv")
+        # logging.info("=============== Kelas ==========")
+        # query = "SELECT  id_kls, id_mk, id_sms, nm_kls, sks_mk, id_smt FROM dbo.kelas_kuliah WHERE id_smt in ('20161', '20162', '20171', '20172', '20181', '20182', '20191', '20192', '20201') and id_sms in (SELECT id_sms FROM dbo.sms where id_sp = '0D1E63E9-CBFB-4546-A242-875C310083A5' and id_jns_sms = '3' and id_jenj_didik = '30')"
+        # result = execute_query(conn, query)
+        # write_to_csv("kelas", result)
+        # logging.info(f"Export {len(result)} data to csv")
         
         logging.info("=============== Nilai ==========")
         query = "SELECT id_sp as id, nm_lemb as 'nama', email as 'usernameAdmin' FROM dbo.satuan_pendidikan WHERE nm_lemb='Universitas Indonesia'"

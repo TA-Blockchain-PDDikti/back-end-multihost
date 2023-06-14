@@ -1,0 +1,71 @@
+12:23:37 INFO    =============== Enroll Admin Network ==========
+12:23:37 INFO    =============== Login Admin PDDIKTI ==========
+12:23:38 INFO    {"success":true,"message":"Successfully Login","user":{"username":"admin.pddikti@gmail.com","userType":"admin pddikti","dataUser":"{}"},"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluLnBkZGlrdGlAZ21haWwuY29tIiwidXNlclR5cGUiOiJhZG1pbiBwZGRpa3RpIiwiZGF0YVVzZXIiOiJ7fSIsImlhdCI6MTY4NjcyMDIxOCwiZXhwIjoxNjg2NzI3NDE4fQ.G6GGbd1e-FCawLHrsM5aKjIeMGdHkV-RPhUwGJdx7UU"}
+12:23:38 INFO    =============== Skenario 2 : Create Pendidikan Tinggi, Prodi, Dosen, Mahasiswa, Matkul, Kelas  ==========
+12:23:39 INFO    {"success":true,"message":"Successfully Login","user":{"username":"humas-ui@ui.ac.id","userType":"admin PT","dataUser":"{\"idSp\":\"0D1E63E9-CBFB-4546-A242-875C310083A5\",\"namaSp\":\"Universitas Indonesia\"}"},"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Imh1bWFzLXVpQHVpLmFjLmlkIiwidXNlclR5cGUiOiJhZG1pbiBQVCIsImRhdGFVc2VyIjoie1wiaWRTcFwiOlwiMEQxRTYzRTktQ0JGQi00NTQ2LUEyNDItODc1QzMxMDA4M0E1XCIsXCJuYW1hU3BcIjpcIlVuaXZlcnNpdGFzIEluZG9uZXNpYVwifSIsImlhdCI6MTY4NjcyMDIxOSwiZXhwIjoxNjg2NzI3NDE5fQ.0tcB7NtyArH8xJJXMxzrcWMK4sL8kuDpDt0tahzWZuw"}
+12:23:39 INFO    =============== Create Prodi ==========
+12:23:42 INFO    {'success': True, 'message': 'Prodi telah ditambahkan'}
+12:23:44 INFO    {'success': True, 'message': 'Prodi telah ditambahkan'}
+12:23:47 INFO    {'success': True, 'message': 'Prodi telah ditambahkan'}
+12:23:50 INFO    {'success': True, 'message': 'Prodi telah ditambahkan'}
+12:23:53 INFO    {'success': True, 'message': 'Prodi telah ditambahkan'}
+12:23:56 INFO    {'success': True, 'message': 'Prodi telah ditambahkan'}
+12:23:59 INFO    {'success': True, 'message': 'Prodi telah ditambahkan'}
+12:24:01 INFO    {'success': True, 'message': 'Prodi telah ditambahkan'}
+12:24:04 INFO    {'success': True, 'message': 'Prodi telah ditambahkan'}
+12:24:07 INFO    {'success': True, 'message': 'Prodi telah ditambahkan'}
+12:24:10 INFO    {'success': True, 'message': 'Prodi telah ditambahkan'}
+12:24:13 INFO    {'success': True, 'message': 'Prodi telah ditambahkan'}
+12:24:16 INFO    {'success': True, 'message': 'Prodi telah ditambahkan'}
+12:24:18 INFO    {'success': True, 'message': 'Prodi telah ditambahkan'}
+12:24:21 INFO    {'success': True, 'message': 'Prodi telah ditambahkan'}
+12:24:24 INFO    {'success': True, 'message': 'Prodi telah ditambahkan'}
+12:24:27 INFO    {'success': True, 'message': 'Prodi telah ditambahkan'}
+12:24:30 INFO    {'success': True, 'message': 'Prodi telah ditambahkan'}
+12:24:33 INFO    {'success': True, 'message': 'Prodi telah ditambahkan'}
+12:24:36 INFO    {'success': True, 'message': 'Prodi telah ditambahkan'}
+12:24:38 INFO    {'success': True, 'message': 'Prodi telah ditambahkan'}
+12:24:41 INFO    {'success': True, 'message': 'Prodi telah ditambahkan'}
+12:24:44 INFO    {'success': True, 'message': 'Prodi telah ditambahkan'}
+12:24:47 INFO    {'success': True, 'message': 'Prodi telah ditambahkan'}
+12:24:50 INFO    {'success': True, 'message': 'Prodi telah ditambahkan'}
+12:24:52 INFO    {'success': True, 'message': 'Prodi telah ditambahkan'}
+12:24:55 INFO    {'success': True, 'message': 'Prodi telah ditambahkan'}
+12:24:58 INFO    {'success': True, 'message': 'Prodi telah ditambahkan'}
+12:25:01 INFO    {'success': True, 'message': 'Prodi telah ditambahkan'}
+12:25:04 INFO    {'success': True, 'message': 'Prodi telah ditambahkan'}
+12:25:06 INFO    {'success': True, 'message': 'Prodi telah ditambahkan'}
+12:25:09 INFO    {'success': True, 'message': 'Prodi telah ditambahkan'}
+12:25:12 INFO    {'success': True, 'message': 'Prodi telah ditambahkan'}
+12:25:15 INFO    {'success': True, 'message': 'Prodi telah ditambahkan'}
+12:25:18 INFO    {'success': True, 'message': 'Prodi telah ditambahkan'}
+12:25:20 INFO    {'success': True, 'message': 'Prodi telah ditambahkan'}
+12:25:23 INFO    {'success': True, 'message': 'Prodi telah ditambahkan'}
+12:25:26 INFO    {'success': True, 'message': 'Prodi telah ditambahkan'}
+12:25:29 INFO    {'success': True, 'message': 'Prodi telah ditambahkan'}
+12:25:32 INFO    {'success': True, 'message': 'Prodi telah ditambahkan'}
+12:25:34 INFO    {'success': True, 'message': 'Prodi telah ditambahkan'}
+12:25:37 INFO    {'success': True, 'message': 'Prodi telah ditambahkan'}
+12:25:40 INFO    {'success': True, 'message': 'Prodi telah ditambahkan'}
+12:25:43 INFO    {'success': True, 'message': 'Prodi telah ditambahkan'}
+12:25:47 INFO    {'success': True, 'message': 'Prodi telah ditambahkan'}
+12:25:51 INFO    {'success': True, 'message': 'Prodi telah ditambahkan'}
+12:25:54 INFO    {'success': True, 'message': 'Prodi telah ditambahkan'}
+12:25:57 INFO    {'success': True, 'message': 'Prodi telah ditambahkan'}
+12:26:02 INFO    {'success': True, 'message': 'Prodi telah ditambahkan'}
+12:26:05 INFO    {'success': True, 'message': 'Prodi telah ditambahkan'}
+12:26:08 INFO    {'success': True, 'message': 'Prodi telah ditambahkan'}
+12:26:10 INFO    {'success': True, 'message': 'Prodi telah ditambahkan'}
+12:26:13 INFO    {'success': True, 'message': 'Prodi telah ditambahkan'}
+12:26:16 INFO    {'success': True, 'message': 'Prodi telah ditambahkan'}
+12:26:19 INFO    {'success': True, 'message': 'Prodi telah ditambahkan'}
+12:26:22 INFO    {'success': True, 'message': 'Prodi telah ditambahkan'}
+12:26:24 INFO    {'success': True, 'message': 'Prodi telah ditambahkan'}
+12:26:27 INFO    {'success': True, 'message': 'Prodi telah ditambahkan'}
+12:26:30 INFO    {'success': True, 'message': 'Prodi telah ditambahkan'}
+12:26:33 INFO    {'success': True, 'message': 'Prodi telah ditambahkan'}
+12:26:36 INFO    {'success': True, 'message': 'Prodi telah ditambahkan'}
+12:26:39 INFO    {'success': True, 'message': 'Prodi telah ditambahkan'}
+12:26:42 INFO    {'success': True, 'message': 'Prodi telah ditambahkan'}
+12:26:44 INFO    {'success': True, 'message': 'Prodi telah ditambahkan'}
+12:26:47 INFO    {'success': True, 'message': 'Prodi telah ditambahkan'}
