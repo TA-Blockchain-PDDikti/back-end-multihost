@@ -32,7 +32,7 @@ const connectToNetwork = async(organizationName, chaincodeName, user) => {
 
     // Create a new gateway for connecting to our peer node.
     const gateway = new Gateway();
-    await gateway.connect(ccp, { wallet, identity: user, discovery: { enabled: true, asLocalhost: true } });
+    await gateway.connect(ccp, { wallet, identity: user, discovery: { enabled: true, asLocalhost: false } });
 
     // Get the network (channel) our contract is deployed to.
     const network = await gateway.getNetwork('academicchannel');
@@ -73,7 +73,7 @@ const getUserAttrs = async(username, organizationName) => {
 }
 
 const calculateBlockHash = function(header) {
-    let headerAsn = asn.define('headerAsn', function() {
+    var headerAsn = asn.define('headerAsn', function() {
         this.seq().obj(
             this.key('Number').int(),
             this.key('PreviousHash').octstr(),
@@ -81,13 +81,13 @@ const calculateBlockHash = function(header) {
         );
     });
 
-    let output = headerAsn.encode({
+    var encodeHeader = headerAsn.encode({
         Number: parseInt(header.number),
         PreviousHash: Buffer.from(header.previous_hash, 'hex'),
         DataHash: Buffer.from(header.data_hash, 'hex')
     }, 'der');
-    let hash = sha.sha256(output);
-  return hash;
+    var blockHash = sha.sha256(encodeHeader);
+  return blockHash;
 };
 
 const getSignature = async(txId) => {

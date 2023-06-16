@@ -2,7 +2,7 @@ const fabric = require("../utils/fabric.js")
 const { v4: uuidv4 } = require('uuid')
 const { getAllParser, getParser } = require('../utils/converter.js')
 const { BlockDecoder } = require('fabric-common');
-const { getAcademicRecordByIdMhsw } = require('./academicRecord.js');
+const { getAcademicRecordByIdMhsw } = require('./administrasiNilai.js');
 
 const getIjzTxIds = async(user, id) => {
     const network = await fabric.connectToNetwork("HE1", "ijzcontract", user)

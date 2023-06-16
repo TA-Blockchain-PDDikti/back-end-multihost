@@ -41,6 +41,7 @@ const parser = async(result) => {
             "id": id,
             "sks": data.sks,
             "namaKls": data.namaKls,
+            "semester": data.semester,
             "namaMk": dataMatkul.namaMk,
             "kodeMk": dataMatkul.kodeMk,
         }

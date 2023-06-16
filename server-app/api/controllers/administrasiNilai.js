@@ -1,5 +1,43 @@
-const academicRecordService = require('../services/academicRecord.js')
+const academicRecordService = require('../services/administrasiNilai.js')
 const { v4: uuidv4 } = require('uuid')
+
+exports.createAcademicRecordBatch = async(req, res) => {
+    try {
+        if (req.user.userType != "dosen") {
+            return res.status(403).send({"result":`Forbidden Access for role ${req.user.userType}`})
+        }
+
+        const data = req.body;
+        const dataNilai = data.dataNilai;
+        
+        await Promise.all(dataNilai.map( async(item, index) => {
+            const idKls = item.idKls;
+            const idDosen = item.idPtk;
+            const idMahasiswa = item.idPd;
+            const nilaiAngka = item.nilaiAngka;
+            const nilaiHuruf = item.nilaiHuruf;
+            const nilaiIndex = item.nilaiIndex;
+            var id = item.id;
+
+            // Randomize unique Id if there is no request id given
+            if (!id) {
+                id = uuidv4()
+            }
+            
+            args = [id, idKls, idDosen, idMahasiswa, nilaiAngka, nilaiHuruf, nilaiIndex]
+            await academicRecordService.createAcademicRecord(req.user.username, args)
+        }))
+        res.status(201).send({
+            success: true,
+            message: "Transaction nilai has been submitted",
+        })
+    } catch(error){
+        res.status(400).send({
+            success: false,
+            error: error.toString(),
+        })    
+    }
+}
 
 exports.createAcademicRecord = async(req, res) => {
     try {
