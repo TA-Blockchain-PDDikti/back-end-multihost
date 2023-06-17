@@ -1,5 +1,5 @@
 const fabric = require("../utils/fabric.js")
-const { getAllParser, getParser, parser } = require('../utils/converter.js')
+const { getAllParser, getParser } = require('../utils/converter.js')
 
 
 const getNpdTxId = async(user, id) => {
@@ -37,7 +37,6 @@ exports.getAllAcademicRecord = async(user) => {
 
     const allData  =  JSON.parse(queryData)
     await Promise.all(allData.map( async(item, index) => {
-        allData[index] = await parser(item)
         const txId = await getNpdTxId(user, item.id)
         const signature =  await fabric.getSignature(txId)
         allData[index].signature = signature
@@ -51,7 +50,7 @@ exports.getAcademicRecordById = async(user, id) => {
     const result = await network.contract.evaluateTransaction("GetNpdById", id)
     network.gateway.disconnect()
 
-    const data = await getParser(result)
+    const data = await getParser(JSON.parse(result))
     const txId = await getNpdTxId(user, data.id)
     console.log(txId)
     data.signature = await fabric.getSignature(txId)
@@ -63,14 +62,21 @@ exports.getAcademicRecordByIdMhsw = async(user, id) => {
     const queryData = await network.contract.evaluateTransaction("GetNpdByIdPd", id)
     network.gateway.disconnect()
 
-    const allData  =  JSON.parse(queryData)
+    try {
+        var allData  =  JSON.parse(queryData)
+    } catch(error){
+        return []
+    }
+
     await Promise.all(allData.map( async(item, index) => {
-        allData[index] = await parser(item, [true, true, true, true, true, false])
+        allData[index] = await getParser(item, [false, false, false, true, true, false, false, false, false])
         const txId = await getNpdTxId(user, item.id)
         const signature =  await fabric.getSignature(txId)
         allData[index].signature = signature
     }))
     return allData
+
+
 }
 
 exports.getAcademicRecordByIdKls = async(user, id) => {
@@ -78,9 +84,13 @@ exports.getAcademicRecordByIdKls = async(user, id) => {
     const queryData = await network.contract.evaluateTransaction("GetNpdByIdKls", id)
     network.gateway.disconnect()
 
-    const allData  =  JSON.parse(queryData)
+    try {
+        var allData  =  JSON.parse(queryData)
+    } catch(error){
+        return []
+    }
     await Promise.all(allData.map( async(item, index) => {
-        allData[index] = await parser(item, [true, true, true, false, true, true])
+        allData[index] = await getParser(item, [false, false, false, false, true, true, false, false, false, false])
         const txId = await getNpdTxId(user, item.id)
         const signature =  await fabric.getSignature(txId)
         allData[index].signature = signature

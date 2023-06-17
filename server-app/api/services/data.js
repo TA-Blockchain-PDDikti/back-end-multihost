@@ -27,7 +27,11 @@ exports.getAllPT = async(user) => {
     const network = await fabric.connectToNetwork("Kemdikbud", "spcontract", user)
     const queryData = await network.contract.evaluateTransaction("GetAllSp")
     network.gateway.disconnect()
-    return  getAllParser(queryData)
+    try {
+        return JSON.parse(queryData)
+    } catch(error) {
+        return []
+    }
 }
 
 exports.getPTById = async(user, idPT, isAdminPt) => {
@@ -68,22 +72,29 @@ exports.getAllProdi = async(user) => {
     const queryData = await network.contract.evaluateTransaction("GetAllSms")
 
     network.gateway.disconnect()
-    return getAllParser(queryData)
-
+    try {
+        return JSON.parse(queryData)
+    } catch(error) {
+        return []
+    }
 }
 
 exports.getProdiByPT = async(user, idPT) => {
     const network = await fabric.connectToNetwork("HE1", "smscontract", user)
     const queryData = await network.contract.evaluateTransaction("GetSmsByIdSp", idPT)
     network.gateway.disconnect()
-    return getAllParser(queryData, [false, true, true, true, true, true])
+    try {
+        return JSON.parse(queryData)
+    } catch(error) {
+        return []
+    }
 }
 
 exports.getProdiById = async(user, idProdi) => {
     const network = await fabric.connectToNetwork("HE1", "smscontract", user)
     const result = await network.contract.evaluateTransaction("GetSmsById", idProdi)
     network.gateway.disconnect()
-    return getParser(result)
+    return getParser(JSON.parse(result))
 }
 
 //dosen
@@ -112,21 +123,29 @@ exports.getAllDosen = async(user) => {
     const network = await fabric.connectToNetwork("HE1", "ptkcontract", user)
     const queryData = await network.contract.evaluateTransaction("GetAllPtk")
     network.gateway.disconnect()
-    return getAllParser(queryData)
+    try {
+        return JSON.parse(queryData)
+    } catch(error) {
+        return []
+    }
 }
 
 exports.getDosenByPT = async(user, idPT) => {
     const network = await fabric.connectToNetwork("HE1", "ptkcontract", user)
     const queryData = await network.contract.evaluateTransaction("GetPtkByIdSp", idPT)
     network.gateway.disconnect()
-    return getAllParser(queryData, [false, true, true, true, true, true])
+    return getAllParser(queryData, [false, true, false, false, false, false, false, false, false])
 }
 
 exports.getDosenByProdi = async(user, idProdi) => {
     const network = await fabric.connectToNetwork("HE1", "ptkcontract", user)
     const queryData = await network.contract.evaluateTransaction("GetPtkByIdSms", idProdi)
     network.gateway.disconnect()
-    return getAllParser(queryData, [true, false, true, true, true, true])
+    try {
+        return JSON.parse(queryData)
+    } catch(error) {
+        return []
+    }
 }
 
 
@@ -134,7 +153,7 @@ exports.getDosenById = async(user, idDosen) => {
     const network = await fabric.connectToNetwork("HE1", "ptkcontract", user)
     const result = await network.contract.evaluateTransaction("GetPtkById", idDosen)
     network.gateway.disconnect()
-    return getParser(result)
+    return getParser(JSON.parse(result))
 }
 
 //mahasiswa
@@ -163,28 +182,36 @@ exports.getAllMahasiswa = async(user) => {
     const network = await fabric.connectToNetwork("HE1", "pdcontract", user)
     const queryData = await network.contract.evaluateTransaction("GetAllPd")
     network.gateway.disconnect()
-    return getAllParser(queryData)
+    try {
+        return JSON.parse(queryData)
+    } catch(error) {
+        return []
+    }
 }
 
 exports.getMahasiswaById = async(user, idMahasiswa) => {
     const network = await fabric.connectToNetwork("HE1", "pdcontract", user)
     const result = await network.contract.evaluateTransaction("GetPdById", idMahasiswa)
     network.gateway.disconnect()
-    return getParser(result)
+    return getParser(JSON.parse(result))
 }
 
 exports.getMahasiswaByPT = async(user, idPt) => {
     const network = await fabric.connectToNetwork("HE1", "pdcontract", user)
     const queryData = await network.contract.evaluateTransaction("GetPdByIdSp", idPt)
     network.gateway.disconnect()
-    return getAllParser(queryData, [false, true, true, true, true, true])
+    return getAllParser(queryData, [false, true, false, false, false, false, false, false, false])
 }
 
 exports.getMahasiswaByProdi = async(user, idProdi) => {
     const network = await fabric.connectToNetwork("HE1", "pdcontract", user)
     const queryData = await network.contract.evaluateTransaction("GetPdByIdSms", idProdi)
     network.gateway.disconnect()
-    return getAllParser(queryData, [true, false, true, true, true, true])
+    try {
+        return JSON.parse(queryData)
+    } catch(error) {
+        return []
+    }
 }
 
 //mata kuliah
@@ -212,7 +239,11 @@ exports.getAllMataKuliah = async(user) => {
     const network = await fabric.connectToNetwork("HE1", "mkcontract", user)
     const queryData = await network.contract.evaluateTransaction("GetAllMk")
     network.gateway.disconnect()
-    return getAllParser(queryData)
+    try {
+        return JSON.parse(queryData)
+    } catch(error) {
+        return []
+    }
 }
 
 
@@ -220,20 +251,25 @@ exports.getMataKuliahById = async(user, idMk) => {
     const network = await fabric.connectToNetwork("HE1", "mkcontract", user)
     const result = await network.contract.evaluateTransaction("GetMkById", idMk)
     network.gateway.disconnect()
-    return getParser(result)
+    return getParser(JSON.parse(result))
 }
 
 exports.getMataKuliahByIdPt = async(user, idPt) => {
     const network = await fabric.connectToNetwork("HE1", "mkcontract", user)
     const result = await network.contract.evaluateTransaction("GetMkByIdSp", idPt)
     network.gateway.disconnect()
-    return getAllParser(result, [false, true, true, true, true, true])
+    return getAllParser(result, [false, true, false, false, false, false, false, false, false])
 }
+
 exports.getMataKuliahByIdProdi = async(user, idProdi) => {
     const network = await fabric.connectToNetwork("HE1", "mkcontract", user)
-    const result = await network.contract.evaluateTransaction("GetMkByIdSms", idProdi)
+    const queryData = await network.contract.evaluateTransaction("GetMkByIdSms", idProdi)
     network.gateway.disconnect()
-    return getAllParser(result, [false, true, true, true, true, true])
+    try {
+        return JSON.parse(queryData)
+    } catch(error) {
+        return []
+    }
 }
 
 //kelas
@@ -275,7 +311,11 @@ exports.getAllKelas = async(user) => {
     const network = await fabric.connectToNetwork("HE1", "klscontract", user)
     const queryData = await network.contract.evaluateTransaction("GetAllKls")
     network.gateway.disconnect()
-    return getAllParser(queryData)
+    try {
+        return JSON.parse(queryData)
+    } catch(error) {
+        return []
+    }
 }
 
 
@@ -283,14 +323,14 @@ exports.getKelasById = async(user, idKelas) => {
     const network = await fabric.connectToNetwork("HE1", "klscontract", user)
     const result = await network.contract.evaluateTransaction("GetKlsById", idKelas)
     network.gateway.disconnect()
-    return getParser(result)
+    return getParser(JSON.parse(result))
 }
 
 exports.getKelasByIdMk = async(user, idKelas) => {
     const network = await fabric.connectToNetwork("HE1", "klscontract", user)
     const result = await network.contract.evaluateTransaction("GetKlsByIdMk", idKelas)
     network.gateway.disconnect()
-    return getAllParser(result, [true, true, false, true, true, true])
+    return getAllParser(result, [false, false, false, false, false, false, true, true, false])
 }
 
 

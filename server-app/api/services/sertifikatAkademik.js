@@ -42,7 +42,7 @@ exports.getIjazahById = async(user, idIjazah) => {
     const result = await network.contract.evaluateTransaction( "GetIjzById", idIjazah)
     network.gateway.disconnect()
 
-    const data =  await getParser(result)
+    const data =  await getParser(JSON.parse(result))
     const txIds = await getIjzTxIds(user, data.id)
     data.signature =  await fabric.getAllSignature(txIds)
     return data
@@ -53,9 +53,13 @@ exports.getIjazahByIdPt = async(user, idPt) => {
     const queryData = await network.contract.evaluateTransaction( "GetIjzByIdSp", idPt)
     network.gateway.disconnect()
     
-    const allData =  JSON.parse(queryData)
+    try {
+        var allData  =  JSON.parse(queryData)
+    } catch(error){
+        return []
+    }
     await Promise.all(allData.map( async(item, index) => {
-        allData[index] = await parser(item, [false, true, true, true, true, true])
+        allData[index] = await getParser(item, [false, true, true, true, true, true, false, false, true])
         const txIds = await getIjzTxIds(user, item.id)
         const signatures = await fabric.getAllSignature(txIds)
         allData[index].signatures = signatures
@@ -68,9 +72,13 @@ exports.getIjazahByIdProdi = async(user, idProdi) => {
     const queryData = await network.contract.evaluateTransaction( "GetIjzByIdSms", idProdi)
     network.gateway.disconnect()
     
-    const allData =  JSON.parse(queryData)
+    try {
+        var allData  =  JSON.parse(queryData)
+    } catch(error) {
+        return []
+    }
     await Promise.all(allData.map( async(item, index) => {
-        allData[index] = await parser(item, [true, false, true, true, true, true])
+        allData[index] = await getParser(item, [true, true, true, true, true, true, false, false, true])
         const txIds = await getIjzTxIds(user, item.id)
         const signatures = await fabric.getAllSignature(txIds)
         allData[index].signatures = signatures
@@ -83,9 +91,13 @@ exports.getIjazahByIdMahasiswa = async(user, idMahasiswa) => {
     const queryData = await network.contract.evaluateTransaction( "GetIjzByIdPd", idMahasiswa)
     network.gateway.disconnect()
     
-    const allData =  JSON.parse(queryData)
+    try {
+        var allData  =  JSON.parse(queryData)
+    } catch(error){
+        return []
+    }
     await Promise.all(allData.map( async(item, index) => {
-        allData[index] = await parser(item, [true, true, true, true, true, false])
+        allData[index] = await getParser(item, [true, true, false, false, false, false, false, false, true])
         const txIds = await getIjzTxIds(user, item.id)
         const signatures = await fabric.getAllSignature(txIds)
         allData[index].signatures = signatures
@@ -98,9 +110,12 @@ exports.getAllIjazah = async(user) => {
     const queryData = await network.contract.evaluateTransaction( "GetAllIjz")
     network.gateway.disconnect()
     
-    const allData =  JSON.parse(queryData)
+    try {
+        var allData  =  JSON.parse(queryData)
+    } catch(error){
+        return []
+    }
     await Promise.all(allData.map( async(item, index) => {
-        allData[index] = await parser(item)
         const txIds = await getIjzTxIds(user, item.id)
         const signatures = await fabric.getAllSignature(txIds)
         allData[index].signatures = signatures
@@ -129,9 +144,12 @@ exports.getAllTranskrip = async(user) => {
     const queryData = await network.contract.evaluateTransaction( "GetAllTsk")
     network.gateway.disconnect()
     
-    const allData =  JSON.parse(queryData)
+    try {
+        var allData  =  JSON.parse(queryData)
+    } catch(error){
+        return []
+    }
     await Promise.all(allData.map( async(item, index) => {
-        allData[index] = await parser(item)
         const nilai = await getAcademicRecordByIdMhsw(user, item.idPd) 
         allData[index].nilai = nilai
         
@@ -147,7 +165,7 @@ exports.getTranskripById = async(user, idTsk) => {
     const result = await network.contract.evaluateTransaction( "GetTskById", idTsk)
     network.gateway.disconnect()
 
-    const data =  await getParser(result)
+    const data =  await getParser(JSON.parse(result))
 
     const nilai = await getAcademicRecordByIdMhsw(user, data.pd.id) 
     data.nilai = nilai
@@ -162,9 +180,13 @@ exports.getTranskripByIdPt = async(user, idPt) => {
     const queryData = await network.contract.evaluateTransaction( "GetTskByIdSp", idPt)
     network.gateway.disconnect()
     
-    const allData =  JSON.parse(queryData)
+    try {
+        var allData  =  JSON.parse(queryData)
+    } catch(error){
+        return []
+    }
     await Promise.all(allData.map( async(item, index) => {
-        allData[index] = await parser(item, [false, true, true, true, true, true])
+        allData[index] = await getParser(item, [false, true, true, true, true, true, false, false, true])
         const nilai = await getAcademicRecordByIdMhsw(user, item.idPd) 
         allData[index].nilai = nilai
         
@@ -175,14 +197,18 @@ exports.getTranskripByIdPt = async(user, idPt) => {
     return allData
 }
 
-exports.getTranskripByIdProdi = async(user, idTsk) => {
+exports.getTranskripByIdProdi = async(user, idProdi) => {
     const network = await fabric.connectToNetwork("HE1", "tskcontract", user)
-    const queryData = await network.contract.evaluateTransaction( "GetTskByIdSms", idTsk)
+    const queryData = await network.contract.evaluateTransaction( "GetTskByIdSms", idProdi)
     network.gateway.disconnect()
     
-    const allData =  JSON.parse(queryData)
+    try {
+        var allData  =  JSON.parse(queryData)
+    } catch(error){
+        return []
+    }
     await Promise.all(allData.map( async(item, index) => {
-        allData[index] = await parser(item, [true, false, true, true, true, true])
+        allData[index] = await getParser(item, [false, false, true, true, true, true, false, false, true])
         const nilai = await getAcademicRecordByIdMhsw(user, item.idPd) 
         allData[index].nilai = nilai
         
@@ -198,9 +224,13 @@ exports.getTranskripByIdMahasiswa = async(user, idTsk) => {
     const queryData = await network.contract.evaluateTransaction( "GetTskByIdPd", idTsk)
     network.gateway.disconnect()
     
-    const allData =  JSON.parse(queryData)
+    try {
+        var allData  =  JSON.parse(queryData)
+    } catch(error){
+        return []
+    }
     await Promise.all(allData.map( async(item, index) => {
-        allData[index] = await parser(item, [true, true, true, true, true, false])
+        allData[index] = await getParser(item, [true, true, false, false, false, false, false, false, true])
         const nilai = await getAcademicRecordByIdMhsw(user, item.idPd) 
         allData[index].nilai = nilai
         
