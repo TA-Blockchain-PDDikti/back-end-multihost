@@ -1,0 +1,7 @@
+23:19:23 INFO    ========== SSH Tunnelling To Kawung =========
+23:19:23 INFO    Server: 0.0.0.0, port: 36111
+23:19:25 INFO    ======== Connect To Database PDDIKTI jdbc:sqlserver://0.0.0.0:36111;databaseName=pddikti;queryTimeout=600;encrypt=true;trustServerCertificate=true; =========
+23:19:25 INFO    =============== Query SQL ==========
+23:19:25 INFO    =============== Nilai ==========
+23:19:36 INFO    Export 413 data to csv
+23:19:36 INFO    =============== Finish Query SQL ==========

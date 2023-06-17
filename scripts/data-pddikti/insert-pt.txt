@@ -1,0 +1,7 @@
+12:38:35 INFO    =============== Enroll Admin Network ==========
+12:38:35 INFO    =============== Login Admin PDDIKTI ==========
+12:38:36 INFO    {"success":true,"message":"Successfully Login","user":{"username":"admin.pddikti@gmail.com","userType":"admin pddikti","dataUser":"{}"},"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluLnBkZGlrdGlAZ21haWwuY29tIiwidXNlclR5cGUiOiJhZG1pbiBwZGRpa3RpIiwiZGF0YVVzZXIiOiJ7fSIsImlhdCI6MTY4NjcyMTExNiwiZXhwIjoxNjg2NzI4MzE2fQ.Eys05ZtD_R0RFs279v6pOcl-QbcdePRMxsk6ekQmieo"}
+12:38:36 INFO    =============== Skenario 2 : Create Pendidikan Tinggi, Prodi, Dosen, Mahasiswa, Matkul, Kelas  ==========
+12:38:36 INFO    =============== Create PT ==========
+12:38:39 INFO    {'success': True, 'message': 'Pendidikan Tinggi telah ditambahkan'}
+12:38:40 INFO    {"success":true,"message":"Successfully Login","user":{"username":"humas-ui@ui.ac.id","userType":"admin PT","dataUser":"{\"idSp\":\"0D1E63E9-CBFB-4546-A242-875C310083A5\",\"namaSp\":\"Universitas Indonesia\"}"},"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Imh1bWFzLXVpQHVpLmFjLmlkIiwidXNlclR5cGUiOiJhZG1pbiBQVCIsImRhdGFVc2VyIjoie1wiaWRTcFwiOlwiMEQxRTYzRTktQ0JGQi00NTQ2LUEyNDItODc1QzMxMDA4M0E1XCIsXCJuYW1hU3BcIjpcIlVuaXZlcnNpdGFzIEluZG9uZXNpYVwifSIsImlhdCI6MTY4NjcyMTEyMCwiZXhwIjoxNjg2NzI4MzIwfQ.6mm5RBwEEM79pvoRHBqL4rE9C7qHtn1L9lJzVR8cAU8"}
