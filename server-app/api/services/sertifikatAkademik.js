@@ -1,6 +1,6 @@
 const fabric = require("../utils/fabric.js")
 const { v4: uuidv4 } = require('uuid')
-const { getAllParser, getParser, parser } = require('../utils/converter.js')
+const { getParser } = require('../utils/converter.js')
 const { BlockDecoder } = require('fabric-common');
 const { getAcademicRecordByIdMhsw } = require('./administrasiNilai.js');
 
@@ -186,8 +186,9 @@ exports.getTranskripByIdPt = async(user, idPt) => {
         return []
     }
     await Promise.all(allData.map( async(item, index) => {
+        idMhsw = item.idPd
         allData[index] = await getParser(item, [false, true, true, true, true, true, false, false, true])
-        const nilai = await getAcademicRecordByIdMhsw(user, item.idPd) 
+        const nilai = await getAcademicRecordByIdMhsw(user, idMhsw) 
         allData[index].nilai = nilai
         
         const txIds = await getTskTxIds(user, item.id)
@@ -208,8 +209,9 @@ exports.getTranskripByIdProdi = async(user, idProdi) => {
         return []
     }
     await Promise.all(allData.map( async(item, index) => {
+        idMhsw = item.idPd
         allData[index] = await getParser(item, [false, false, true, true, true, true, false, false, true])
-        const nilai = await getAcademicRecordByIdMhsw(user, item.idPd) 
+        const nilai = await getAcademicRecordByIdMhsw(user, idMhsw) 
         allData[index].nilai = nilai
         
         const txIds = await getTskTxIds(user, item.id)
@@ -230,8 +232,9 @@ exports.getTranskripByIdMahasiswa = async(user, idTsk) => {
         return []
     }
     await Promise.all(allData.map( async(item, index) => {
+        idMhsw = item.idPd
         allData[index] = await getParser(item, [true, true, false, false, false, false, false, false, true])
-        const nilai = await getAcademicRecordByIdMhsw(user, item.idPd) 
+        const nilai = await getAcademicRecordByIdMhsw(user, idMhsw) 
         allData[index].nilai = nilai
         
         const txIds = await getTskTxIds(user, item.id)
