@@ -1,7 +1,7 @@
 const dataService = require('../services/data.js')
 
-const parser = async(result) => {
-    if (result.idSp){
+const parser = async(result, query = [true, true, true, true, true, true]) => {
+    if (query[0] && result.idSp){
         const id = result.idSp
         const data = await dataService.getPTById('admin', id)
         result.sp = {
@@ -11,7 +11,7 @@ const parser = async(result) => {
         delete result.idSp
     }
 
-    if (result.idSms){
+    if (query[1] && result.idSms){
         const id = result.idSms
         const data = await dataService.getProdiById('admin', id)
         result.sms = {
@@ -22,7 +22,7 @@ const parser = async(result) => {
         delete result.idSms
     }
 
-    if (result.idMk){
+    if (query[2] && result.idMk){
         const id = result.idMk
         const data = await dataService.getMataKuliahById('admin', id)
         result.mk = {
@@ -33,7 +33,7 @@ const parser = async(result) => {
         delete result.idMk
     }
 
-    if (result.idKls){
+    if (query[3] && result.idKls){
         const id = result.idKls
         const data = await dataService.getKelasById('admin', id)
         const dataMatkul = await dataService.getMataKuliahById('admin', data.mk.id)
@@ -48,7 +48,7 @@ const parser = async(result) => {
         delete result.idKls
     }
 
-    if (result.idPtk){
+    if (query[4] && result.idPtk){
         const id = result.idPtk
         const data = await dataService.getDosenById('admin', id)
         result.ptk = {
@@ -59,7 +59,7 @@ const parser = async(result) => {
         delete result.idPtk
     }
 
-    if (result.idPd){
+    if (query[5] && result.idPd){
         const id = result.idPd
         const data = await dataService.getMahasiswaById('admin', id)
         result.pd = {
@@ -109,11 +109,11 @@ const parser = async(result) => {
     return result;
 }
 
-const getAllParser = async (queryData) => {
+const getAllParser = async (queryData, query = [true, true, true, true, true, true]) => {
     try {
         let result = JSON.parse(queryData)
         await Promise.all(result.map( async(item, index) => {
-            result[index] = await parser(item)
+            result[index] = await parser(item, query)
         }))
         return result;
     } catch(error) {
@@ -121,11 +121,11 @@ const getAllParser = async (queryData) => {
     }
 }
 
-const getParser = (queryData) => {
+const getParser = (queryData, query = [true, true, true, true, true, true]) => {
     const jsonParse = JSON.parse(queryData)
-    return parser(jsonParse)
+    return parser(jsonParse, query)
 }
 
 
 
-module.exports = { getAllParser, getParser };
+module.exports = { getAllParser, getParser, parser };
