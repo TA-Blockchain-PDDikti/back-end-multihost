@@ -80,11 +80,11 @@ def login(username, password):
     logging.info(login.text)
     return json.loads(login.text)['token']
 
-logging_file("insert-mahasiswa")
+logging_file("insert-nilai-1")
 logging.info('=============== Enroll Admin Network ==========')
 #init()
 logging.info('=============== Login Admin PDDIKTI ==========')
-tokenAdminPddikti = login("admin.pddikti@gmail.com", "98d33c91")
+#tokenAdminPddikti = login("admin.pddikti@gmail.com", "98d33c91")
 logging.info('=============== Skenario 2 : Create Pendidikan Tinggi, Prodi, Dosen, Mahasiswa, Matkul, Kelas  ==========')
 
 # logging.info("=============== Create PT ==========")
@@ -120,66 +120,80 @@ print(tokenAdminPT)
 # fp = open('dosen.csv', 'r')
 # read_data = csv.reader(fp)
 # for row in read_data:
-#     emailDosen = row[5] if row[5] != None else f"{''.join(random.choice(string.ascii_lowercase) for i in range(10))}@gamil.com"
+#     print(row[5] != "")
+#     emailDosen = row[5] if row[5] != "" else f"{''.join(random.choice(string.ascii_lowercase) for i in range(10))}@gmail.com"
+#     print(emailDosen)
 #     data = {
 #         "id": row[0],
 #         "idSp": row[1],
 #         "idSms": row[2],
 #         "nama": row[3],
 #         "nidn": row[4],
+#         "jabatan": "",
+#         "nomorSk": "",
 #         "username": emailDosen
 #     }
 #     res_skenario = skenario( "POST", "data/dosen", data, tokenAdminPT)
+#     logging.info(res_skenario)
 # fp.close()
 
 
-logging.info("=============== Create Mahasiswa ==========")
-fp = open('mahasiswa.csv', 'r')
-read_data = csv.reader(fp)
-for row in read_data:
-    emailMahasiswa = row[5] if row[5] != None else f"{''.join(random.choice(string.ascii_lowercase) for i in range(10))}@gamil.com"
-    if emailMahasiswa not in ('dina@cs.ui.ac.id', 'santo@cs.ui.ac.id', 'bettyp@cs.ui.ac.id', 'chan@cs.ui.ac.id','nizar@cs.ui.ac.id', 'kasiyah@cs.ui.ac.id','wisnuj@cs.ui.ac.id','alfan@cs.ui.ac.id','saptawijaya@cs.ui.ac.id'):
-        data = {
-                "id": row[0],
-                "idSp": row[1],
-                "idSms": row[2],
-                "nama": row[3],
-                "nipd": row[4],
-                "username": emailMahasiswa
-            }
-        res_skenario = skenario( "POST", "data/mahasiswa", data, tokenAdminPT)
-        logging.info(res_skenario, data)
-fp.close()
+# logging.info("=============== Create Mahasiswa ==========")
+# fp = open('mahasiswa.csv', 'r')
+# read_data = csv.reader(fp)
+# for row in read_data:
+#     emailMahasiswa = row[5] if row[5] != None else f"{''.join(random.choice(string.ascii_lowercase) for i in range(10))}@gmail.com"
+#     if emailMahasiswa not in ('dina@cs.ui.ac.id', 'santo@cs.ui.ac.id', 'bettyp@cs.ui.ac.id', 'chan@cs.ui.ac.id','nizar@cs.ui.ac.id', 'kasiyah@cs.ui.ac.id','wisnuj@cs.ui.ac.id','alfan@cs.ui.ac.id','saptawijaya@cs.ui.ac.id', 'ari.kuncoro@ie.ui.ac.id'):
+#         data = {
+#                 "id": row[0],
+#                 "idSp": row[1],
+#                 "idSms": row[2],
+#                 "nama": row[3],
+#                 "nipd": row[4],
+#                 "username": emailMahasiswa
+#             }
+#         res_skenario = skenario( "POST", "data/mahasiswa", data, tokenAdminPT)
+#         logging.info(res_skenario, data)
+# fp.close()
 
 # logging.info("=============== Create Matkul ==========")
-# fp = open('matkul.csv', 'r')
+# fp = open('matkul-1.csv', 'r')
 # read_data = csv.reader(fp)
 # for row in read_data:
 #     data = {
 #         "id": row[0],
 #         "idSms": row[1],
-#         "idSp": row[2],
-#         "nama": row[3],
-#         "sks": row[4],
-#         "kodeMk":row[5],
+#         "idSp": '0D1E63E9-CBFB-4546-A242-875C310083A5',
+#         "nama": row[2],
+#         "sks": int(float(row[3])),
+#         "kodeMk":row[4],
 #         "jenjangPendidikan": "S1"  
 #     }
-#     skenario("POST", "data/matkul", data, tokenAdminPddikti)
+#     res_skenario = skenario("POST", "data/matkul", data, tokenAdminPT)
+#     logging.info(res_skenario)
 # fp.close()
 
 # logging.info("=============== Create Kelas ==========")
-# fp = open('kelas.csv', 'r')
+# fp = open('kelas-1.csv', 'r')
 # read_data = csv.reader(fp)
 # for row in read_data:
-#     data = {
-#         "id": row[0],
-#         "idMk": row[1],
-#         "idSms": row[2],
-#         "nama": row[3],
-#         "sks": row[4],
-#         "semester": row[5]  
-#     }
-#     res_skenario = skenario("POST", "data/kelas", data, tokenAdminPddikti)
+#     get_mk = skenario('GET', f'data/matkul/{row[2]}', {}, tokenAdminPT)
+#     
+#     try:
+#         print(get_mk['namaMk;])
+#         data = {
+#             "id": row[0],
+#             "idMk": row[2],
+#             "idSms": row[1],
+#             "nama": row[3],
+#             "sks": int(float(row[5])),
+#             "semester": row[4]  
+#         }
+#     except:
+#         print("halo")
+#         continue
+#     res_skenario = skenario("POST", "data/kelas", data, tokenAdminPT)
+#     logging.info(res_skenario)
 # fp.close()
 
 
@@ -209,7 +223,39 @@ fp.close()
 # logging.info('=============== Skenario 3 : Dosen menambahkan nilai mahasiswa ke sistem Gradechain  ==========')
 # data = {}
 # result = skenario('POST', 'data/academicRecord/', data, tokenDosen)
-# logging.info(result)
+
+fp = open('user.txt', 'r')
+read_data = fp.readlines()
+user = {}
+for row in read_data:
+    split_row = row.split('~')
+    user[split_row[0]] = split_row[2].strip()
+
+fp.close()
+
+fp = open('nilai-3.csv', 'r')
+read_data = csv.reader(fp)
+for row in read_data:
+    nilai = float(row[3]) if row[3] != "" else -1
+    print(nilai)
+    data = { 
+        "idKls":row[0],
+        "idPtk":row[1], 
+        "idPd":row[2], 
+        "nilaiAngka": nilai,
+        "nilaiHuruf": row[4], 
+        "nilaiIndex": float(row[5])
+        }
+    try:
+        get_dosen = skenario('GET', f'data/dosen/{row[1]}', {}, tokenAdminPT)
+        print(get_dosen)
+        username = get_dosen['username']
+    except:
+        continue
+    tokenDosen = login(username, user[username])
+    res_skenario = skenario('POST', 'academicRecords/', data, tokenDosen)
+    logging.info(res_skenario)
+fp.close()
 # logging.info('=============== Skenario 3 : Melihat nilai beserta sign-nya  ==========')
 # result = skenario('GET', 'data/academicRecord/', data, tokenMahasiswa)
 # logging.info('=============== Skenario 4 : Menerbitkan Ijazah dan transkrip  ==========')
