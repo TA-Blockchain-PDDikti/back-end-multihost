@@ -1,6 +1,6 @@
 const dataService = require('../services/data.js')
 
-const parser = async(result, query = [true, true, true, true, true, true]) => {
+const getParser = async(result, query = [true, true, true, true, true, true, true, true, true]) => {
     if (query[0] && result.idSp){
         const id = result.idSp
         const data = await dataService.getPTById('admin', id)
@@ -36,14 +36,12 @@ const parser = async(result, query = [true, true, true, true, true, true]) => {
     if (query[3] && result.idKls){
         const id = result.idKls
         const data = await dataService.getKelasById('admin', id)
-        const dataMatkul = await dataService.getMataKuliahById('admin', data.mk.id)
         result.kls = {
             "id": id,
             "sks": data.sks,
             "namaKls": data.namaKls,
             "semester": data.semester,
-            "namaMk": dataMatkul.namaMk,
-            "kodeMk": dataMatkul.kodeMk,
+            "mk": data.mk,
         }
         delete result.idKls
     }
@@ -70,7 +68,7 @@ const parser = async(result, query = [true, true, true, true, true, true]) => {
         delete result.idPd
     }
 
-    if (result.listPd) {
+    if (query[6] && result.listPd) {
         const list = result.listPd
         await Promise.all(list.map( async(item, index) => {
             const data = await dataService.getMahasiswaById('admin', item)
@@ -78,7 +76,7 @@ const parser = async(result, query = [true, true, true, true, true, true]) => {
         }))
     }
 
-    if (result.listPtk) {
+    if (query[7] && result.listPtk) {
         const list = result.listPtk
         const listIdPtk = []
         await Promise.all(list.map( async(item, index) => {
@@ -90,7 +88,7 @@ const parser = async(result, query = [true, true, true, true, true, true]) => {
     }
 
 
-    if (result.Approvers) {
+    if (query[8] && result.Approvers) {
         const approvers = result.Approvers
         await Promise.all(approvers.map( async(item, index) => {
             const id = item
@@ -109,11 +107,11 @@ const parser = async(result, query = [true, true, true, true, true, true]) => {
     return result;
 }
 
-const getAllParser = async (queryData, query = [true, true, true, true, true, true]) => {
+const getAllParser = async (queryData, query = [true, true, true, true, true, true, true, true, true]) => {
     try {
         let result = JSON.parse(queryData)
         await Promise.all(result.map( async(item, index) => {
-            result[index] = await parser(item, query)
+            result[index] = await getParser(item, query)
         }))
         return result;
     } catch(error) {
@@ -121,11 +119,5 @@ const getAllParser = async (queryData, query = [true, true, true, true, true, tr
     }
 }
 
-const getParser = (queryData, query = [true, true, true, true, true, true]) => {
-    const jsonParse = JSON.parse(queryData)
-    return parser(jsonParse, query)
-}
 
-
-
-module.exports = { getAllParser, getParser, parser };
+module.exports = { getAllParser, getParser };
