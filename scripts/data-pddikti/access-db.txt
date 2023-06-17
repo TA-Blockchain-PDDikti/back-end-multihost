@@ -1,21 +1,21 @@
-13:32:44 INFO    ========== SSH Tunnelling To Kawung =========
-13:32:44 INFO    Server: 0.0.0.0, port: 40995
-13:32:46 INFO    ======== Connect To Database PDDIKTI jdbc:sqlserver://0.0.0.0:40995;databaseName=pddikti;queryTimeout=600;encrypt=true;trustServerCertificate=true; =========
-13:32:46 INFO    =============== Query SQL ==========
-13:32:46 INFO    =============== Pendidikan Tinggi ==========
-13:32:46 INFO    Export 1 data to csv
-13:32:46 INFO    =============== Prodi ==========
-13:32:46 INFO    Export 65 data to csv
-13:32:46 INFO    =============== Dosen ==========
-13:32:47 INFO    Export 1603 data to csv
-13:32:47 INFO    =============== Mahasiswa ==========
-13:32:47 INFO    Export 1 data to csv
-13:32:47 INFO    =============== Matkul ==========
-13:32:47 INFO    Export 1 data to csv
-13:32:47 INFO    =============== Kelas ==========
-13:32:47 INFO    Export 1 data to csv
-13:32:47 INFO    =============== Nilai ==========
-13:32:47 INFO    Export 1 data to csv
-13:32:47 INFO    =============== Ijazah ==========
-13:32:47 INFO    Export 1 data to csv
-13:32:47 INFO    =============== Finish Query SQL ==========
+21:31:16 INFO    ========== SSH Tunnelling To Kawung =========
+21:31:16 INFO    Server: 0.0.0.0, port: 38425
+21:31:22 INFO    ======== Connect To Database PDDIKTI jdbc:sqlserver://0.0.0.0:38425;databaseName=pddikti;queryTimeout=600;encrypt=true;trustServerCertificate=true; =========
+21:31:22 INFO    =============== Query SQL ==========
+21:31:22 INFO    =============== Pendidikan Tinggi ==========
+21:31:22 INFO    Export 1 data to csv
+21:31:22 INFO    =============== Prodi ==========
+21:31:22 INFO    Export 65 data to csv
+21:31:22 INFO    =============== Dosen ==========
+21:31:23 INFO    Export 1603 data to csv
+21:31:23 INFO    =============== Mahasiswa ==========
+21:31:27 INFO    Export 14124 data to csv
+21:31:27 INFO    =============== Matkul ==========
+21:31:30 INFO    Export 43238 data to csv
+21:31:30 INFO    =============== Kelas ==========
+21:31:36 INFO    Export 142618 data to csv
+21:31:36 INFO    =============== Nilai ==========
+21:31:36 INFO    Export 1 data to csv
+21:31:36 INFO    =============== Ijazah ==========
+21:31:36 INFO    Export 1 data to csv
+21:31:36 INFO    =============== Finish Query SQL ==========
