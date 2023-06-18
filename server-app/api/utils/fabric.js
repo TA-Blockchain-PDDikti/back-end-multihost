@@ -103,7 +103,7 @@ const getSignature = async(txId) => {
 
     const pubKey = Buffer.from(trEnvelope.payload.data.actions[0].header.creator.id_bytes).toString()
     const result = {
-        "signatures": signature,
+        "signature": signature,
         "signTime": timeFormat,
         "signerPubKey": pubKey
     }
