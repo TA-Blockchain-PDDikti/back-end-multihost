@@ -74,8 +74,9 @@ const updateUser = async(req, res) => {
         const password = data.password;
         const organizationName = data.organizationName;
         const dataUser = data.dataUser
+        const role = data.role
 
-        const result = await userService.updateUser(organizationName, username, password, dataUser)
+        const result = await userService.updateUser(organizationName, username, password, role, dataUser)
         res.status(200).send(result)
 
     } catch(error) {
