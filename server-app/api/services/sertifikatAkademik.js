@@ -44,7 +44,7 @@ exports.getIjazahById = async(user, idIjazah) => {
 
     const data =  await getParser(JSON.parse(result))
     const txIds = await getIjzTxIds(user, data.id)
-    data.signature =  await fabric.getAllSignature(txIds)
+    data.signatures =  await fabric.getAllSignature(txIds)
     return data
 }
 
@@ -154,8 +154,8 @@ exports.getAllTranskrip = async(user) => {
         allData[index].nilai = nilai
         
         const txIds = await getTskTxIds(user, item.id)
-        const signature = await fabric.getAllSignature(txIds)
-        allData[index].signature = signature
+        const signatures = await fabric.getAllSignature(txIds)
+        allData[index].signatures = signatures
     }))
     return allData
 }
@@ -192,8 +192,8 @@ exports.getTranskripByIdPt = async(user, idPt) => {
         allData[index].nilai = nilai
         
         const txIds = await getTskTxIds(user, item.id)
-        const signature = await fabric.getAllSignature(txIds)
-        allData[index].signature = signature
+        const signatures = await fabric.getAllSignature(txIds)
+        allData[index].signatures = signatures
     }))
     return allData
 }
@@ -215,8 +215,8 @@ exports.getTranskripByIdProdi = async(user, idProdi) => {
         allData[index].nilai = nilai
         
         const txIds = await getTskTxIds(user, item.id)
-        const signature = await fabric.getAllSignature(txIds)
-        allData[index].signature = signature
+        const signatures = await fabric.getAllSignature(txIds)
+        allData[index].signatures = signatures
     }))
     return allData
 }
@@ -238,8 +238,8 @@ exports.getTranskripByIdMahasiswa = async(user, idTsk) => {
         allData[index].nilai = nilai
         
         const txIds = await getTskTxIds(user, item.id)
-        const signature = await fabric.getAllSignature(txIds)
-        allData[index].signature = signature
+        const signatures = await fabric.getAllSignature(txIds)
+        allData[index].signatures = signatures
     }))
     return allData
 }
