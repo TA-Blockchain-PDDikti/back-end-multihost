@@ -90,7 +90,7 @@ exports.getAcademicRecordByIdKls = async(user, id) => {
         return []
     }
     await Promise.all(allData.map( async(item, index) => {
-        allData[index] = await getParser(item, [false, false, false, false, true, true, false, false, false, false])
+        allData[index] = await getParser(item, [false, false, false, false, true, false, false, false, false])
         const txId = await getNpdTxId(user, item.id)
         const signature =  await fabric.getSignature(txId)
         allData[index].signature = signature
