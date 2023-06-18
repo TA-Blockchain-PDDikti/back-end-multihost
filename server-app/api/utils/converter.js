@@ -6,7 +6,7 @@ const getParser = async(result, query = [true, true, true, true, true, true, tru
         const data = await dataService.getPTById('admin', id)
         result.sp = {
             "id": id,
-            "nama": data.namaSp
+            "nama": JSON.parse(data).namaSp
         }
         delete result.idSp
     }

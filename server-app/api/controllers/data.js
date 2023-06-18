@@ -911,8 +911,8 @@ exports.getKelasByIdDosen = async(req, res) => {
         await Promise.all(result.map( async(item, index) => {
             if (item.listPtk) {
                 const list = item.listPtk
-                await Promise.all(list.map( async(item, index) => {
-                    const data = await dataService.getDosenById('admin', item)
+                await Promise.all(list.map( async(dosen, index) => {
+                    const data = await dataService.getDosenById('admin', dosen)
                     item.listPtk[index] = data
                 }))
                 result[index] = item
