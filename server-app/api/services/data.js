@@ -326,11 +326,17 @@ exports.getKelasById = async(user, idKelas) => {
     return getParser(JSON.parse(result))
 }
 
-exports.getKelasByIdMk = async(user, idKelas) => {
+exports.getKelasByIdMk = async(user, idMk) => {
     const network = await fabric.connectToNetwork("HE1", "klscontract", user)
-    const result = await network.contract.evaluateTransaction("GetKlsByIdMk", idKelas)
+    const queryData = await network.contract.evaluateTransaction("GetKlsByIdMk", idMk)
     network.gateway.disconnect()
-    return getAllParser(result, [false, false, false, false, false, false, true, true, false])
+    const resultParser = getAllParser(queryData, [false, false, false, false, false, false, true, true, false])
+    const mk = await dataService.getMataKuliahById('admin', idMk)
+    const result = {
+        "mk": mk,
+        "data": resultParser
+    }
+    return result   
 }
 
 
