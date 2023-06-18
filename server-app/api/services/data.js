@@ -134,7 +134,11 @@ exports.getDosenByPT = async(user, idPT) => {
     const network = await fabric.connectToNetwork("HE1", "ptkcontract", user)
     const queryData = await network.contract.evaluateTransaction("GetPtkByIdSp", idPT)
     network.gateway.disconnect()
-    return getAllParser(queryData, [false, true, false, false, false, false, false, false, false])
+    try {
+        return JSON.parse(queryData)
+    } catch(error) {
+        return []
+    }
 }
 
 exports.getDosenByProdi = async(user, idProdi) => {
@@ -200,7 +204,11 @@ exports.getMahasiswaByPT = async(user, idPt) => {
     const network = await fabric.connectToNetwork("HE1", "pdcontract", user)
     const queryData = await network.contract.evaluateTransaction("GetPdByIdSp", idPt)
     network.gateway.disconnect()
-    return getAllParser(queryData, [false, true, false, false, false, false, false, false, false])
+    try {
+        return JSON.parse(queryData)
+    } catch(error) {
+        return []
+    }
 }
 
 exports.getMahasiswaByProdi = async(user, idProdi) => {
@@ -251,7 +259,7 @@ exports.getMataKuliahById = async(user, idMk) => {
     const network = await fabric.connectToNetwork("HE1", "mkcontract", user)
     const result = await network.contract.evaluateTransaction("GetMkById", idMk)
     network.gateway.disconnect()
-    return getParser(JSON.parse(result))
+    return JSON.parse(result)
 }
 
 exports.getMataKuliahByIdPt = async(user, idPt) => {
@@ -330,13 +338,7 @@ exports.getKelasByIdMk = async(user, idMk) => {
     const network = await fabric.connectToNetwork("HE1", "klscontract", user)
     const queryData = await network.contract.evaluateTransaction("GetKlsByIdMk", idMk)
     network.gateway.disconnect()
-    const resultParser = getAllParser(queryData, [false, false, false, false, false, false, true, true, false])
-    const mk = await dataService.getMataKuliahById('admin', idMk)
-    const result = {
-        "mk": mk,
-        "data": resultParser
-    }
-    return result   
+    return await getAllParser(queryData, [false, false, false, false, false, false, false, true, false])
 }
 
 
