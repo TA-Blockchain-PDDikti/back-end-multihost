@@ -164,7 +164,7 @@ const loginUser = async(username, password) => {
 }
 
 
-const updateUser = async(organizationName, username, password, dataUser) => {
+const updateUser = async(organizationName, username, password, role,dataUser) => {
 
     const ccp = await fabric.getCcp(organizationName)
     const wallet = await fabric.getWallet(organizationName)
@@ -191,7 +191,7 @@ const updateUser = async(organizationName, username, password, dataUser) => {
         affiliation: `${organizationName.toLowerCase()}.department1`,
         role: 'client',
         attrs: [
-            { "name": "userType", "value": userType, "ecert": true}, 
+            { "name": "userType", "value": role, "ecert": true}, 
             { "name": "password", "value": encryptedPassword, "ecert": true},
             { "name": "dataUser", "value": JSON.stringify(dataUser), "ecert": true},
         ]
