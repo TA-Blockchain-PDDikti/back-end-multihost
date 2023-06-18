@@ -163,5 +163,48 @@ const loginUser = async(username, password) => {
 
 }
 
-module.exports = {enrollAdmin, registerUser, loginUser}
+
+const updateUser = async(organizationName, username, password, dataUser) => {
+
+    const ccp = await fabric.getCcp(organizationName)
+    const wallet = await fabric.getWallet(organizationName)
+
+    // Create a new CA client for interacting with the CA.
+    const caURL = ccp.certificateAuthorities[`ca.${organizationName.toLowerCase()}.example.com`].url;
+    const ca = new FabricCAServices(caURL, undefined, `ca.${organizationName.toLowerCase()}.example.com`);
+    
+    // Check to see if we've already enrolled the admin user.
+    const adminIdentity = await wallet.get('admin');
+    if (!adminIdentity) {
+        throw "Admin network does not exist"
+    }
+
+
+    // build a user object for authenticating with the CA
+    const provider = wallet.getProviderRegistry().getProvider(adminIdentity.type);
+    const adminUser = await provider.getUserContext(adminIdentity, 'admin');
+
+    // retrieve the registered identity 
+    const identityService = ca.newIdentityService()   
+    var encryptedPassword = await bcrypt.hash(password, 10);
+    updateObj = {
+        affiliation: `${organizationName.toLowerCase()}.department1`,
+        role: 'client',
+        attrs: [
+            { "name": "userType", "value": userType, "ecert": true}, 
+            { "name": "password", "value": encryptedPassword, "ecert": true},
+            { "name": "dataUser", "value": JSON.stringify(dataUser), "ecert": true},
+        ]
+    }
+    identityService.update(username, updateObj, adminUser)
+
+    const userIdentity = await identityService.getOne(username, adminUser)
+
+    // Get user attr 
+    const userAttrs = userIdentity.result.attrs
+    return userAttrs
+
+}
+
+module.exports = {enrollAdmin, registerUser, loginUser, updateUser}
 
