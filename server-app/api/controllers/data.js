@@ -907,13 +907,19 @@ exports.getKelasByIdDosen = async(req, res) => {
 
         const allKelas = await dataService.getAllKelas(req.user.username) 
         const result = allKelas.filter(x => x.listPtk.includes(idDosen))
-        if (result.listPtk) {
-            const list = result.listPtk
-            await Promise.all(list.map( async(item, index) => {
-                const data = await dataService.getDosenById('admin', item)
-                result.listPtk[index] = data
-            }))
-        }
+        console.log("res", result)
+        await Promise.all(result.map( async(item, index) => {
+            if (item.listPtk) {
+                const list = item.listPtk
+                await Promise.all(list.map( async(item, index) => {
+                    const data = await dataService.getDosenById('admin', item)
+                    item.listPtk[index] = data
+                }))
+                result[index] = item
+                console.log("It", result)
+            }
+        }))
+        
         res.status(200).send(result);
     } catch(error){
         res.status(400).send({
