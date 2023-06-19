@@ -912,9 +912,11 @@ exports.getKelasByIdDosen = async(req, res) => {
             if (item.listPtk) {
                 const list = item.listPtk
                 await Promise.all(list.map( async(dosen, index) => {
-                    const data = await dataService.getDosenById('admin', dosen)
+                    const data = await dataService.getDosenById('admin', dosen, false)
                     item.listPtk[index] = data
                 }))
+                const matkul = await dataService.getMataKuliahById('admin', item.idMk)
+                item.mk = matkul
                 result[index] = item
                 console.log("It", result)
             }
