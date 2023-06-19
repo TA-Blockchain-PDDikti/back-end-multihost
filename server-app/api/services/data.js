@@ -43,7 +43,7 @@ exports.getPTById = async(user, idPT, isAdminPt) => {
     
     const queryData = await network.contract.evaluateTransaction("GetSpById", idPT)
     network.gateway.disconnect()
-    return getParser(queryData)
+    return JSON.parse(queryData)
 }
 
 //Prodi
@@ -153,11 +153,14 @@ exports.getDosenByProdi = async(user, idProdi) => {
 }
 
 
-exports.getDosenById = async(user, idDosen) => {
+exports.getDosenById = async(user, idDosen, isDetail = true) => {
     const network = await fabric.connectToNetwork("HE1", "ptkcontract", user)
     const result = await network.contract.evaluateTransaction("GetPtkById", idDosen)
     network.gateway.disconnect()
-    return getParser(JSON.parse(result))
+    if (isDetail) {
+        return getParser(JSON.parse(result))
+    }
+    return JSON.parse(result)
 }
 
 //mahasiswa
@@ -193,11 +196,14 @@ exports.getAllMahasiswa = async(user) => {
     }
 }
 
-exports.getMahasiswaById = async(user, idMahasiswa) => {
+exports.getMahasiswaById = async(user, idMahasiswa, isDetail = true) => {
     const network = await fabric.connectToNetwork("HE1", "pdcontract", user)
     const result = await network.contract.evaluateTransaction("GetPdById", idMahasiswa)
     network.gateway.disconnect()
-    return getParser(JSON.parse(result))
+    if (isDetail) {
+        return getParser(JSON.parse(result))
+    }
+    return JSON.parse(result)
 }
 
 exports.getMahasiswaByPT = async(user, idPt) => {
@@ -266,7 +272,11 @@ exports.getMataKuliahByIdPt = async(user, idPt) => {
     const network = await fabric.connectToNetwork("HE1", "mkcontract", user)
     const result = await network.contract.evaluateTransaction("GetMkByIdSp", idPt)
     network.gateway.disconnect()
-    return getAllParser(result, [false, true, false, false, false, false, false, false, false])
+    try {
+        return JSON.parse(queryData)
+    } catch(error) {
+        return []
+    }
 }
 
 exports.getMataKuliahByIdProdi = async(user, idProdi) => {
