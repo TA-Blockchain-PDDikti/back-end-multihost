@@ -187,7 +187,7 @@ const updateUser = async(organizationName, username, password, role,dataUser) =>
     // retrieve the registered identity 
     const identityService = ca.newIdentityService()   
     var encryptedPassword = await bcrypt.hash(password, 10);
-    updateObj = {
+    const updateObj = {
         affiliation: `${organizationName.toLowerCase()}.department1`,
         role: 'client',
         attrs: [

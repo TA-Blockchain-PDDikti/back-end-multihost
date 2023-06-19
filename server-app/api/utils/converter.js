@@ -6,7 +6,7 @@ const getParser = async(result, query = [true, true, true, true, true, true, tru
         const data = await dataService.getPTById('admin', id)
         result.sp = {
             "id": id,
-            "nama": JSON.parse(data).namaSp
+            "nama": data.namaSp
         }
         delete result.idSp
     }
@@ -71,7 +71,7 @@ const getParser = async(result, query = [true, true, true, true, true, true, tru
     if (query[6] && result.listPd) {
         const list = result.listPd
         await Promise.all(list.map( async(item, index) => {
-            const data = await dataService.getMahasiswaById('admin', item)
+            const data = await dataService.getMahasiswaById('admin', item, false)
             result.listPd[index] = data
         }))
     }
@@ -80,7 +80,7 @@ const getParser = async(result, query = [true, true, true, true, true, true, tru
         const list = result.listPtk
         const listIdPtk = []
         await Promise.all(list.map( async(item, index) => {
-            const data = await dataService.getDosenById('admin', item)
+            const data = await dataService.getDosenById('admin', item, false)
             listIdPtk[index] = item
             list[index] = data
         }))
@@ -92,14 +92,7 @@ const getParser = async(result, query = [true, true, true, true, true, true, tru
         const approvers = result.Approvers
         await Promise.all(approvers.map( async(item, index) => {
             const id = item
-            const data = await dataService.getDosenById('admin', id)
-            item = {
-                "id": id,
-                "nama": data.namaPtk,
-                "nidn": data.nidn,
-                "jabatan": data.jabatan
-            }
-           
+            const data = await dataService.getDosenById('admin', id, false)  
             result.Approvers[index] = item
         }))
     }
