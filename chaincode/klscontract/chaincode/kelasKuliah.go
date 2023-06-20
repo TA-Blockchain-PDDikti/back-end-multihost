@@ -45,6 +45,61 @@ type KelasKuliah struct {
 
 
 // ============================================================================================================================
+// Struct Definitions - Pendidik Tenaga Kependidikan (PTK)
+// ============================================================================================================================
+
+type PendidikTenagaKependidikan struct {
+	ID      			string `json:"id"`
+	IdSP				string `json:"idSp"`
+	IdSMS				string `json:"idSms"`
+	NamaPTK				string `json:"namaPtk"`
+	NIDN				string `json:"nidn"`
+}
+
+
+// ============================================================================================================================
+// Struct Definitions - Peserta Didik (PD)
+// ============================================================================================================================
+
+type PesertaDidik struct {
+	ID      			string 	`json:"id"`
+	IdSP				string 	`json:"idSp"`
+	IdSMS				string 	`json:"idSms"`
+	NamaPD				string 	`json:"namaPd"`
+	NIPD				string 	`json:"nipd"`
+}
+
+
+// ============================================================================================================================
+// Asset Definitions - Mata Kuliah (MK)
+// ============================================================================================================================
+
+type MataKuliah struct {
+	ID      			string 	`json:"id"`
+	NamaMK				string 	`json:"namaMk"`
+	KodeMK				string 	`json:"kodeMk"`
+	SKS					int 	`json:"sks"`
+	JenjangPendidikan	string 	`json:"jenjangPendidikan"`
+}
+
+
+// ============================================================================================================================
+// Struct Definitions - Result of Query Kelas Kuliah (KLS) data
+// ============================================================================================================================
+
+type KelasKuliahResult struct {
+	ID      			string 							`json:"id"`
+	IdSMS				string 							`json:"idSms"`
+	MK					*MataKuliah						`json:"mk"`
+	NamaKLS				string 							`json:"namaKls"`
+	Semester			string 							`json:"semester"`
+	SKS					int 							`json:"sks"`
+	ListPTK				[]*PendidikTenagaKependidikan 	`json:"listPtk"`
+	ListPD				[]*PesertaDidik					`json:"listPd"`
+}
+
+
+// ============================================================================================================================
 // Error Messages
 // ============================================================================================================================
 
@@ -57,8 +112,23 @@ const (
 	ER33        = "ER33-Failed to get result from iterator: %v."
 	ER34        = "ER34-Failed unmarshaling JSON: %v."
 	ER35        = "ER35-Failed parsing string to integer: %v."
+	ER36        = "ER36-Failed parsing string to float: %v."
+	ER37        = "ER37-Failed to query another chaincode (%s): %v."
 	ER41        = "ER41-Access is not permitted with MSDPID '%s'."
 	ER42        = "ER42-Unknown MSPID: '%s'."
+)
+
+
+// ============================================================================================================================
+// Channel Name & Contract Name In The Channel
+// ============================================================================================================================
+
+const (
+	AcademicChannel	string = "academicchannel"
+	PTKContract 	string = "ptkcontract"
+	PDContract 		string = "pdcontract"
+	MKContract 		string = "mkcontract"
+	QSCC			string = "qscc"
 )
 
 
@@ -329,7 +399,7 @@ func (s *KLSContract) GetAllKls(ctx contractapi.TransactionContextInterface) ([]
 // Arguments - ID
 // ============================================================================================================================
 
-func (s *KLSContract) GetKlsById(ctx contractapi.TransactionContextInterface) (*KelasKuliah, error) {
+func (s *KLSContract) GetKlsById(ctx contractapi.TransactionContextInterface) (*KelasKuliahResult, error) {
 	args := ctx.GetStub().GetStringArgs()[1:]
 
 	logger.Infof("Run GetKlsById function with args: %+q.", args)
@@ -346,7 +416,12 @@ func (s *KLSContract) GetKlsById(ctx contractapi.TransactionContextInterface) (*
 		return nil, err
 	}
 
-	return kls, nil
+	klsResult, err := getCompleteDataKls(ctx, kls)
+	if err != nil {
+		return nil, err
+	}
+
+	return klsResult, nil
 }
 
 
@@ -355,7 +430,7 @@ func (s *KLSContract) GetKlsById(ctx contractapi.TransactionContextInterface) (*
 // Arguments - idMk
 // ============================================================================================================================
 
-func (t *KLSContract) GetKlsByIdMk(ctx contractapi.TransactionContextInterface) ([]*KelasKuliah, error) {
+func (t *KLSContract) GetKlsByIdMk(ctx contractapi.TransactionContextInterface) ([]*KelasKuliahResult, error) {
 	args := ctx.GetStub().GetStringArgs()[1:]
 
 	logger.Infof("Run GetKlsByIdMk function with args: %+q.", args)
@@ -368,7 +443,61 @@ func (t *KLSContract) GetKlsByIdMk(ctx contractapi.TransactionContextInterface) 
 	idMk:= args[0]
 
 	queryString := fmt.Sprintf(`{"selector":{"idMk":"%s"}}`, idMk)
-	return getQueryResultForQueryString(ctx, queryString)
+	queryResult, err := getQueryResultForQueryString(ctx, queryString)
+	if err != nil {
+		return nil, err
+	}
+
+	var klsList []*KelasKuliahResult
+
+	for _, kls := range queryResult {
+		klsResult, err := getCompleteDataKls(ctx, kls)
+		if err != nil {
+			return nil, err
+		}
+
+		klsList = append(klsList, klsResult)
+	}
+
+	return klsList, nil
+}
+
+
+// ============================================================================================================================
+// GetKlsByIdPtk - Get the Kelas Kuliah (KLS) stored in the world state with given IdPtk.
+// Arguments - idPtk
+// ============================================================================================================================
+
+func (t *KLSContract) GetKlsByIdPtk(ctx contractapi.TransactionContextInterface) ([]*KelasKuliahResult, error) {
+	args := ctx.GetStub().GetStringArgs()[1:]
+
+	logger.Infof("Run GetKlsByIdPtk function with args: %+q.", args)
+
+	if len(args) != 1 {
+		logger.Errorf(ER11, 1, len(args))
+		return nil, fmt.Errorf(ER11, 1, len(args))
+	}
+
+	idPtk:= args[0]
+
+	queryString := fmt.Sprintf(`{"selector":{"listPtk":{"$elemMatch":{"$eq":"%s"}}}}`, idPtk)
+	queryResult, err := getQueryResultForQueryString(ctx, queryString)
+	if err != nil {
+		return nil, err
+	}
+
+	var klsList []*KelasKuliahResult
+
+	for _, kls := range queryResult {
+		klsResult, err := getCompleteDataKls(ctx, kls)
+		if err != nil {
+			return nil, err
+		}
+
+		klsList = append(klsList, klsResult)
+	}
+
+	return klsList, nil
 }
 
 
@@ -411,6 +540,138 @@ func getKlsStateById(ctx contractapi.TransactionContextInterface, id string) (*K
 	}
 
 	return &kls, nil
+}
+
+
+// ============================================================================================================================
+// getPtkByIds - Get PTK with given idsPtk.
+// ============================================================================================================================
+
+func getPtkByIds(ctx contractapi.TransactionContextInterface, idsPtk string) ([]*PendidikTenagaKependidikan, error) {
+	logger.Infof("Run getPtkByIds function with idsPtk: '%s'.", idsPtk)
+
+	params := []string{"GetPtkByIds", idsPtk}
+	queryArgs := make([][]byte, len(params))
+	for i, arg := range params {
+		queryArgs[i] = []byte(arg)
+	}
+
+	response := ctx.GetStub().InvokeChaincode(PTKContract, queryArgs, AcademicChannel)
+	logger.Infof("Response Payload: '%+q'.", response.Payload)
+	if response.Status != shim.OK {
+		return nil, fmt.Errorf(ER37, PTKContract, response.Message)
+	}
+
+	var listPtk []*PendidikTenagaKependidikan
+	err := json.Unmarshal([]byte(response.Payload), &listPtk)
+	if err != nil {
+		return nil, fmt.Errorf(ER34, err)
+	}
+
+	return listPtk, nil
+}
+
+
+// ============================================================================================================================
+// getPdByIds - Get PD with given idsPd.
+// ============================================================================================================================
+
+func getPdByIds(ctx contractapi.TransactionContextInterface, idsPd string) ([]*PesertaDidik, error) {
+	logger.Infof("Run getPdByIds function with idsPd: '%s'.", idsPd)
+
+	params := []string{"GetPdByIds", idsPd}
+	queryArgs := make([][]byte, len(params))
+	for i, arg := range params {
+		queryArgs[i] = []byte(arg)
+	}
+
+	response := ctx.GetStub().InvokeChaincode(PDContract, queryArgs, AcademicChannel)
+	logger.Infof("Response Payload: '%+q'.", response.Payload)
+	if response.Status != shim.OK {
+		return nil, fmt.Errorf(ER37, PDContract, response.Message)
+	}
+
+	var listPd []*PesertaDidik
+	err := json.Unmarshal([]byte(response.Payload), &listPd)
+	if err != nil {
+		return nil, fmt.Errorf(ER34, err)
+	}
+
+	return listPd, nil
+}
+
+
+// ============================================================================================================================
+// getMkById - Get MK with given idMk.
+// ============================================================================================================================
+
+func getMkById(ctx contractapi.TransactionContextInterface, idMk string) (*MataKuliah, error) {
+	logger.Infof("Run getMkById function with idMk: '%s'.", idMk)
+
+	params := []string{"GetMkById", idMk}
+	queryArgs := make([][]byte, len(params))
+	for i, arg := range params {
+		queryArgs[i] = []byte(arg)
+	}
+
+	response := ctx.GetStub().InvokeChaincode(MKContract, queryArgs, AcademicChannel)
+	if response.Status != shim.OK {
+		return nil, fmt.Errorf(ER37, MKContract, response.Message)
+	}
+
+	var kls MataKuliah
+	err := json.Unmarshal([]byte(response.Payload), &kls)
+	if err != nil {
+		return nil, fmt.Errorf(ER34, err)
+	}
+
+	return &kls, nil
+}
+
+
+// ============================================================================================================================
+// getCompleteDataKls - Get Complete Kelas Kuliah (KLS) data.
+// ============================================================================================================================
+
+func getCompleteDataKls(ctx contractapi.TransactionContextInterface, kls *KelasKuliah) (*KelasKuliahResult, error) {
+	logger.Infof("Run getCompleteDataKls function with kls id: '%s'.", kls.ID)
+
+	var klsResult KelasKuliahResult
+
+	klsResult.ID = kls.ID
+	klsResult.IdSMS = kls.IdSMS
+
+	klsResult.NamaKLS = kls.NamaKLS
+	klsResult.Semester = kls.Semester
+	klsResult.SKS = kls.SKS
+
+	mk, err := getMkById(ctx, kls.IdMK)
+	if err != nil {
+		return nil, err
+	}
+	klsResult.MK = mk
+
+	if len(kls.ListPTK) != 0 {
+		listPtk, err := getPtkByIds(ctx, "[" + strings.Join(kls.ListPTK, ",") + "]")
+			if err != nil {
+				return nil, err
+			}
+		klsResult.ListPTK = listPtk
+	} else {
+		klsResult.ListPTK = []*PendidikTenagaKependidikan{}
+	}
+
+	if len(kls.ListPD) != 0 {
+		listPd, err := getPdByIds(ctx, "[" + strings.Join(kls.ListPD, ",") + "]")
+			if err != nil {
+				return nil, err
+			}
+		klsResult.ListPD = listPd
+	} else {
+		klsResult.ListPD = []*PesertaDidik{}
+	}
+
+	return &klsResult, nil
 }
 
 
