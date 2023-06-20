@@ -310,7 +310,7 @@ exports.getIjazahByIdApprover = async(req, res) => {
         }
         const idApprover = req.params.id
         const approver = await dataService.getDosenById(req.user.username, idApprover) 
-        var lstProdi = await dataService.getProdiByPT(req.user.username, approver.sp.id)
+        var lstProdi = await dataService.getProdiByPT(req.user.username, approver.idSp)
         lstProdi = lstProdi.filter(x => x.approversIjz.includes(idApprover))
 
         var listIjazah = []
@@ -339,7 +339,7 @@ exports.getTranskripByIdApprover = async(req, res) => {
 
         const idApprover = req.params.id
         const approver = await dataService.getDosenById(req.user.username, idApprover) 
-        var lstProdi = await dataService.getProdiByPT(req.user.username, approver.sp.id)
+        var lstProdi = await dataService.getProdiByPT(req.user.username, approver.idSp)
         lstProdi = lstProdi.filter(x => x.approversTsk.includes(idApprover))
 
         var listTranskrip = []
