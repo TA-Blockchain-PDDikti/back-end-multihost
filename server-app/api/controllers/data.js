@@ -905,7 +905,7 @@ exports.getKelasByIdDosen = async(req, res) => {
 
         const idDosen = req.params.id
 
-        const result = await dataService.getKelasByDosen(req.user.username)    
+        const result = await dataService.getKelasByDosen(req.user.username, idDosen)    
         res.status(200).send(result);
     } catch(error){
         res.status(400).send({
