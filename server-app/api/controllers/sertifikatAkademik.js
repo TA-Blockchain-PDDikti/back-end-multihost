@@ -345,7 +345,7 @@ exports.getTranskripByIdApprover = async(req, res) => {
         var listTranskrip = []
         await Promise.all(lstProdi.map( async(item, index) => {
             const result = await certificateService.getTranskripByIdProdi(req.user.username, item.id)
-            listIjazah.push(...result)
+            listTranskrip.push(...result)
             console.log(item.id, listTranskrip)
             
         }))
