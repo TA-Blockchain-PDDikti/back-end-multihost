@@ -248,8 +248,8 @@ exports.generateIdentifier = async(user, idIjazah, idTranskrip) => {
         const identifier = {}
 
         network = await fabric.connectToNetwork("Kemdikbud", "qscc", 'admin')
-        const blockIjazah = await network.contract.evaluateTransaction('GetBlockByTxID', 'academicchannel', ijazah.approvalTxId[listTxIdIjz.length - 1])
-        const blockTranskrip = await network.contract.evaluateTransaction('GetBlockByTxID', 'academicchannel', transkrip.approvalTxId[listTxIdTsk.length - 1])
+        const blockIjazah = await network.contract.evaluateTransaction('GetBlockByTxID', 'academicchannel', ijazah.approvalTxId[ijazah.approvalTxId.length - 1])
+        const blockTranskrip = await network.contract.evaluateTransaction('GetBlockByTxID', 'academicchannel', transkrip.approvalTxId[transkrip.approvalTxId.length - 1])
 
         identifier.ijazah = fabric.calculateBlockHash(BlockDecoder.decode(blockIjazah).header)
         identifier.transkrip = fabric.calculateBlockHash(BlockDecoder.decode(blockTranskrip).header)
