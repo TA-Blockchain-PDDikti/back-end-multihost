@@ -1,22 +1,7 @@
 const fabric = require("../utils/fabric.js")
 const { v4: uuidv4 } = require('uuid')
-const { getParser } = require('../utils/converter.js')
 const { BlockDecoder } = require('fabric-common');
 const { getAcademicRecordByIdMhsw } = require('./administrasiNilai.js');
-
-const getIjzTxIds = async(user, id) => {
-    const network = await fabric.connectToNetwork("HE1", "ijzcontract", user)
-    const txIds = await network.contract.evaluateTransaction("GetIjzAddApprovalTxIdById", id)
-    console.log("IJZ TX ID",txIds)
-    return txIds
-}
-
-const getTskTxIds = async(user, id) => {
-    const network = await fabric.connectToNetwork("HE1", "tskcontract", user)
-    const txIds = await network.contract.evaluateTransaction("GetTskAddApprovalTxIdById", id)
-    console.log("Tsk TX ID",txIds)
-    return txIds
-}
 
 
 // Ijazah
@@ -42,9 +27,8 @@ exports.getIjazahById = async(user, idIjazah) => {
     const result = await network.contract.evaluateTransaction( "GetIjzById", idIjazah)
     network.gateway.disconnect()
 
-    const data =  await getParser(JSON.parse(result))
-    const txIds = await getIjzTxIds(user, data.id)
-    data.signatures =  await fabric.getAllSignature(txIds)
+    const data =  JSON.parse(result)
+    data.signatures =  await fabric.getAllSignature(data.approvalTxId)
     return data
 }
 
@@ -59,9 +43,7 @@ exports.getIjazahByIdPt = async(user, idPt) => {
         return []
     }
     await Promise.all(allData.map( async(item, index) => {
-        allData[index] = await getParser(item, [false, true, true, true, true, true, false, false, true])
-        const txIds = await getIjzTxIds(user, item.id)
-        const signatures = await fabric.getAllSignature(txIds)
+        const signatures = await fabric.getAllSignature(item.approvalTxId)
         allData[index].signatures = signatures
     }))
     return allData
@@ -78,9 +60,7 @@ exports.getIjazahByIdProdi = async(user, idProdi) => {
         return []
     }
     await Promise.all(allData.map( async(item, index) => {
-        allData[index] = await getParser(item, [true, true, true, true, true, true, false, false, true])
-        const txIds = await getIjzTxIds(user, item.id)
-        const signatures = await fabric.getAllSignature(txIds)
+        const signatures = await fabric.getAllSignature(item.approvalTxId)
         allData[index].signatures = signatures
     }))
     return allData
@@ -97,9 +77,7 @@ exports.getIjazahByIdMahasiswa = async(user, idMahasiswa) => {
         return []
     }
     await Promise.all(allData.map( async(item, index) => {
-        allData[index] = await getParser(item, [true, true, false, false, false, false, false, false, true])
-        const txIds = await getIjzTxIds(user, item.id)
-        const signatures = await fabric.getAllSignature(txIds)
+        const signatures = await fabric.getAllSignature(item.approvalTxId)
         allData[index].signatures = signatures
     }))
     return allData
@@ -115,11 +93,6 @@ exports.getAllIjazah = async(user) => {
     } catch(error){
         return []
     }
-    await Promise.all(allData.map( async(item, index) => {
-        const txIds = await getIjzTxIds(user, item.id)
-        const signatures = await fabric.getAllSignature(txIds)
-        allData[index].signatures = signatures
-    }))
     return allData
 }
 
@@ -149,14 +122,6 @@ exports.getAllTranskrip = async(user) => {
     } catch(error){
         return []
     }
-    await Promise.all(allData.map( async(item, index) => {
-        const nilai = await getAcademicRecordByIdMhsw(user, item.idPd) 
-        allData[index].nilai = nilai
-        
-        const txIds = await getTskTxIds(user, item.id)
-        const signatures = await fabric.getAllSignature(txIds)
-        allData[index].signatures = signatures
-    }))
     return allData
 }
 
@@ -165,13 +130,12 @@ exports.getTranskripById = async(user, idTsk) => {
     const result = await network.contract.evaluateTransaction( "GetTskById", idTsk)
     network.gateway.disconnect()
 
-    const data =  await getParser(JSON.parse(result))
+    const data =  await JSON.parse(result)
 
     const nilai = await getAcademicRecordByIdMhsw(user, data.pd.id) 
     data.nilai = nilai
 
-    const txIds = await getTskTxIds(user, data.id)
-    data.signatures =  await fabric.getAllSignature(txIds)
+    data.signatures =  await fabric.getAllSignature(data.approvalTxId)
     return data
 }
 
@@ -186,13 +150,10 @@ exports.getTranskripByIdPt = async(user, idPt) => {
         return []
     }
     await Promise.all(allData.map( async(item, index) => {
-        idMhsw = item.idPd
-        allData[index] = await getParser(item, [false, true, true, true, true, true, false, false, true])
-        const nilai = await getAcademicRecordByIdMhsw(user, idMhsw) 
+        const nilai = await getAcademicRecordByIdMhsw(user, item.pd.id) 
         allData[index].nilai = nilai
         
-        const txIds = await getTskTxIds(user, item.id)
-        const signatures = await fabric.getAllSignature(txIds)
+        const signatures = await fabric.getAllSignature(item.approvalTxId)
         allData[index].signatures = signatures
     }))
     return allData
@@ -209,13 +170,10 @@ exports.getTranskripByIdProdi = async(user, idProdi) => {
         return []
     }
     await Promise.all(allData.map( async(item, index) => {
-        idMhsw = item.idPd
-        allData[index] = await getParser(item, [false, false, true, true, true, true, false, false, true])
-        const nilai = await getAcademicRecordByIdMhsw(user, idMhsw) 
+        const nilai = await getAcademicRecordByIdMhsw(user, item.pd.id) 
         allData[index].nilai = nilai
         
-        const txIds = await getTskTxIds(user, item.id)
-        const signatures = await fabric.getAllSignature(txIds)
+        const signatures = await fabric.getAllSignature(item.approvalTxId)
         allData[index].signatures = signatures
     }))
     return allData
@@ -232,13 +190,10 @@ exports.getTranskripByIdMahasiswa = async(user, idTsk) => {
         return []
     }
     await Promise.all(allData.map( async(item, index) => {
-        idMhsw = item.idPd
-        allData[index] = await getParser(item, [true, true, false, false, false, false, false, false, true])
-        const nilai = await getAcademicRecordByIdMhsw(user, idMhsw) 
+        const nilai = await getAcademicRecordByIdMhsw(user, item.pd.id) 
         allData[index].nilai = nilai
         
-        const txIds = await getTskTxIds(user, item.id)
-        const signatures = await fabric.getAllSignature(txIds)
+        const signatures = await fabric.getAllSignature(item.approvalTxId)
         allData[index].signatures = signatures
     }))
     return allData
@@ -283,23 +238,18 @@ exports.addApproverTranskrip = async(user, args) => {
 exports.generateIdentifier = async(user, idIjazah, idTranskrip) => {
 
     var network = await fabric.connectToNetwork("HE1", "ijzcontract", user)
-    const ijazah = await network.contract.evaluateTransaction( "GetIjzById", idIjazah)
+    const ijazah = JSON.parse(await network.contract.evaluateTransaction( "GetIjzById", idIjazah))
 
     network = await fabric.connectToNetwork("HE1", "tskcontract", user)
-    const transkrip = await network.contract.evaluateTransaction( "GetTskById", idTranskrip)
+    const transkrip = JSON.parse(await network.contract.evaluateTransaction( "GetTskById", idTranskrip))
   
-    console.log(JSON.parse(ijazah), JSON.parse(transkrip))
-    if (JSON.parse(ijazah).remainingApprover == 0 && JSON.parse(transkrip).remainingApprover == 0 ) {
+    console.log(ijazah, transkrip)
+    if (ijazah.remainingApprover == 0 && transkrip.remainingApprover == 0 ) {
         const identifier = {}
 
-        const txIdsIjz = await getIjzTxIds(user, idIjazah)
-        const listTxIdIjz = JSON.parse(txIdsIjz)
-        const txIdsTsk = await  getTskTxIds(user, idTranskrip)
-        const listTxIdTsk = JSON.parse(txIdsTsk)
-
         network = await fabric.connectToNetwork("Kemdikbud", "qscc", 'admin')
-        const blockIjazah = await network.contract.evaluateTransaction('GetBlockByTxID', 'academicchannel', listTxIdIjz[listTxIdIjz.length - 1])
-        const blockTranskrip = await network.contract.evaluateTransaction('GetBlockByTxID', 'academicchannel', listTxIdTsk[listTxIdTsk.length - 1])
+        const blockIjazah = await network.contract.evaluateTransaction('GetBlockByTxID', 'academicchannel', ijazah.approvalTxId[listTxIdIjz.length - 1])
+        const blockTranskrip = await network.contract.evaluateTransaction('GetBlockByTxID', 'academicchannel', transkrip.approvalTxId[listTxIdTsk.length - 1])
 
         identifier.ijazah = fabric.calculateBlockHash(BlockDecoder.decode(blockIjazah).header)
         identifier.transkrip = fabric.calculateBlockHash(BlockDecoder.decode(blockTranskrip).header)

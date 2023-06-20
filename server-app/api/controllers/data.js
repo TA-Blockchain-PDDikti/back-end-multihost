@@ -905,23 +905,7 @@ exports.getKelasByIdDosen = async(req, res) => {
 
         const idDosen = req.params.id
 
-        const allKelas = await dataService.getAllKelas(req.user.username) 
-        const result = allKelas.filter(x => x.listPtk.includes(idDosen))
-        console.log("res", result)
-        await Promise.all(result.map( async(item, index) => {
-            if (item.listPtk) {
-                const list = item.listPtk
-                await Promise.all(list.map( async(dosen, index) => {
-                    const data = await dataService.getDosenById('admin', dosen, false)
-                    item.listPtk[index] = data
-                }))
-                const matkul = await dataService.getMataKuliahById('admin', item.idMk)
-                item.mk = matkul
-                result[index] = item
-                console.log("It", result)
-            }
-        }))
-        
+        const result = await dataService.getKelasByDosen(req.user.username)    
         res.status(200).send(result);
     } catch(error){
         res.status(400).send({
