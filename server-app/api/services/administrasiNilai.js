@@ -41,7 +41,6 @@ exports.getAcademicRecordById = async(user, id) => {
     network.gateway.disconnect()
 
     const data = JSON.parse(result)
-    data.signature = await fabric.getSignature(data.lastTxId)
     return data
 }
 
