@@ -28,6 +28,7 @@ exports.createAcademicCertificate = async(req, res) => {
             const idPT = item.idSp;
             const idProdi = item.idSms;
             const idMahasiswa = item.idPd;
+            const jenjangPendidikan = item.jenjangPendidikan;
             const totalMutu = item.totalMutu;
             const totalSks = item.totalSks;
             const ipk = item.ipk
