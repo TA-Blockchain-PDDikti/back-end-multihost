@@ -19,13 +19,20 @@ exports.createAcademicCertificate = async(req, res) => {
             const jenjangPendidikan = item.jenjangPendidikan;
             const nomorIjazah = item.nomorIjazah;
             const tanggalLulus = item.tanggalLulus;
+
+            argsIjazah = [idPT, idProdi, idMahasiswa, jenjangPendidikan, nomorIjazah, tanggalLulus]
+            await certificateService.createIjazah(req.user.username, argsIjazah)
+        }))
+
+        await Promise.all(dataLulusan.map( async(item, index) => {
+            const idPT = item.idSp;
+            const idProdi = item.idSms;
+            const idMahasiswa = item.idPd;
             const totalMutu = item.totalMutu;
             const totalSks = item.totalSks;
             const ipk = item.ipk
 
-            argsIjazah = [idPT, idProdi, idMahasiswa, jenjangPendidikan, nomorIjazah, tanggalLulus]
             argsTranskrip = [idPT, idProdi, idMahasiswa, jenjangPendidikan, totalMutu, totalSks, ipk] 
-            await certificateService.createIjazah(req.user.username, argsIjazah)
             await certificateService.createTranskrip(req.user.username, argsTranskrip)
         }))
         
@@ -317,8 +324,6 @@ exports.getIjazahByIdApprover = async(req, res) => {
         await Promise.all(lstProdi.map( async(item, index) => {
             const result = await certificateService.getIjazahByIdProdi(req.user.username, item.id)
             listIjazah.push(...result)
-            console.log(item.id, listIjazah)
-            
         }))
         res.status(200).send({
             listIjazah
@@ -345,9 +350,7 @@ exports.getTranskripByIdApprover = async(req, res) => {
         var listTranskrip = []
         await Promise.all(lstProdi.map( async(item, index) => {
             const result = await certificateService.getTranskripByIdProdi(req.user.username, item.id)
-            listIjazah.push(...result)
-            console.log(item.id, listTranskrip)
-            
+            listTranskrip.push(...result)         
         }))
 
         res.status(200).send({
