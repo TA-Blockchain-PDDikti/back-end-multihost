@@ -111,10 +111,11 @@ const getSignature = async(txId) => {
 }
 
 const getAllSignature = async(txIds) => {
-     await Promise.all(txIds.map( async(item, index) => {
-        txIds[index] = await getSignature(item)
+    lstTx = txIds
+     await Promise.all(lstTx.map( async(item, index) => {
+        lstTx[index] = await getSignature(item)
      }))
-    return txIds
+    return lstTx
 }
 
 module.exports = {getCcp, getWallet, connectToNetwork, getUserAttrs, calculateBlockHash, getSignature, getAllSignature}

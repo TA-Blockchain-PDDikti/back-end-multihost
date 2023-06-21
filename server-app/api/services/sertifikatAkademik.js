@@ -101,6 +101,7 @@ exports.createTranskrip = async(user, args) => {
     const idTranskrip = uuidv4()
     const network = await fabric.connectToNetwork("HE1", "tskcontract", user)
     const result = await network.contract.submitTransaction( "CreateTsk", idTranskrip, ...args)
+    console.log("CreateTranskrip",idTranskrip,)
     network.gateway.disconnect()
     return result;
 }
