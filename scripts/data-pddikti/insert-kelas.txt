@@ -1,0 +1,221 @@
+01:19:52 INFO    =============== Enroll Admin Network ==========
+01:19:52 INFO    =============== Login Admin PDDIKTI ==========
+01:19:52 INFO    =============== Skenario 2 : Create Pendidikan Tinggi, Prodi, Dosen, Mahasiswa, Matkul, Kelas  ==========
+01:19:52 INFO    {"success":true,"message":"Successfully Login","user":{"username":"humas-ui@ui.ac.id","userType":"admin PT","dataUser":"{\"idSp\":\"0D1E63E9-CBFB-4546-A242-875C310083A5\",\"namaSp\":\"Universitas Indonesia\"}"},"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Imh1bWFzLXVpQHVpLmFjLmlkIiwidXNlclR5cGUiOiJhZG1pbiBQVCIsImRhdGFVc2VyIjoie1wiaWRTcFwiOlwiMEQxRTYzRTktQ0JGQi00NTQ2LUEyNDItODc1QzMxMDA4M0E1XCIsXCJuYW1hU3BcIjpcIlVuaXZlcnNpdGFzIEluZG9uZXNpYVwifSIsImlhdCI6MTY4NjkzOTU5MiwiZXhwIjoxNjg2OTQ2NzkyfQ.wpVCXQgXowLjPhiKvNJ-BImn7trHWaNbGAqfPNaBKAw"}
+01:19:52 INFO    =============== Create Kelas ==========
+01:19:54 INFO    {'success': False, 'error': "Error: No valid responses from any peers. Errors:\n    peer=peer0.kemdikbud.example.com:7051, status=500, message=ER12-KelasKuliah with id '94A76282-C290-49B2-985A-0236E773DF37' already exists."}
+01:19:56 INFO    {'success': False, 'error': "Error: No valid responses from any peers. Errors:\n    peer=peer0.he1.example.com:9051, status=500, message=ER12-KelasKuliah with id 'CB7D1EC4-D6E0-47F9-8EFA-023D11838066' already exists."}
+01:20:00 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:20:04 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:20:06 INFO    {'success': False, 'error': "Error: No valid responses from any peers. Errors:\n    peer=peer0.kemdikbud.example.com:7051, status=500, message=ER12-KelasKuliah with id 'D5D394E4-7A73-4AD6-8EFD-067383D50CEC' already exists."}
+01:20:08 INFO    {'success': False, 'error': "Error: No valid responses from any peers. Errors:\n    peer=peer0.he1.example.com:9051, status=500, message=ER12-KelasKuliah with id '4F2F7A2D-6FA0-4ED0-9283-08F89A99ACA7' already exists."}
+01:20:10 INFO    {'success': False, 'error': "Error: No valid responses from any peers. Errors:\n    peer=peer0.he1.example.com:9051, status=500, message=ER12-KelasKuliah with id '4C042A31-1F0A-4DE1-B4DD-09635D95371C' already exists."}
+01:20:12 INFO    {'success': False, 'error': "Error: No valid responses from any peers. Errors:\n    peer=peer0.kemdikbud.example.com:7051, status=500, message=ER12-KelasKuliah with id 'D7C9F0FA-98BF-43EB-A564-09C9F3CF6060' already exists."}
+01:20:13 INFO    {'success': False, 'error': "Error: No valid responses from any peers. Errors:\n    peer=peer0.kemdikbud.example.com:7051, status=500, message=ER12-KelasKuliah with id '3B67F2A9-3A74-4123-AE2B-0A27B293F1F2' already exists."}
+01:20:15 INFO    {'success': False, 'error': "Error: No valid responses from any peers. Errors:\n    peer=peer0.kemdikbud.example.com:7051, status=500, message=ER12-KelasKuliah with id 'D080759A-39C5-429C-89EB-0A692052B871' already exists."}
+01:20:17 INFO    {'success': False, 'error': "Error: No valid responses from any peers. Errors:\n    peer=peer0.he1.example.com:9051, status=500, message=ER12-KelasKuliah with id '139B9204-20EA-4549-BF46-0ACDF49882B5' already exists."}
+01:20:19 INFO    {'success': False, 'error': "Error: No valid responses from any peers. Errors:\n    peer=peer0.kemdikbud.example.com:7051, status=500, message=ER12-KelasKuliah with id 'B5DAFD8F-5EEA-40EF-833D-0AEF406D600A' already exists."}
+01:20:21 INFO    {'success': False, 'error': "Error: No valid responses from any peers. Errors:\n    peer=peer0.kemdikbud.example.com:7051, status=500, message=ER12-KelasKuliah with id '8B4D22DC-7EE6-4BB7-997E-0B12A072C6B4' already exists."}
+01:20:23 INFO    {'success': False, 'error': "Error: No valid responses from any peers. Errors:\n    peer=peer0.he1.example.com:9051, status=500, message=ER12-KelasKuliah with id 'A3D1C238-B2CF-48E6-85FF-0BF508022EBB' already exists."}
+01:20:24 INFO    {'success': False, 'error': "Error: No valid responses from any peers. Errors:\n    peer=peer0.kemdikbud.example.com:7051, status=500, message=ER12-KelasKuliah with id '5A543549-BF46-40C5-A580-0C20047CA7BF' already exists."}
+01:20:28 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:20:30 INFO    {'success': False, 'error': "Error: No valid responses from any peers. Errors:\n    peer=peer0.kemdikbud.example.com:7051, status=500, message=ER12-KelasKuliah with id '6226144B-38F1-4F08-AC6F-0D07424070BF' already exists."}
+01:20:34 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:20:36 INFO    {'success': False, 'error': "Error: No valid responses from any peers. Errors:\n    peer=peer0.he1.example.com:9051, status=500, message=ER12-KelasKuliah with id 'C1DE147F-3BB3-4F3C-BEF9-1070EB1C5680' already exists."}
+01:20:38 INFO    {'success': False, 'error': "Error: No valid responses from any peers. Errors:\n    peer=peer0.he1.example.com:9051, status=500, message=ER12-KelasKuliah with id '5E90E8EB-36F0-4882-8AF2-11F31342D6A8' already exists."}
+01:20:40 INFO    {'success': False, 'error': "Error: No valid responses from any peers. Errors:\n    peer=peer0.he1.example.com:9051, status=500, message=ER12-KelasKuliah with id '55F47273-9556-4BA7-9F09-11FE3605122D' already exists."}
+01:20:42 INFO    {'success': False, 'error': "Error: No valid responses from any peers. Errors:\n    peer=peer0.he1.example.com:9051, status=500, message=ER12-KelasKuliah with id '25D7E4B5-D907-4E4D-8EF3-15EC04BE6457' already exists."}
+01:20:44 INFO    {'success': False, 'error': "Error: No valid responses from any peers. Errors:\n    peer=peer0.he1.example.com:9051, status=500, message=ER12-KelasKuliah with id '9E4440BA-907A-4EF4-88AF-1669DA780133' already exists."}
+01:20:46 INFO    {'success': False, 'error': "Error: No valid responses from any peers. Errors:\n    peer=peer0.kemdikbud.example.com:7051, status=500, message=ER12-KelasKuliah with id '0001D544-A688-4174-99C0-1AA5AAA8382F' already exists."}
+01:20:48 INFO    {'success': False, 'error': "Error: No valid responses from any peers. Errors:\n    peer=peer0.he1.example.com:9051, status=500, message=ER12-KelasKuliah with id 'C4DBD7F2-296F-4D7F-A30C-1CF7E7E02EE6' already exists."}
+01:20:50 INFO    {'success': False, 'error': "Error: No valid responses from any peers. Errors:\n    peer=peer0.he1.example.com:9051, status=500, message=ER12-KelasKuliah with id 'C9663381-8508-428B-813C-1FFB1B7D54B8' already exists."}
+01:20:52 INFO    {'success': False, 'error': "Error: No valid responses from any peers. Errors:\n    peer=peer0.kemdikbud.example.com:7051, status=500, message=ER12-KelasKuliah with id 'E4118E0F-17CC-41A6-AF87-20EA7DF27554' already exists."}
+01:20:53 INFO    {'success': False, 'error': "Error: No valid responses from any peers. Errors:\n    peer=peer0.he1.example.com:9051, status=500, message=ER12-KelasKuliah with id 'BF4C5C16-E31B-4CFB-ABAC-215043D3EB31' already exists."}
+01:20:57 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:21:01 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:21:04 INFO    {'success': False, 'error': "Error: No valid responses from any peers. Errors:\n    peer=peer0.kemdikbud.example.com:7051, status=500, message=ER12-KelasKuliah with id 'C502B00A-3C82-494D-B061-26CA6882ACB5' already exists."}
+01:21:06 INFO    {'success': False, 'error': "Error: No valid responses from any peers. Errors:\n    peer=peer0.kemdikbud.example.com:7051, status=500, message=ER12-KelasKuliah with id '41F988EA-5659-4AD1-9726-26EA816FDC1E' already exists."}
+01:21:08 INFO    {'success': False, 'error': "Error: No valid responses from any peers. Errors:\n    peer=peer0.kemdikbud.example.com:7051, status=500, message=ER12-KelasKuliah with id '54BE3FD8-C943-4885-9191-2794F6EF4A07' already exists."}
+01:21:10 INFO    {'success': False, 'error': "Error: No valid responses from any peers. Errors:\n    peer=peer0.kemdikbud.example.com:7051, status=500, message=ER12-KelasKuliah with id '627310A7-C1B1-4BD7-95F8-28F671914C11' already exists."}
+01:21:14 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:21:18 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:21:22 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:21:26 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:21:30 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:21:34 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:21:39 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:21:44 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:21:48 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:21:52 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:21:56 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:22:00 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:22:04 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:22:08 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:22:12 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:22:16 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:22:21 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:22:25 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:22:29 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:22:33 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:22:37 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:22:41 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:22:45 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:22:49 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:22:53 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:22:58 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:23:03 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:23:09 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:23:16 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:23:21 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:23:25 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:23:29 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:23:34 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:23:37 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:23:42 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:23:46 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:23:50 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:23:54 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:23:58 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:24:03 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:24:07 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:24:11 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:24:15 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:24:19 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:24:23 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:24:27 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:24:32 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:24:36 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:24:40 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:24:44 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:24:49 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:24:53 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:24:57 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:25:01 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:25:05 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:25:09 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:25:13 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:25:17 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:25:21 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:25:25 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:25:29 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:25:33 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:25:37 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:25:41 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:25:45 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:25:49 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:25:53 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:25:57 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:26:01 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:26:06 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:26:09 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:26:14 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:26:18 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:26:22 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:26:26 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:26:30 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:26:35 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:26:40 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:26:44 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:26:48 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:26:52 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:26:56 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:27:01 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:27:05 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:27:10 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:27:14 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:27:19 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:27:23 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:27:27 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:27:32 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:27:36 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:27:40 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:27:45 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:27:49 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:27:52 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:27:57 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:28:01 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:28:06 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:28:10 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:28:14 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:28:18 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:28:22 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:28:26 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:28:31 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:28:35 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:28:40 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:28:44 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:28:48 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:28:52 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:28:56 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:29:00 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:29:04 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:29:08 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:29:12 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:29:16 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:29:20 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:29:24 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:29:29 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:29:33 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:29:38 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:29:42 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:29:46 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:29:50 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:29:54 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:29:58 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:30:03 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:30:07 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:30:11 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:30:15 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:30:19 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:30:23 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:30:28 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:30:32 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:30:36 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:30:40 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:30:44 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:30:48 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:30:52 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:30:56 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:31:01 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:31:05 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:31:09 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:31:14 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:31:18 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:31:22 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:31:26 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:31:31 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:31:35 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:31:39 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:31:43 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:31:48 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:31:52 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:31:56 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:32:00 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:32:04 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:32:08 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:32:12 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:32:16 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:32:20 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:32:24 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:32:28 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:32:33 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:32:37 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:32:41 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:32:45 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:32:49 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:32:53 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:32:57 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:33:01 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:33:05 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:33:09 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:33:13 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:33:17 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:33:22 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:33:26 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:33:30 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:33:34 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:33:38 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:33:42 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:33:46 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:33:50 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}
+01:33:55 INFO    {'success': True, 'message': 'Kelas telah ditambahkan'}

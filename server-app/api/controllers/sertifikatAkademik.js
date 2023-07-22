@@ -19,13 +19,21 @@ exports.createAcademicCertificate = async(req, res) => {
             const jenjangPendidikan = item.jenjangPendidikan;
             const nomorIjazah = item.nomorIjazah;
             const tanggalLulus = item.tanggalLulus;
+
+            argsIjazah = [idPT, idProdi, idMahasiswa, jenjangPendidikan, nomorIjazah, tanggalLulus]
+            await certificateService.createIjazah(req.user.username, argsIjazah)
+        }))
+
+        await Promise.all(dataLulusan.map( async(item, index) => {
+            const idPT = item.idSp;
+            const idProdi = item.idSms;
+            const idMahasiswa = item.idPd;
+            const jenjangPendidikan = item.jenjangPendidikan;
             const totalMutu = item.totalMutu;
             const totalSks = item.totalSks;
             const ipk = item.ipk
 
-            argsIjazah = [idPT, idProdi, idMahasiswa, jenjangPendidikan, nomorIjazah, tanggalLulus]
             argsTranskrip = [idPT, idProdi, idMahasiswa, jenjangPendidikan, totalMutu, totalSks, ipk] 
-            await certificateService.createIjazah(req.user.username, argsIjazah)
             await certificateService.createTranskrip(req.user.username, argsTranskrip)
         }))
         
@@ -310,15 +318,13 @@ exports.getIjazahByIdApprover = async(req, res) => {
         }
         const idApprover = req.params.id
         const approver = await dataService.getDosenById(req.user.username, idApprover) 
-        var lstProdi = await dataService.getProdiByPT(req.user.username, approver.sp.id)
+        var lstProdi = await dataService.getProdiByPT(req.user.username, approver.idSp)
         lstProdi = lstProdi.filter(x => x.approversIjz.includes(idApprover))
 
         var listIjazah = []
         await Promise.all(lstProdi.map( async(item, index) => {
             const result = await certificateService.getIjazahByIdProdi(req.user.username, item.id)
             listIjazah.push(...result)
-            console.log(item.id, listIjazah)
-            
         }))
         res.status(200).send({
             listIjazah
@@ -339,12 +345,14 @@ exports.getTranskripByIdApprover = async(req, res) => {
 
         const idApprover = req.params.id
         const approver = await dataService.getDosenById(req.user.username, idApprover) 
-        var prodi = await dataService.getProdiById(req.user.username, approver.sms.id)
-        
+        var lstProdi = await dataService.getProdiByPT(req.user.username, approver.idSp)
+        lstProdi = lstProdi.filter(x => x.approversTsk.includes(idApprover))
+
         var listTranskrip = []
-        if (prodi.approversTsk.includes(idApprover)){
-            listTranskrip = await certificateService.getTranskripByIdProdi(req.user.username, approver.sms.id)
-        }
+        await Promise.all(lstProdi.map( async(item, index) => {
+            const result = await certificateService.getTranskripByIdProdi(req.user.username, item.id)
+            listTranskrip.push(...result)         
+        }))
 
         res.status(200).send({
             listTranskrip
